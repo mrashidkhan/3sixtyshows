@@ -8,6 +8,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
+    <meta name="keywords" content="Rangotsav Holi Festival Tickets, Dew Events Center, Holi Celebration Tickets" />
+    <meta property="og:title" content="3Sixty Shows - The Premier Choice for Entertainment!" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="http://3sixtyshows.test/images/favicon.png" />
+    <meta property="og:url" content="http://3sixtyshows.test" />
+    <meta property="og:site_name" content="3sixtyshows" />
+    <meta property="og:description" content="At 3Sixty Shows, we go beyond organizing events; we create unforgettable experiences. Embark on an extraordinary journey with us, where imagination has no limits and entertainment reaches new heights. ENGAGING CONCERTS, LASTING MEMORIES, EASY TICKETING, HASSLE-FREE ACCESS, STRATEGIC PARTNERSHIPS &amp; POWERFUL ADVERTISING." />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="3sixtyshows" />
+    <meta name="twitter:title" content="3Sixty Shows - The Premier Choice for Entertainment!" />
+    <meta name="twitter:description" content="At 3Sixty Shows, we go beyond organizing events; we create unforgettable experiences. Embark on an extraordinary journey with us, where imagination has no limits and entertainment reaches new heights. ENGAGING CONCERTS, LASTING MEMORIES, EASY TICKETING, HASSLE-FREE ACCESS, STRATEGIC PARTNERSHIPS &amp; POWERFUL ADVERTISING." />
+    <meta name="twitter:image" content="http://3sixtyshows.test/images/favicon.png" />
+    <meta name="twitter:url" content="http://3sixtyshows.test" />
+    <meta name="description" content="At 3Sixty Shows, we go beyond organizing events; we create unforgettable experiences. Embark on an extraordinary journey with us, where imagination has no limits and entertainment reaches new heights. ENGAGING CONCERTS, LASTING MEMORIES, EASY TICKETING, HASSLE-FREE ACCESS, STRATEGIC PARTNERSHIPS &amp; POWERFUL ADVERTISING." />
+
     <link rel="stylesheet" href="{{ asset('assets/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/all.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/animate.css') }}">
@@ -19,10 +34,11 @@
     <link rel="stylesheet" href="{{ asset('assets/css/nice-select.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/jquery.animatedheadline.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/main.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/logo-slider.css') }}" />
 
     <link rel="shortcut icon" href="{{ asset('assets/images/favicon.png') }}" type="image/x-icon">
 
-    <title>Boleto  - Online Ticket Booking Website HTML Template</title>
+    <title>3SixtyShows</title>
 
 
 </head>
@@ -48,25 +64,32 @@
     <!-- ==========Header-Section========== -->
     <header class="header-section">
         <div class="container">
+            
             <div class="header-wrapper">
                 <div class="logo">
-                    <a href="index.html">
-                        <img src="{{ asset('assets/images/logo/logo.png') }}" alt="logo">
+                    <a href="{{ route('index') }}">
+                        <img src="{{ asset('assets/images/logo/favicon.png') }}" alt="logo">
                     </a>
                 </div>
                 <ul class="menu">
                     <li>
-                        <a href="#0" class="active">Home</a>
-                        <ul class="submenu">
+                        <a href="{{ route('index') }}" class="active">Home</a>
+                        {{-- <ul class="submenu">
                             <li>
                                 <a href="#0" class="active">Home One</a>
                             </li>
                             <li>
                                 <a href="index-2.html">Home Two</a>
                             </li>
-                        </ul>
+                        </ul> --}}
                     </li>
                     <li>
+                        <a href="{{ route('aboutus') }}">About</a>
+                    </li>
+                    <li>
+                        <a href="{{ route('activeevents') }}">Active Events</a>
+                    </li>
+                    {{-- <li>
                         <a href="#0">movies</a>
                         <ul class="submenu">
                             <li>
@@ -94,8 +117,8 @@
                                 <a href="popcorn.html">Movie Food</a>
                             </li>
                         </ul>
-                    </li>
-                    <li>
+                    </li> --}}
+                    {{-- <li>
                         <a href="#0">events</a>
                         <ul class="submenu">
                             <li>
@@ -114,7 +137,7 @@
                                 <a href="event-checkout.html">Event Checkout</a>
                             </li>
                         </ul>
-                    </li>
+                    </li> --}}
                     <li>
                         <a href="#0">sports</a>
                         <ul class="submenu">
@@ -167,7 +190,16 @@
                         <a href="contact.html">contact</a>
                     </li>
                     <li class="header-button pr-0">
-                        <a href="sign-up.html">join us</a>
+                        @auth
+                            <a href="{{ route('user_logout') }}"
+                               onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
+                               class="btn btn-link">Logout</a>
+                            <form id="logout-form" action="{{ route('user_logout') }}" method="GET" style="display: none;">
+                                @csrf
+                            </form>
+                        @else
+                            <a href="{{ route('user_login') }}">Join Us</a>
+                        @endauth
                     </li>
                 </ul>
                 <div class="header-bar d-lg-none">

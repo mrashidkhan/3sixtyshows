@@ -6,11 +6,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasFactory, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -21,6 +20,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
     ];
 
     /**
@@ -34,11 +34,40 @@ class User extends Authenticatable
     ];
 
     /**
-     * The attributes that should be cast.
+     * Get the attributes that should be cast.
      *
-     * @var array<string, string>
+     * @return array<string, string>
      */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+        ];
+    }
+
+    // Add these relationships to your User model
+
+public function bookings()
+{
+    return $this->hasMany(Booking::class);
+}
+
+public function getIsAdminAttribute()
+{
+    // You should implement your own admin detection here
+    // This is just a placeholder
+    return $this->email === 'admin@example.com';
+}
+
+private function authorizeAdmin()
+{
+    if (!Auth::check() || !Auth::user()->isAdmin()) {
+        return redirect()->route('user_login')->with('error', 'You are not authorized to access this page.');
+    }
+}
+public function isAdmin()
+    {
+        return $this->role === 'admin';
+    }
 }

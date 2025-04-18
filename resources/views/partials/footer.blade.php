@@ -2,15 +2,15 @@
 <footer class="footer-section">
     <div class="newslater-section padding-bottom">
         <div class="container">
-            <div class="newslater-container bg_img" data-background="assets/images/newslater/newslater-bg01.jpg">
+            <div class="newslater-container bg_img">
                 <div class="newslater-wrapper">
-                    <h5 class="cate">subscribe to Boleto </h5>
-                    <h3 class="title">to get exclusive benifits</h3>
-                    <form class="newslater-form">
+                    <h5 class="cate">contact 3Sixty Shows LLC</h5>
+                    <h3 class="title">+1-855-360-SHOWS</h3>
+                    <!-- <form class="newslater-form">
                         <input type="text" placeholder="Your Email Address">
-                        <button type="submit">subscribe</button>
-                    </form>
-                    <p>We respect your privacy, so we never share your info</p>
+                        <button type="submit" style="color:white;">subscribe</button>
+                    </form> -->
+                    <p>info@3SixtyShows.com</p>
                 </div>
             </div>
         </div>
@@ -19,32 +19,23 @@
         <div class="footer-top">
             <div class="logo">
                 <a href="index-1.html">
-                    <img src="{{ asset('assets/images/footer/footer-logo.png') }}" alt="footer">
+                    <img src="{{ asset('assets/images/logo/footerlogo.png') }}" width="170" height: auto;  alt="footer">
                 </a>
             </div>
             <ul class="social-icons">
                 <li>
-                    <a href="#0">
+                    <a href="https://www.facebook.com/3SixtyShows/" rel="alternate" target="_blank">
                         <i class="fab fa-facebook-f"></i>
                     </a>
                 </li>
                 <li>
-                    <a href="#0" class="active">
-                        <i class="fab fa-twitter"></i>
+                    <a href="https://www.youtube.com/%403sixtyshows" rel="alternate" target="_blank">
+                        <i class="fab fa-youtube"></i>
                     </a>
                 </li>
+
                 <li>
-                    <a href="#0">
-                        <i class="fab fa-pinterest-p"></i>
-                    </a>
-                </li>
-                <li>
-                    <a href="#0">
-                        <i class="fab fa-google"></i>
-                    </a>
-                </li>
-                <li>
-                    <a href="#0">
+                    <a href="https://www.instagram.com/3sixtyshows/"  rel="alternate"  target="_blank">
                         <i class="fab fa-instagram"></i>
                     </a>
                 </li>
@@ -53,7 +44,7 @@
         <div class="footer-bottom">
             <div class="footer-bottom-area">
                 <div class="left">
-                    <p>Copyright © 2020.All Rights Reserved By <a href="#0">Boleto </a></p>
+                    <p>Copyright © 2020.All Rights Reserved By <a href="#0"> 3Sixty Shows LLC </a></p>
                 </div>
                 <ul class="links">
                     <li>
@@ -93,6 +84,7 @@
 <script src="{{ asset('assets/js/viewport.jquery.js') }}"></script>
 <script src="{{ asset('assets/js/nice-select.js') }}"></script>
 <script src="{{ asset('assets/js/main.js') }}"></script>
+<script src="{{ asset('assets/js/logoslider.js"></script>
 </body>
 
 

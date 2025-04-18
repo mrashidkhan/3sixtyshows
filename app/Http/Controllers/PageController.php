@@ -17,20 +17,20 @@ class PageController extends Controller
     //     return view('pages.about',['pagetitle' => $pagetitle]);
     // }
 
-    public function about()
-    {
-    $pageClass = 'page-banner-section';
-    $pagetitle = 'About Us';
+    // public function about()
+    // {
+    // $pageClass = 'page-banner-section';
+    // $pagetitle = 'About Us';
 
-    return view('pages.about', compact('pageClass', 'pagetitle'));
-    }
+    // return view('pages.about', compact('pageClass', 'pagetitle'));
+    // }
 
     public function aboutus()
     {
     $pageClass = 'page-banner-aboutus';
     $pagetitle = 'About Us';
 
-    return view('pages.about', compact('pageClass', 'pagetitle'));
+    return view('pages.aboutus', compact('pageClass', 'pagetitle'));
     }
 
     // public function contact()
@@ -53,10 +53,10 @@ class PageController extends Controller
         return view('pages.gallery',['pagetitle' => $pagetitle]);
     }
 
-    public function events()
+    public function activeevents()
     {
-        $pagetitle = 'Past Events';
-        return view('pages.events',['pagetitle' => $pagetitle]);
+        $pagetitle = 'Active Events';
+        return view('pages.activeevents',['pagetitle' => $pagetitle]);
     }
 
     //

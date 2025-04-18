@@ -1,10 +1,10 @@
 @import url("https://fonts.googleapis.com/css?family=Open+Sans:400,400i,600,600i,700,700i,800&amp;display=swap");
 /*
-Template Name: Boleto - Online Ticket Booking Website HTML Template
+Template Name: BoxOfficeTech - Online Ticket Booking Website HTML Template
 Template URI: http://pixner.net/boleto/
 Author: pixelaxis
 Author URI: https: //themeforest.net/user/pixelaxis
-Description: Boleto | Online Ticket Booking Website HTML Template. Boleto is a Pixel-Perfect Powerful,
+Description: BoxOfficeTech | Online Ticket Booking Website HTML Template. BoxOfficeTech is a Pixel-Perfect Powerful,
 Online Ticket Booking Website HTML Template for all types of Cinema Hall and Online Premium TV Channel.
 Version: 1.0.0
 Text Domain:
@@ -862,19 +862,19 @@ input[type="submit"] {
 }
 
 .padding-top {
-  padding-top: 80px;
+  padding-top: 60px;
 }
 
 .padding-bottom {
-  padding-bottom: 80px;
+  padding-bottom: 60px;
 }
 
 @media (min-width: 992px) {
   .padding-top {
-    padding-top: 120px;
+    padding-top: 60px;
   }
   .padding-bottom {
-    padding-bottom: 120px;
+    padding-bottom: 60px;
   }
 }
 
@@ -1629,7 +1629,7 @@ input[type="submit"] {
 }
 
 .banner-content .title {
-  font-size: 60px;
+  font-size: 80px;
   line-height: 1.1;
   text-transform: uppercase;
   margin-bottom: 18px;
@@ -1801,6 +1801,10 @@ input[type="submit"] {
   .details-banner-wrapper .details-banner-thumb {
     width: calc(25% - 28px);
     display: block;
+  }
+  .seats-io-chart{
+      width:100%;
+      height:950px;
   }
 }
 
@@ -2056,6 +2060,11 @@ input[type="submit"] {
   .details-banner.hero-area .details-banner-wrapper .details-banner-content .title {
     font-size: 60px;
   }
+
+    .seats-io-chart {
+        width: 100%;
+        height: 500px;
+    }
 }
 
 .details-banner.hero-area .details-banner-wrapper .details-banner-content .tags {
@@ -2115,6 +2124,11 @@ input[type="submit"] {
     margin-bottom: 10px;
     line-height: 70px;
   }
+
+    .seats-io-chart {
+        width: 100%;
+        height: 700px;
+    }
 }
 
 .details-banner.event-details-banner.style-two::before {
@@ -2256,6 +2270,10 @@ input[type="submit"] {
   .speaker-banner-content .title {
     font-size: 60px;
   }
+    .seats-io-chart {
+        width: 100%;
+        height: 700px;
+    }
 }
 
 @media (max-width: 575px) {
@@ -2461,6 +2479,10 @@ input[type="submit"] {
     width: 40px;
     font-size: 24px;
   }
+    .seats-io-chart {
+        width: 100%;
+        height: 950px;
+    }
 }
 
 .widget-1 .widget-header {
@@ -3309,7 +3331,7 @@ input[type="submit"] {
 }
 
 .newslater-wrapper .title {
-  margin-bottom: 50px;
+  margin-bottom: 10px;
 }
 
 @media (max-width: 575px) {
@@ -3990,7 +4012,7 @@ input[type="submit"] {
   width: 130px;
   height: 130px;
   border-radius: 50%;
-  border: 1px solid rgba(49, 215, 169, 0.5);
+  /*border: 1px solid rgba(49, 215, 169, 0.5);*/
   margin: 0 auto;
   margin-bottom: 30px;
   padding: 10px;
@@ -4001,9 +4023,10 @@ input[type="submit"] {
 }
 
 .cast-item .cast-thumb img {
-  width: 100%;
-  border-radius: 50%;
-  border: 4px solid #31d7a9;
+    width: 100%;
+    border-radius: 50%;
+    border: 4px solid #31d7a9;
+    height: 112px;
 }
 
 .cast-item .cast-content {
@@ -4280,7 +4303,7 @@ input[type="submit"] {
 }
 
 .seat-plan-wrapper li .movie-schedule {
-  width: calc(100% - 45%);
+  /*width: calc(100% - 45%);*/
   padding: 30px;
   -webkit-box-pack: justify;
       -ms-flex-pack: justify;
@@ -4980,6 +5003,7 @@ input[type="submit"] {
 .grid--area .grid-item .grid-inner .grid-content .cart-button .cart-plus-minus .qtybutton.dec {
   left: 0;
   border-right: 1px solid #11326f;
+  z-index:5;
 }
 
 .grid--area .grid-item .grid-inner .grid-content .cart-button .custom-button {
@@ -6248,6 +6272,7 @@ input[type="submit"] {
 .cart-plus-minus .qtybutton.dec {
   left: 0;
   border-right: 1px solid #11326f;
+  z-index:5;
 }
 
 .event-cart {
@@ -6255,6 +6280,19 @@ input[type="submit"] {
       -ms-flex-align: center;
           align-items: center;
   margin-bottom: 10px;
+}
+
+.event-cart-ticket-count {
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    margin-bottom: 25px;
+    color: black;
+    margin-left: 87px;
+}
+
+.event-cart-ticket-count input {
+    color: black;
 }
 
 @media (max-width: 575px) {
@@ -6706,7 +6744,14 @@ input[type="submit"] {
   margin-bottom: 32px;
 }
 
-@media (max-width: 575px) {
+.leveldisplay-p {
+    color: #001232;
+    margin: 0;
+    margin-top: 10px !important;
+    margin-bottom: 10px !important;
+}
+
+/*@media (max-width: 575px) {
   .sports-ticket p {
     margin-bottom: 22px;
   }
@@ -6716,7 +6761,7 @@ input[type="submit"] {
   .sports-ticket p {
     margin-bottom: 22px;
   }
-}
+}*/
 
 .sports-ticket p span {
   font-weight: 700;
@@ -7505,7 +7550,7 @@ input[type="submit"] {
   border-radius: 0;
   border: none;
   border-bottom: 1px solid #23334f;
-  padding-left: 0;
+  padding-left: 10px;
 }
 
 .account-area .account-form .form-group input::-webkit-input-placeholder {
@@ -9112,3 +9157,252 @@ aside {
   }
 }
 /*# sourceMappingURL=main.css.map */
+
+.error-message {
+    color: #F7444B;
+    font-size: 11px;
+    display: none;
+}
+
+.form-group .nice-select {
+    background: transparent;
+    border: none;
+    color: #ffffff;
+    width:100%;
+}
+
+.form-group .current {
+    line-height: 42px;
+}
+
+.form-group .list {
+    max-height: 200px;
+    overflow-y: scroll;
+    color: #292929;
+    width: 100%;
+}
+
+    .form-group .list li {
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+
+.dropdown {
+    display: flex;
+}
+
+.type {
+    font-size: 14px;
+    margin-top: 6px;
+}
+
+.clientslogos img {
+    max-width: 60%;
+}
+.single_brand {
+    width:200px;
+    float:left;
+    padding:10px;
+    max-height:130px;
+
+}
+.galleryimage {
+    width:90%;
+}
+
+.box {
+}
+
+.home-banner .list-style .box {
+    display: flex;
+}
+
+.box h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-top: 15px;
+}
+
+.home-banner .box h3 {
+    font-size: 26px;
+}
+
+.home-banner .list-style .box h3 {
+    display: none;
+}
+
+.box .box-img {
+    background: #000;
+    position: relative;
+    text-align: center;
+    border-radius: 10px;
+    -webkit-transition: all .35s;
+    transition: all .35s;
+    overflow: hidden;
+}
+
+    .box .box-img img {
+        width: 100%;
+        margin: auto;
+        border-radius: 10px;
+    }
+
+    .box .box-img:hover {
+        transform: scale(1.05);
+    }
+
+.home-banner .box .box-img img {
+    max-height: 410px;
+    height: 100%;
+}
+
+.home-banner .list-style .box .box-img {
+    margin-right: 10px;
+    width: 100%;
+    height: 130px;
+    margin-bottom: 10px;
+}
+
+    .home-banner .list-style .box .box-img img {
+        max-height: 180px;
+        height: 100%;
+    }
+
+.box .box-img .box-content {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    background: rgba(0,0,0,0.5);
+    display: none;
+    align-items: center;
+    flex-direction: column;
+    align-content: space-between;
+    justify-content: center;
+}
+
+.box .box-img:hover .box-content {
+    display: flex;
+}
+
+.list-style .box .box-img .box-content {
+    display: none;
+}
+
+.box .btn {
+    max-width: 150px;
+    width: 100%;
+    font-size: 12px;
+}
+
+.box .btn-outline {
+    border: 1px solid #fff;
+    color: #fff;
+}
+
+.card {
+    -webkit-box-shadow: 0 0 30px 0 rgb(41 44 28 / 5%);
+    -ms-box-shadow: 0 0 30px 0 rgba(41,44,28,.045);
+    box-shadow: 0 0 30px 0 rgb(41 44 28 / 7%);
+    border: none;
+}
+
+    .card .card-body {
+        padding: 40px;
+    }
+
+
+.topbottom20pxpadding {
+    padding-top:20px;
+    padding-bottom:20px;
+}
+
+.gallery-grid {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-content: center;
+    justify-content: center;
+    align-items: center;
+}
+
+    .gallery-grid .item {
+        width: 25%;
+    }
+
+        .gallery-grid .item img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+        }
+        .gallery-grid .item a {
+            width: 100%;
+        }
+
+.payment-button {
+    width: 200px;
+    text-align: center;
+}
+
+.team-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+}
+
+.team {
+    text-align: center;
+    flex-basis: 29%;
+    margin:10px;
+}
+    .team img {
+        width: 230px;
+        height: 230px;
+        border-radius: 50%;
+        margin-bottom: 10px;
+        margin:20px;
+    }
+
+.item-content > a:hover {
+    text-decoration: underline;
+}
+
+.teambg1 {
+    background-color: #00acef;
+}
+
+.teambg2 {
+    background-color: #554cb8;
+}
+
+.teambg3 {
+    background-color: #f9d365;
+}
+
+.teambg4 {
+    background-color: #fc0a7c;
+}
+
+.teambg5 {
+    background-color: #44d7b6;
+}
+
+.team-designation {
+    font-weight:bold;
+    color:#ffffff;
+    font-size:14px;
+}
+.spnsor-bg-color {
+    background-color: #dbe2fb;
+
+}
+
+.spnsor-border {
+    border-style: solid;
+    border-color: #dbe2fb;
+}
+
+
