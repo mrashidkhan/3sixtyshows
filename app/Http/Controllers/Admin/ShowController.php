@@ -7,8 +7,9 @@ use App\Models\Show;
 use App\Models\ShowCategory;
 use App\Models\Venue;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
+use Illuminate\Support\Facades\Storage;
+
 
 class ShowController extends Controller
 {
@@ -39,60 +40,49 @@ class ShowController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'category_id' => 'required|exists:show_categories,id',
-            'venue_id' => 'required|exists:venues,id',
-            'description' => 'required|string',
-            'short_description' => 'nullable|string|max:500',
-            'featured_image' => 'required|image|mimes:jpeg,png,jpg|max:2048',
-            'start_date' => 'required|date',
-            'end_date' => 'nullable|date|after_or_equal:start_date',
-            'price' => 'nullable|numeric|min:0',
-            'available_tickets' => 'nullable|integer|min:0',
-            'is_featured' => 'boolean',
-            'status' => 'required|in:upcoming,ongoing,past,cancelled',
-            'performers' => 'nullable|array',
-            'duration' => 'nullable|string|max:50',
-            'age_restriction' => 'nullable|string|max:50',
-            'is_active' => 'boolean',
-        ]);
+{
+    $validated = $request->validate([
+        'title' => 'required|string|max:255',
+        'category_id' => 'required|exists:show_categories,id',
+        'venue_id' => 'required|exists:venues,id',
+        'description' => 'required|string',
+        'short_description' => 'nullable|string|max:500',
+        'featured_image' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+        'start_date' => 'required|date',
+        'end_date' => 'nullable|date|after_or_equal:start_date',
+        'price' => 'nullable|numeric|min:0',
+        'available_tickets' => 'nullable|integer|min:0',
+        'is_featured' => 'boolean',
+        'status' => 'required|in:upcoming,ongoing,past,cancelled',
+        'performers' => 'nullable|string',
+        'duration' => 'nullable|string|max:50',
+        'age_restriction' => 'nullable|string|max:50',
+        'is_active' => 'boolean',
+        'redirect' => 'boolean',
+        'redirect_url' => 'nullable|url|required_if:redirect,1',
+    ]);
 
-        // Handle image upload
-        if ($request->hasFile('featured_image')) {
-            $image = $request->file('featured_image');
-            $filename = time() . '.' . $image->getClientOriginalExtension();
-
-            // Store original image
-            $path = $image->storeAs('public/shows', $filename);
-
-            // Create thumbnail
-            $thumbnail = Image::make($image)
-                ->resize(400, null, function ($constraint) {
-                    $constraint->aspectRatio();
-                    $constraint->upsize();
-                })
-                ->encode();
-
-            Storage::put('public/shows/thumbnails/' . $filename, $thumbnail);
-
-            $validated['featured_image'] = $filename;
-        }
-
-        // Create show
-        $show = Show::create($validated);
-
-        return redirect()->route('shows.index')
-                        ->with('success', 'Show created successfully!');
+    // Simple image upload without manipulation
+    if ($request->hasFile('featured_image')) {
+        $file = $request->file('featured_image');
+        $filename = time() . '.' . $file->getClientOriginalExtension();
+        $path=$file->storeAs('shows', $filename);
+        $validated['featured_image'] = $path;
     }
+
+    // Create show
+    $show = Show::create($validated);
+
+    return redirect()->route('show.index')
+                    ->with('success', 'Show created successfully!');
+}
 
     public function show($id)
     {
         $show = Show::with(['category', 'venue', 'gallery'])
                    ->findOrFail($id);
 
-        return view('shows.show', compact('show'));
+        return view('admin.show.show', compact('show'));
     }
 
     public function edit($id)
@@ -124,19 +114,13 @@ class ShowController extends Controller
         'available_tickets' => 'nullable|integer|min:0',
         'is_featured' => 'required|boolean',
         'status' => 'required|in:upcoming,ongoing,past,cancelled',
+        'performers' => 'nullable|string',
         'duration' => 'nullable|string|max:50',
         'age_restriction' => 'nullable|string|max:50',
         'is_active' => 'required|boolean',
+        'redirect' => 'boolean',
+        'redirect_url' => 'nullable|url|required_if:redirect,1', // URL required if redirect is enabled
     ]);
-
-    // Handle the performers array (from performers_json hidden field)
-    if ($request->has('performers_json')) {
-        $validated['performers'] = json_decode($request->performers_json, true);
-    } elseif ($request->has('performers')) {
-        // Fallback in case the JavaScript processing didn't work
-        $performers = explode("\n", $request->performers);
-        $validated['performers'] = array_map('trim', array_filter($performers));
-    }
 
     // Handle the additional_info array (from additional_info_json hidden field)
     if ($request->has('additional_info_json')) {
@@ -160,35 +144,28 @@ class ShowController extends Controller
         $validated['additional_info'] = $additionalInfo;
     }
 
-    // // Handle image upload if present
-    // if ($request->hasFile('featured_image')) {
-    //     // Delete old image if exists
-    //     if ($show->featured_image) {
-    //         Storage::delete([
-    //             'public/shows/' . $show->featured_image,
-    //             'public/shows/thumbnails/' . $show->featured_image
-    //         ]);
-    //     }
+    // Handle image upload if present
+    if ($request->hasFile('featured_image')) {
+        // Delete old image if exists
+        if ($show->featured_image) {
+            Storage::delete('public/shows/' . $show->featured_image);
+        }
 
-    //     // Upload new image
-    //     $image = $request->file('featured_image');
-    //     $filename = time() . '.' . $image->getClientOriginalExtension();
+        // Upload new image
+        $image = $request->file('featured_image');
+        $filename = time() . '.' . $image->getClientOriginalExtension();
 
-    //     // Store original image
-    //     $path = $image->storeAs('public/shows', $filename);
+        // Store image
+        $path = $image->storeAs('shows', $filename);
 
-    //     // Create thumbnail
-    //     $thumbnail = Image::make($image)
-    //         ->resize(400, null, function ($constraint) {
-    //             $constraint->aspectRatio();
-    //             $constraint->upsize();
-    //         })
-    //         ->encode();
+        // Save filename to database
+        $validated['featured_image'] = $path;
+    }
 
-    //     Storage::put('public/shows/thumbnails/' . $filename, $thumbnail);
-
-    //     $validated['featured_image'] = $filename;
-    // }
+    // Clear redirect URL if redirect is disabled
+    if (!$request->has('redirect') || !$request->redirect) {
+        $validated['redirect_url'] = null;
+    }
 
     // Update show
     $show->update($validated);
@@ -207,16 +184,14 @@ class ShowController extends Controller
         // Delete images
         if ($show->featured_image) {
             Storage::delete([
-                'public/shows/' . $show->featured_image,
-                'public/shows/thumbnails/' . $show->featured_image
+                'public/shows/' . $show->featured_image
             ]);
         }
 
         // Delete associated gallery images
         foreach ($show->gallery as $galleryItem) {
             Storage::delete([
-                'public/gallery/' . $galleryItem->image,
-                'public/gallery/thumbnails/' . $galleryItem->image
+                'public/gallery/' . $galleryItem->image
             ]);
             $galleryItem->delete();
         }
@@ -224,7 +199,7 @@ class ShowController extends Controller
         // Delete show
         $show->delete();
 
-        return redirect()->route('shows.index')
+        return redirect()->route('show.index')
                         ->with('success', 'Show deleted successfully!');
     }
 }

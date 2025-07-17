@@ -56,6 +56,13 @@
                                     </select>
                                 </div>
                                 <div class="form-group mr-2">
+                                    <select name="redirect" class="form-control form-control-sm">
+                                        <option value="">All</option>
+                                        <option value="1" {{ request('redirect') == '1' ? 'selected' : '' }}>With Redirect</option>
+                                        <option value="0" {{ request('redirect') == '0' ? 'selected' : '' }}>No Redirect</option>
+                                    </select>
+                                </div>
+                                <div class="form-group mr-2">
                                     <input type="text" name="search" class="form-control form-control-sm" placeholder="Search titles..." value="{{ request('search') }}">
                                 </div>
                                 <button type="submit" class="btn btn-primary btn-sm">Filter</button>
@@ -96,6 +103,9 @@
                                         {{ $show->title }}
                                         @if($show->is_featured)
                                             <span class="badge badge-warning ml-1">Featured</span>
+                                        @endif
+                                        @if($show->redirect)
+                                            <span class="badge badge-info ml-1" title="{{ $show->redirect_url }}">Redirect</span>
                                         @endif
                                     </td>
                                     <td>{{ $show->category->name ?? 'None' }}</td>
@@ -141,8 +151,8 @@
                                             <a href="{{ route('show.edit', $show->id) }}" class="btn btn-info btn-sm" title="Edit">
                                                 <i class="fa fa-edit"></i>
                                             </a>
-                                            {{-- <a href="{{ route('show.show', $show->id) }}" class="btn btn-primary btn-sm" title="View">
-                                                <i class="fa fa-eye"></i> --}}
+                                            <a href="{{ route('shows.show', $show->id) }}" class="btn btn-primary btn-sm" title="View">
+                                                <i class="fa fa-eye"></i>
                                             </a>
                                             <a href="javascript:void(0)" data-id="{{ $show->id }}" class="btn btn-danger btn-sm show-delete" title="Delete">
                                                 <i class="fa fa-trash"></i>
@@ -207,7 +217,7 @@
         });
 
         // Auto-submit filter form when select fields change
-        document.querySelectorAll('select[name="category"], select[name="status"], select[name="is_active"]').forEach(function(select) {
+        document.querySelectorAll('select[name="category"], select[name="status"], select[name="is_active"], select[name="redirect"]').forEach(function(select) {
             select.addEventListener('change', function() {
                 this.form.submit();
             });

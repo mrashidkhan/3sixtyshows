@@ -15,16 +15,18 @@ class Show extends Model
         'title', 'slug', 'category_id', 'venue_id', 'description',
         'short_description', 'featured_image', 'start_date', 'end_date',
         'price', 'available_tickets', 'is_featured', 'status',
-        'performers', 'additional_info', 'duration', 'age_restriction', 'is_active'
+        'performers', 'additional_info', 'duration', 'age_restriction', 'is_active',
+        'redirect', 'redirect_url' // New fields added
     ];
 
     protected $casts = [
-        'performers' => 'array',
+        // 'performers' => 'array',
         'additional_info' => 'array',
         'start_date' => 'datetime',
         'end_date' => 'datetime',
         'is_featured' => 'boolean',
         'is_active' => 'boolean',
+        'redirect' => 'boolean', // New field casting
     ];
 
     public function category()
@@ -38,9 +40,9 @@ class Show extends Model
     }
 
     public function tickets()
-{
-    return $this->hasMany(Ticket::class);
-}
+    {
+        return $this->hasMany(Ticket::class);
+    }
 
     public function gallery()
     {
@@ -54,27 +56,27 @@ class Show extends Model
     }
 
     // One show has many posters
-public function posters()
-{
-    return $this->hasMany(Poster::class);
-}
+    public function posters()
+    {
+        return $this->hasMany(Poster::class);
+    }
 
-// One show has many photos
-public function photos()
-{
-    return $this->hasMany(PhotoGallery::class);
-}
+    // One show has many photos
+    public function photos()
+    {
+        return $this->hasMany(PhotoGallery::class);
+    }
 
-// One show has many videos
-public function videos()
-{
-    return $this->hasMany(VideoGallery::class);
-}
+    // One show has many videos
+    public function videos()
+    {
+        return $this->hasMany(VideoGallery::class);
+    }
 
-public function ticketTypes()
-{
-    return $this->hasMany(TicketType::class);
-}
+    public function ticketTypes()
+    {
+        return $this->hasMany(TicketType::class);
+    }
 
 
     // Get sold tickets count
@@ -166,23 +168,23 @@ public function ticketTypes()
     }
 
     // A show has many seat reservations
-public function seatReservations()
-{
-    return $this->hasMany(SeatReservation::class);
-}
+    public function seatReservations()
+    {
+        return $this->hasMany(SeatReservation::class);
+    }
 
-// Get available seats for this show
-public function getAvailableSeatsAttribute()
-{
-    // Get all seat IDs that are reserved for this show
-    $reservedSeatIds = $this->seatReservations()
-        ->whereIn('status', ['booked', 'reserved'])
-        ->pluck('seat_id');
+    // Get available seats for this show
+    public function getAvailableSeatsAttribute()
+    {
+        // Get all seat IDs that are reserved for this show
+        $reservedSeatIds = $this->seatReservations()
+            ->whereIn('status', ['booked', 'reserved'])
+            ->pluck('seat_id');
 
-    // Get venue's seats excluding the reserved ones
-    return Seat::where('venue_id', $this->venue_id)
-        ->where('is_active', true)
-        ->whereNotIn('id', $reservedSeatIds)
-        ->get();
-}
+        // Get venue's seats excluding the reserved ones
+        return Seat::where('venue_id', $this->venue_id)
+            ->where('is_active', true)
+            ->whereNotIn('id', $reservedSeatIds)
+            ->get();
+    }
 }

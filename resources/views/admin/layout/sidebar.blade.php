@@ -71,6 +71,50 @@
 
                         <li>
                             <a>
+                                <i class="fa fa-product-hunt"></i> Photo Gallery Manager
+                                <span class="fa fa-chevron-down"></span>
+                            </a>
+                            <ul class="nav child_menu" style="display: none;">
+                                <li><a href="{{ route('photogallery.list') }}">List</a></li>
+                                <li><a href="{{ route('photogallery.create') }}">Create</a></li>
+                            </ul>
+                        </li>
+
+                        <li>
+                            <a>
+                                <i class="fa fa-product-hunt"></i> Photos in Gallery
+                                <span class="fa fa-chevron-down"></span>
+                            </a>
+                            <ul class="nav child_menu" style="display: none;">
+                                <li><a href="{{ route('photosingallery.list') }}">List</a></li>
+                                <li><a href="{{ route('photosingallery.create') }}">Create</a></li>
+                            </ul>
+                        </li>
+
+                        <li>
+                            <a>
+                                <i class="fa fa-product-hunt"></i> Video Gallery Manager
+                                <span class="fa fa-chevron-down"></span>
+                            </a>
+                            <ul class="nav child_menu" style="display: none;">
+                                <li><a href="{{ route('videogallery.list') }}">List</a></li>
+                                <li><a href="{{ route('videogallery.create') }}">Create</a></li>
+                            </ul>
+                        </li>
+
+                        <li>
+                            <a>
+                                <i class="fa fa-product-hunt"></i> Videos in Gallery
+                                <span class="fa fa-chevron-down"></span>
+                            </a>
+                            <ul class="nav child_menu" style="display: none;">
+                                <li><a href="{{ route('videosingallery.list') }}">List</a></li>
+                                <li><a href="{{ route('videosingallery.create') }}">Create</a></li>
+                            </ul>
+                        </li>
+
+                        {{-- <li>
+                            <a>
                                 <i class="fa fa-product-hunt"></i> Customer Manager
                                 <span class="fa fa-chevron-down"></span>
                             </a>
@@ -78,10 +122,10 @@
                                 <li><a href="{{ route('customer.index') }}">List</a></li>
                                 <li><a href="{{ route('customer.create') }}">Create</a></li>
                             </ul>
-                        </li>
+                        </li> --}}
 
 
-                        <li>
+                        {{-- <li>
                             <a>
                                 <i class="fa fa-product-hunt"></i> Orders Manager
                                 <span class="fa fa-chevron-down"></span>
@@ -90,9 +134,9 @@
                                 <li><a href="{{ route('index') }}">Order List</a></li>
                                 <li><a href="{{ route('index') }}">Direct Order List</a></li>
                             </ul>
-                        </li>
+                        </li> --}}
 
-                        <li>
+                        {{-- <li>
                             <a>
                                 <i class="fa fa-ticket"></i> Coupon Manager
                                 <span class="fa fa-chevron-down"></span>
@@ -101,7 +145,7 @@
                                 <li><a href="{{ route('index') }}">List</a></li>
                                 <li><a href="{{ route('index') }}">Create</a></li>
                             </ul>
-                        </li>
+                        </li> --}}
 
                         <li>
                             <a><i class="fa fa-product-hunt"></i> User Manager<span class="fa fa-chevron-down"></span></a>

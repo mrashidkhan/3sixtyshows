@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class Customer extends Authenticatable
@@ -11,7 +10,7 @@ class Customer extends Authenticatable
     use HasFactory;
 
     protected $fillable = [
-        'name', 'email', 'phone', 'address', 'city', 'state',
+        'user_id', 'name', 'email', 'phone', 'address', 'city', 'state',
         'country', 'postal_code', 'password'
     ];
 
@@ -19,13 +18,20 @@ class Customer extends Authenticatable
         'password', 'remember_token',
     ];
 
-    // One customer can have many tickets
+    /**
+     * Get the user that owns the customer.
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    // Existing relationships remain the same
     public function tickets()
     {
         return $this->hasMany(Ticket::class);
     }
 
-    // One customer can have many bookings
     public function bookings()
     {
         return $this->hasMany(Booking::class);

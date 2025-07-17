@@ -70,4 +70,38 @@ public function isAdmin()
     {
         return $this->role === 'admin';
     }
+
+    /**
+     * Get the customer profile associated with the user.
+     */
+    public function customer()
+    {
+        return $this->hasOne(Customer::class);
+    }
+
+    /**
+     * Check if the user has a customer profile.
+     */
+    public function hasCustomerProfile()
+    {
+        return $this->customer()->exists();
+    }
+
+    /**
+     * Create a customer profile if one doesn't exist.
+     */
+    public function createCustomerProfile(array $attributes = [])
+    {
+        if (!$this->hasCustomerProfile()) {
+            // Pre-fill name and email from user if not provided
+            $defaults = [
+                'name' => $attributes['name'] ?? $this->name,
+                'email' => $attributes['email'] ?? $this->email
+            ];
+
+            return $this->customer()->create(array_merge($defaults, $attributes));
+        }
+
+        return $this->customer;
+    }
 }
