@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Show;
 
 class PageController extends Controller
 {
@@ -46,6 +47,13 @@ class PageController extends Controller
 
     return view('pages.contact', compact('pageClass', 'pagetitle'));
 }
+
+public function selection()
+    {
+        $show = Show::find(1);
+        $pagetitle = 'Seat Selection';
+        return view('frontend.seat-selection',['pagetitle' => $pagetitle,'show' => '$show']);
+    }
 
     public function gallery()
     {

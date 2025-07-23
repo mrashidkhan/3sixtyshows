@@ -1,0 +1,436 @@
+<?php
+
+// ADVANCED SEAT MANAGEMENT SYSTEM
+// This creates a seats.io-like experience for your users
+
+// 1. ENHANCED SEAT MODEL
+// app/Models/Seat.php
+<?php
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Seat extends Model
+{
+    protected $fillable = [
+        'venue_id', 'seat_category_id', 'section', 'row', 'seat_number',
+        'coordinates_x', 'coordinates_y', 'status', 'is_active', 'is_accessible',
+        'seat_metadata'
+    ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
+        'is_accessible' => 'boolean',
+        'coordinates_x' => 'float',
+        'coordinates_y' => 'float',
+        'seat_metadata' => 'array',
+    ];
+
+    // Seat statuses
+    const STATUS_AVAILABLE = 'available';
+    const STATUS_RESERVED = 'reserved';
+    const STATUS_SOLD = 'sold';
+    const STATUS_BLOCKED = 'blocked';
+
+    public function venue()
+    {
+        return $this->belongsTo(Venue::class);
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(SeatCategory::class, 'seat_category_id');
+    }
+
+    public function reservations()
+    {
+        return $this->hasMany(SeatReservation::class);
+    }
+
+    // Get seat identifier
+    public function getIdentifierAttribute()
+    {
+        return $this->section . '-' . $this->row . '-' . $this->seat_number;
+    }
+
+    // Check if seat is available for specific show
+    public function isAvailableForShow($showId)
+    {
+        if (!$this->is_active) return false;
+
+        return !$this->reservations()
+            ->where('show_id', $showId)
+            ->whereIn('status', ['reserved', 'sold', 'blocked'])
+            ->exists();
+    }
+
+    // Get seat status for specific show
+    public function getStatusForShow($showId)
+    {
+        $reservation = $this->reservations()
+            ->where('show_id', $showId)
+            ->first();
+
+        return $reservation ? $reservation->status : self::STATUS_AVAILABLE;
+    }
+}
+
+// 2. SEAT CATEGORY MODEL WITH PRICING
+// app/Models/SeatCategory.php
+<?php
+namespace App\Models;
+
+class SeatCategory extends Model
+{
+    protected $fillable = [
+        'name', 'description', 'color_code', 'base_price', 
+        'is_active', 'display_order', 'category_metadata'
+    ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
+        'base_price' => 'decimal:2',
+        'category_metadata' => 'array',
+    ];
+
+    public function seats()
+    {
+        return $this->hasMany(Seat::class);
+    }
+
+    public function showPricing()
+    {
+        return $this->hasMany(ShowSeatPricing::class);
+    }
+
+    // Get price for specific show
+    public function getPriceForShow($showId)
+    {
+        $pricing = $this->showPricing()
+            ->where('show_id', $showId)
+            ->first();
+
+        return $pricing ? $pricing->price : $this->base_price;
+    }
+}
+
+// 3. SHOW-SPECIFIC SEAT PRICING
+// app/Models/ShowSeatPricing.php
+<?php
+namespace App\Models;
+
+class ShowSeatPricing extends Model
+{
+    protected $fillable = [
+        'show_id', 'seat_category_id', 'price', 'is_active'
+    ];
+
+    protected $casts = [
+        'price' => 'decimal:2',
+        'is_active' => 'boolean',
+    ];
+
+    public function show()
+    {
+        return $this->belongsTo(Show::class);
+    }
+
+    public function seatCategory()
+    {
+        return $this->belongsTo(SeatCategory::class);
+    }
+}
+
+// 4. ADVANCED SEAT RESERVATION MODEL
+// app/Models/SeatReservation.php
+<?php
+namespace App\Models;
+
+class SeatReservation extends Model
+{
+    protected $fillable = [
+        'show_id', 'seat_id', 'user_id', 'booking_id', 'status',
+        'reserved_until', 'price_paid', 'reservation_metadata'
+    ];
+
+    protected $casts = [
+        'reserved_until' => 'datetime',
+        'price_paid' => 'decimal:2',
+        'reservation_metadata' => 'array',
+    ];
+
+    // Reservation statuses
+    const STATUS_TEMPORARY = 'temporary';
+    const STATUS_RESERVED = 'reserved';
+    const STATUS_SOLD = 'sold';
+    const STATUS_BLOCKED = 'blocked';
+    const STATUS_CANCELLED = 'cancelled';
+
+    public function show()
+    {
+        return $this->belongsTo(Show::class);
+    }
+
+    public function seat()
+    {
+        return $this->belongsTo(Seat::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function booking()
+    {
+        return $this->belongsTo(Booking::class);
+    }
+
+    // Scope for active reservations
+    public function scopeActive($query)
+    {
+        return $query->whereIn('status', [self::STATUS_RESERVED, self::STATUS_SOLD]);
+    }
+
+    // Scope for expired temporary reservations
+    public function scopeExpired($query)
+    {
+        return $query->where('status', self::STATUS_TEMPORARY)
+                    ->where('reserved_until', '<', now());
+    }
+
+    // Check if reservation is expired
+    public function isExpired()
+    {
+        return $this->status === self::STATUS_TEMPORARY && 
+               $this->reserved_until < now();
+    }
+}
+
+// 5. SEAT MANAGEMENT SERVICE
+// app/Services/SeatManagementService.php
+<?php
+namespace App\Services;
+
+use App\Models\Show;
+use App\Models\Seat;
+use App\Models\SeatReservation;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
+
+class SeatManagementService
+{
+    public function getSeatsForShow($showId)
+    {
+        $cacheKey = "show_seats_{$showId}";
+        
+        return Cache::remember($cacheKey, 300, function () use ($showId) {
+            $show = Show::findOrFail($showId);
+            
+            return Seat::where('venue_id', $show->venue_id)
+                ->where('is_active', true)
+                ->with(['category', 'reservations' => function ($q) use ($showId) {
+                    $q->where('show_id', $showId)->active();
+                }])
+                ->get()
+                ->map(function ($seat) use ($showId) {
+                    return [
+                        'id' => $seat->id,
+                        'identifier' => $seat->identifier,
+                        'section' => $seat->section,
+                        'row' => $seat->row,
+                        'number' => $seat->seat_number,
+                        'x' => $seat->coordinates_x,
+                        'y' => $seat->coordinates_y,
+                        'category' => [
+                            'id' => $seat->category->id,
+                            'name' => $seat->category->name,
+                            'color' => $seat->category->color_code,
+                            'price' => $seat->category->getPriceForShow($showId),
+                        ],
+                        'status' => $seat->getStatusForShow($showId),
+                        'is_accessible' => $seat->is_accessible,
+                    ];
+                });
+        });
+    }
+
+    public function reserveSeatsTemporarily($showId, array $seatIds, $userId, $minutes = 10)
+    {
+        DB::beginTransaction();
+        
+        try {
+            $reservedSeats = [];
+            $expiresAt = Carbon::now()->addMinutes($minutes);
+            
+            foreach ($seatIds as $seatId) {
+                $seat = Seat::findOrFail($seatId);
+                
+                // Check if seat is available
+                if (!$seat->isAvailableForShow($showId)) {
+                    throw new \Exception("Seat {$seat->identifier} is not available");
+                }
+                
+                // Create temporary reservation
+                $reservation = SeatReservation::create([
+                    'show_id' => $showId,
+                    'seat_id' => $seatId,
+                    'user_id' => $userId,
+                    'status' => SeatReservation::STATUS_TEMPORARY,
+                    'reserved_until' => $expiresAt,
+                    'price_paid' => $seat->category->getPriceForShow($showId),
+                ]);
+                
+                $reservedSeats[] = [
+                    'seat_id' => $seatId,
+                    'identifier' => $seat->identifier,
+                    'price' => $reservation->price_paid,
+                    'expires_at' => $expiresAt,
+                ];
+            }
+            
+            DB::commit();
+            
+            // Clear cache
+            Cache::forget("show_seats_{$showId}");
+            
+            return $reservedSeats;
+            
+        } catch (\Exception $e) {
+            DB::rollback();
+            throw $e;
+        }
+    }
+
+    public function confirmReservations($showId, array $seatIds, $bookingId)
+    {
+        DB::beginTransaction();
+        
+        try {
+            SeatReservation::where('show_id', $showId)
+                ->whereIn('seat_id', $seatIds)
+                ->where('status', SeatReservation::STATUS_TEMPORARY)
+                ->update([
+                    'status' => SeatReservation::STATUS_SOLD,
+                    'booking_id' => $bookingId,
+                    'reserved_until' => null,
+                ]);
+            
+            DB::commit();
+            
+            // Clear cache
+            Cache::forget("show_seats_{$showId}");
+            
+        } catch (\Exception $e) {
+            DB::rollback();
+            throw $e;
+        }
+    }
+
+    public function releaseExpiredReservations()
+    {
+        $expired = SeatReservation::expired()->get();
+        
+        foreach ($expired as $reservation) {
+            $reservation->update(['status' => SeatReservation::STATUS_CANCELLED]);
+            Cache::forget("show_seats_{$reservation->show_id}");
+        }
+        
+        return $expired->count();
+    }
+
+    public function getSeatMapData($venueId)
+    {
+        return Cache::remember("venue_map_{$venueId}", 3600, function () use ($venueId) {
+            return Seat::where('venue_id', $venueId)
+                ->where('is_active', true)
+                ->with('category')
+                ->get()
+                ->groupBy('section')
+                ->map(function ($seats, $section) {
+                    return [
+                        'section' => $section,
+                        'seats' => $seats->map(function ($seat) {
+                            return [
+                                'id' => $seat->id,
+                                'row' => $seat->row,
+                                'number' => $seat->seat_number,
+                                'x' => $seat->coordinates_x,
+                                'y' => $seat->coordinates_y,
+                                'category_color' => $seat->category->color_code,
+                            ];
+                        }),
+                    ];
+                });
+        });
+    }
+}
+
+// 6. SEAT SELECTION CONTROLLER
+// app/Http/Controllers/SeatSelectionController.php
+<?php
+namespace App\Http\Controllers;
+
+use App\Services\SeatManagementService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
+class SeatSelectionController extends Controller
+{
+    private $seatService;
+
+    public function __construct(SeatManagementService $seatService)
+    {
+        $this->seatService = $seatService;
+    }
+
+    public function showSeatMap($showId)
+    {
+        $seats = $this->seatService->getSeatsForShow($showId);
+        
+        return view('frontend.seat-selection', [
+            'show_id' => $showId,
+            'seats' => $seats,
+        ]);
+    }
+
+    public function reserveSeats(Request $request)
+    {
+        $request->validate([
+            'show_id' => 'required|exists:shows,id',
+            'seat_ids' => 'required|array|min:1',
+            'seat_ids.*' => 'exists:seats,id',
+        ]);
+
+        try {
+            $reservations = $this->seatService->reserveSeatsTemporarily(
+                $request->show_id,
+                $request->seat_ids,
+                Auth::id()
+            );
+
+            return response()->json([
+                'success' => true,
+                'reservations' => $reservations,
+                'message' => 'Seats reserved for 10 minutes',
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 400);
+        }
+    }
+
+    public function getAvailableSeats($showId)
+    {
+        $seats = $this->seatService->getSeatsForShow($showId);
+        
+        return response()->json([
+            'seats' => $seats,
+            'last_updated' => now()->toISOString(),
+        ]);
+    }
+}

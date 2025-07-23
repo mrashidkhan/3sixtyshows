@@ -1,0 +1,2666 @@
+=== emails/contact.blade.php ===
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>New Contact Message</title>
+</head>
+<body>
+    <h1>New Contact Message</h1>
+    <p><strong>Name:</strong> {{ $contactData['name'] }}</p>
+    <p><strong>Email:</strong> {{ $contactData['email'] }}</p>
+    <p><strong>Subject:</strong> {{ $contactData['subject'] ?? 'No subject provided' }}</p>
+    <p><strong>Message:</strong> {{ $contactData['message'] }}</p>
+</body>
+</html>
+
+
+=== front/login.blade.php ===
+@extends('front.layout.layout')
+
+@section('content')
+    <div class="container mt-5">
+        <div class="row justify-content-center" style="margin-top: 100px;">
+            <div class="col-md-6">
+
+                @if (session('success'))
+            <div class="alert alert-success"
+                style="color: black; background-color: #d4edda; border: 1px solid #c3e6cb; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+                {{ session('success') }}
+            </div>
+        @endif
+
+        @if ($errors->any())
+            <div class="alert alert-danger"
+                style="color: black; background-color: #f8d7da; border: 1px solid #f5c6cb; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+                <ul style="list-style-type: none; padding-left: 0;">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+                <div class="card shadow mt-5">
+                    <div class="card-header text-center bg-primary text-white">
+                        <h4 class="mt-4">Login here!</h4>
+                    </div>
+                    <div class="card-body">
+                        @if ($errors->any())
+                            <div class="alert alert-danger">
+                                <ul>
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+                        <form action="{{ route('logincheck') }}" method="POST">
+                            @csrf
+                            <div class="form-group mb-3">
+                                <input type="email" name="emaillogin" id="emaillogin" class="form-control"
+                                    placeholder="Enter your email" required>
+                            </div>
+                            <div class="form-group mb-3">
+                                <input type="password" name="passwordlogin" id="passwordlogin" class="form-control"
+                                    placeholder="Enter your password" required>
+                            </div>
+                            <div class="form-group mb-3">
+                                <button type="submit" class="btn btn-primary w-100">Login</button>
+                            </div>
+                        </form>
+                        @if (session('success'))
+            <div class="alert alert-success"
+                style="color: black; background-color: #d4edda; border: 1px solid #c3e6cb; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+                {{ session('success') }}
+            </div>
+        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row justify-content-center" style="margin-top: 20px;">
+            <div class="col-md-6">
+                <div class="card mt-5">
+                    <div class="card-header text-center">
+                        <h4 class="bg-dark text-white">Signup here!</h4>
+                    </div>
+                    <div class="card-body">
+                        <form action="{{ route('user_store') }}" method="POST">
+                            @csrf
+                            <div class="mb-3">
+                                <input type="text" class="form-control" id="firstName" name="first_name"
+                                    placeholder="Enter your first name" required>
+                            </div>
+                            <div class="mb-3">
+                                <input type="text" class="form-control" id="lastName" name="last_name"
+                                    placeholder="Enter your last name" required>
+                            </div>
+                            <div class="mb-3">
+                                <input type="email" class="form-control" id="email" name="email"
+                                    placeholder="Enter your email" required>
+                            </div>
+                            <div class="mb-3">
+                                <input type="password" class="form-control" id="password" name="password"
+                                    placeholder="Enter your password" required>
+                            </div>
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-dark">Sign Up</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection
+
+
+=== front/layout/footer.blade.php ===
+
+<!-- Footer Start -->
+<div class="container-fluid bg-dark footer mt-5 pt-5 wow fadeIn" data-wow-delay="0.1s">
+    <div class="container py-4">
+        <div class="row g-4">
+            <!-- About Section -->
+            <div class="col-lg-3 col-md-6 mb-4">
+                <h2 class="fw-bold text-primary mb-4">3Sixty<span class="text-secondary">Shows</span></h2>
+                <p style="color:white">At 3Sixty Shows, we are not just creating events; we are crafting moments that last a lifetime.</p>
+            </div>
+
+            <!-- Address Section -->
+            <div class="col-lg-3 col-md-6 mb-4">
+                <h4 class="text-light mb-4">Address</h4>
+                <address>
+                    <p class="text-light"><i class="fa fa-map-marker-alt me-3 text-warning"></i>2727 LBJ Freeway, Suite 200 Dallas, TX, 75234</p>
+                    <p class="text-light"><i class="fa fa-phone-alt me-3 text-warning"></i>+92 304 76 71 316</p>
+                    <p>
+                        <i class="fa fa-envelope me-3 text-warning"></i>
+                        <a href="mailto:info@3SixtyShows.com" class="text-light">info@3SixtyShows.com</a>
+                    </p>
+                </address>
+            </div>
+
+            <!-- Quick Links Section -->
+            <div class="col-lg-3 col-md-6 mb-4">
+                <h4 class="text-light mb-4">Quick Links</h4>
+                <a href="{{ route('aboutus') }}" class="d-block text-light mb-2">
+                    <i class="fa fa-chevron-right me-2"></i>About Us
+                </a>
+                <a href="{{ route('index') }}" class="d-block text-light mb-2">
+                    <i class="fa fa-chevron-right me-2"></i>Recent Events
+                </a>
+                <a href="{{ route('activeevents') }}" class="d-block text-light mb-2">
+                    <i class="fa fa-chevron-right me-2"></i>Active Events
+                </a>
+
+            </div>
+
+            <!-- Social Media Section -->
+            <div class="col-lg-3 col-md-6 mb-4">
+                <h4 class="text-light mb-4">Follow Us</h4>
+                <p class="text-light">For unforgettable Bollywood events in Dallas, contact 3Sixty Shows today!</p>
+                <div class="d-flex pt-2">
+                    <a class="btn btn-square btn-outline-light rounded-circle me-1" href="https://x.com/Pattokinaturals" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a class="btn btn-square btn-outline-light rounded-circle me-1" href="https://www.facebook.com/pattokinaturals" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a class="btn btn-square btn-outline-light rounded-circle me-1" href="https://youtube.com/@pattokinaturals" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
+                        <i class="fab fa-youtube"></i>
+                    </a>
+                    <a class="btn btn-square btn-outline-light rounded-circle me-1" href="https://www.tiktok.com/@pattokinaturals" target="_blank" rel="noopener noreferrer" aria-label="TikTok">
+                        <i class="fab fa-tiktok"></i>
+                    </a>
+                    <a class="btn btn-square btn-outline-light rounded-circle me-0" href="https://wa.me/+9203047671316?text=Welcome%20to%20Pattoki%20Naturals!%20I%20am%20interested%20in%20your%20products." target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
+                        <i class="fab fa-whatsapp"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Bottom -->
+    <div class="container-fluid text-light py-4" style="background: #333;">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
+                    &copy; <a href="{{ route('index') }}" class="text-primary">3sixtyshows</a>, All Rights Reserved.
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    Designed by <a href="https://htmlcodex.com" target="_blank" rel="noopener noreferrer" class="text-light">HTML Codex</a> | Distributed by
+                    <a href="https://themewagon.com" target="_blank" rel="noopener noreferrer" class="text-light">ThemeWagon</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Footer End -->
+
+
+=== front/layout/header.blade.php ===
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="keywords" content="Rangotsav Holi Festival Tickets, Dew Events Center, Holi Celebration Tickets" />
+    <meta property="og:title" content="3Sixty Shows - The Premier Choice for Entertainment!" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="http://3sixtyshows.test/images/favicon.png" />
+    <meta property="og:url" content="http://3sixtyshows.test" />
+    <meta property="og:site_name" content="3sixtyshows" />
+    <meta property="og:description" content="At 3Sixty Shows, we go beyond organizing events; we create unforgettable experiences. Embark on an extraordinary journey with us, where imagination has no limits and entertainment reaches new heights. ENGAGING CONCERTS, LASTING MEMORIES, EASY TICKETING, HASSLE-FREE ACCESS, STRATEGIC PARTNERSHIPS &amp; POWERFUL ADVERTISING." />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="3sixtyshows" />
+    <meta name="twitter:title" content="3Sixty Shows - The Premier Choice for Entertainment!" />
+    <meta name="twitter:description" content="At 3Sixty Shows, we go beyond organizing events; we create unforgettable experiences. Embark on an extraordinary journey with us, where imagination has no limits and entertainment reaches new heights. ENGAGING CONCERTS, LASTING MEMORIES, EASY TICKETING, HASSLE-FREE ACCESS, STRATEGIC PARTNERSHIPS &amp; POWERFUL ADVERTISING." />
+    <meta name="twitter:image" content="http://3sixtyshows.test/images/favicon.png" />
+    <meta name="twitter:url" content="http://3sixtyshows.test" />
+    <meta name="description" content="At 3Sixty Shows, we go beyond organizing events; we create unforgettable experiences. Embark on an extraordinary journey with us, where imagination has no limits and entertainment reaches new heights. ENGAGING CONCERTS, LASTING MEMORIES, EASY TICKETING, HASSLE-FREE ACCESS, STRATEGIC PARTNERSHIPS &amp; POWERFUL ADVERTISING." />
+
+    <link rel="shortcut icon" href="{{ asset('assets/images/favicon.png') }}" type="image/x-icon">
+
+    <title>3SixtyShows</title>
+    {{-- <title>3Sixtyshows</title> --}}
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no">
+    <meta name="keywords" content="organic, natural products, Pattoki, Pakistan, skincare, health, wellness">
+    <meta name="description" content="Pattoki Naturals offers a wide range of organic and natural products sourced locally from Pattoki, Pakistan. Quality products for your health and wellness.">
+
+    <!-- Favicon -->
+    {{-- <link href="{{ asset('favicon.ico') }}" rel="icon" type="image/x-icon">
+    <link href="{{ asset('favicon.png') }}" rel="alternate icon" type="image/png"> --}}
+
+    <!-- Bootstrap 5 and other libraries -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500&family=Lora:wght@600;700&display=swap" rel="stylesheet">
+
+    <!-- Icon Font Stylesheet -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Libraries Stylesheet -->
+    <link href="{{ asset('lib/animate/animate.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('lib/owlcarousel/assets/owl.carousel.min.css') }}" rel="stylesheet">
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet">
+
+    <!-- Template Stylesheet -->
+    <link href="{{ asset('css/style.css') }}" rel="stylesheet">
+    {{-- <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Handle the plus button click
+            document.querySelectorAll('.btn-plus').forEach(button => {
+                button.addEventListener('click', function() {
+                    const itemId = this.getAttribute('data-id');
+                    const quantityInput = this.closest('.input-group').querySelector('.quantity-input');
+                    let quantity = parseInt(quantityInput.value) || 0;
+                    quantity++;
+                    quantityInput.value = quantity;
+
+                    // Update the cart session via AJAX
+                    updateCart(itemId, quantity);
+                });
+            });
+
+            // Handle the minus button click
+            document.querySelectorAll('.btn-minus').forEach(button => {
+                button.addEventListener('click', function() {
+                    const itemId = this.getAttribute('data-id');
+                    const quantityInput = this.closest('.input-group').querySelector('.quantity-input');
+                    let quantity = parseInt(quantityInput.value) || 0;
+
+                    if (quantity > 0) {
+                        quantity--;
+                        quantityInput.value = quantity;
+
+                        // Update the cart session via AJAX
+                        updateCart(itemId, quantity);
+                    }
+                });
+            });
+
+            function updateCart(itemId, quantity) {
+                fetch(`/cart/update/${itemId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}' // Include CSRF token for security
+                    },
+                    body: JSON.stringify({ quantity: quantity })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Optionally, you can update the total price displayed
+                    const totalPriceCell = document.querySelector('.total-price[data-price="' + itemId + '"]');
+                    const price = parseFloat(totalPriceCell.getAttribute('data-price'));
+                    totalPriceCell.innerHTML = 'Rs' + (price * quantity).toFixed(2);
+                })
+                .catch(error => console.error('Error updating cart:', error));
+            }
+        });
+    </script> --}}
+    <script src="https://cdn.ckeditor.com/4.16.0/standard/ckeditor.js"></script>
+    <script>
+        CKEDITOR.replace('description');
+    </script>
+
+
+</head>
+
+<body>
+    <!-- Navbar Start -->
+    <div class="container-fluid fixed-top px-0 wow fadeIn" data-wow-delay="0.1s">
+        <!-- Top Bar Start -->
+        <div class="top-bar row gx-0 align-items-center bg-success text-white d-none d-md-flex">
+            <div class="col-md-6 px-5 text-start">
+                <small><i class="fa fa-map-marker-alt me-2 text-warning"></i>Welcome to 3SixtyShows - Admin Portal</small>
+                <small class="ms-4"><i class="fa fa-envelope me-2"></i>info@3SixtyShows.com</small>
+            </div>
+            <div class="col-md-6 px-5 text-end">
+                <span class="navbar-text fw-bold text-warning">At 3Sixty Shows, we create unforgettable moments, not just events.</span>
+            </div>
+        </div>
+        <!-- Top Bar End -->
+        <marquee class="bg-success text-white py-1">
+            <i class="text-white">At 3Sixty Shows, we are your gateway to unforgettable entertainment experiences</i>
+        </marquee>
+        <!-- Navbar Start -->
+        <nav class="navbar navbar-expand-lg navbar-light bg-white py-2 px-lg-5">
+            <a href="{{ route('index') }}" class="navbar-brand ms-4 ms-lg-0">
+                <img src="{{ asset('assets/images/favicon.png') }}" alt="3Sixtyshows Logo" class="img-fluid me-3" style="height: 50px;">
+            </a>
+            <button class="navbar-toggler me-4" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarCollapse">
+                <div class="navbar-nav ms-auto p-2 p-lg-0">
+                    <a href="{{ route('index') }}" class="nav-item nav-link text-success fw-bold" aria-label="index">index</a>
+                    {{-- <a href="{{ route('shop') }}" class="nav-item nav-link text-success" aria-label="Products">Shop</a> --}}
+                    <a href="{{ route('aboutus') }}" class="nav-item nav-link text-success" aria-label="About Us">About Us</a>
+                    {{-- @auth
+    <a href="{{ route('my.orders') }}" class="nav-item nav-link text-success" aria-label="My Orders">My Orders</a>
+@endauth --}}
+
+                    {{-- <a href="{{ route('index') }}" class="nav-item nav-link text-success" aria-label="Contact Us">Contact Us</a> --}}
+                    {{-- <a href="{{ route('cart.view') }}" class="nav-item nav-link text-success" aria-label="Cart"><i class="bi bi-cart fs-6"></i> Cart</a> --}}
+                    @if (Auth::check())
+                        <a href="{{ route('user_logout') }}" class="nav-item nav-link text-success" aria-label="Log Out"><i class="fas fa-sign-out-alt"></i> Log Out</a>
+                    @else
+                        <a href="{{ route('user_login') }}" class="nav-item nav-link text-success" aria-label="Log In"><i class="fas fa-sign-in-alt"></i> Login</a>
+                    @endif
+                    @if (Auth::check())
+                <span class="navbar-text text-success me-3">
+                    Welcome, {{ Auth::user()->name }} <!-- Display the authenticated user's name -->
+                </span>
+                @endif
+
+                </div>
+            </div>
+        </nav>
+        <!-- Navbar End -->
+    </div>
+    <!-- Navbar End -->
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+=== front/layout/layout.blade.php ===
+
+<!-- Main Layout -->
+@include('front.layout.header')
+@yield('slider')
+@yield('content')
+@include('front.layout.footer')
+
+<!-- Back to Top Button -->
+<a href="#" class="btn btn-lg btn-primary btn-lg-square rounded-circle back-to-top" aria-label="Back to Top">
+    <i class="bi bi-arrow-up"></i>
+</a>
+
+<!-- JavaScript Libraries -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{{ asset('admin_themelib/wow/wow.min.js') }}"></script>
+<script src="{{ asset('admin_themelib/easing/easing.min.js') }}"></script>
+<script src="{{ asset('admin_themelib/waypoints/waypoints.min.js') }}"></script>
+<script src="{{ asset('admin_themelib/owlcarousel/owl.carousel.min.js') }}"></script>
+<script src="{{ asset('admin_theme/js/main.js') }}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle the plus button click
+        document.querySelectorAll('.btn-plus').forEach(button => {
+            button.addEventListener('click', function() {
+                const itemId = this.getAttribute('data-id');
+                const quantityInput = this.closest('.input-group').querySelector('.quantity-input');
+                let quantity = parseInt(quantityInput.value) || 0;
+                quantity++;
+                quantityInput.value = quantity;
+
+                // Update the cart session via AJAX
+                updateCart(itemId, quantity);
+                // Reload the page
+        location.reload();
+            });
+        });
+
+        // Handle the minus button click
+        document.querySelectorAll('.btn-minus').forEach(button => {
+            button.addEventListener('click', function() {
+                const itemId = this.getAttribute('data-id');
+                const quantityInput = this.closest('.input-group').querySelector('.quantity-input');
+                let quantity = parseInt(quantityInput.value) || 0;
+
+                // Check if quantity is greater than 1 before decrementing
+                if (quantity > 1) {
+                    quantity--;
+                    quantityInput.value = quantity;
+
+                    // Update the cart session via AJAX
+                    updateCart(itemId, quantity);
+                    // Reload the page
+        location.reload();
+                } else {
+                    // Optionally, you can show a message to the user
+                    alert("Quantity cannot be less than 1.");
+                }
+            });
+        });
+    });
+
+    function updateCart(itemId, quantity) {
+    fetch(`/cart/update/${itemId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}' // Include CSRF token for security
+        },
+        body: JSON.stringify({
+            quantity: quantity
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log(data.message); // Log success message if needed
+
+        // Update the cart item quantity and price in the DOM
+        document.querySelector(`#item-quantity-${itemId}`).innerText = data.updatedQuantity;
+        document.querySelector(`#item-total-${itemId}`).innerText = data.itemTotal;
+
+        // Update the cart total price
+        document.querySelector('#cart-total').innerText = data.cartTotal;
+
+    })
+   // .catch(error => {
+   //     console.error('Error updating cart:', error);
+   //     alert('An error occurred while updating the item. Please try again.');
+   // });
+}
+
+</script>
+
+@stack('footer-script')
+</body>
+
+</html>
+
+=== pages/aboutus.blade.php ===
+
+@extends('layouts.master')
+
+@section('content')
+    <!-- About Us Hero Section -->
+    {{-- <div class="hero-section" style="background-image: url('/images/about-hero.jpg');">
+        <div class="container">
+            <h1 class="page-title">About Us</h1>
+        </div>
+    </div> --}}
+
+    <!-- About Us Info Section -->
+    @include('partials.aboutusinfo')
+
+    <!-- Staff Section -->
+    @include('partials.staff')
+@endsection
+
+
+=== pages/activeevents.blade.php ===
+
+@extends('layouts.master')
+
+@section('content')
+
+
+    <!-- About Us Info Section -->
+    @include('partials.activeevents.bannersection')
+    @include('partials.activeevents.activeeventssection')
+
+@endsection
+
+
+=== pages/index.blade.php ===
+
+@extends('layouts.master')
+
+@section('title', 'Home')
+
+@section('page-title', 'Home')
+
+@section('content')
+
+    @include('partials.banner')
+    @include('partials.categorysection')
+    @include('partials.commingsoon')
+    @include('partials.pasteventssection')
+    {{-- @include('partials.ticket-search') --}}
+    {{-- @include('partials.movie-section') --}}
+    {{-- @include('partials.event-section') --}}
+    {{-- @include('partials.sports-section') --}}
+    @include('partials.sponsors-section')
+
+
+
+@endsection
+
+=== partials/aboutusinfo.blade.php ===
+<!-- ==========Banner-Section========== -->
+<section class="banner-section" style="padding-top:150px; padding-bottom:0px;">
+    <div class="banner-bg bg_img bg-fixed" data-background="https://mtpcdn.azurewebsites.net/cdn/whitelabel/3sixtyshows/images/banner/banner01.jpg?mt=20250123"></div>
+    <div class="container">
+        <div class="banner-content">
+            <h1 class="title cd-headline clip" style="font-size:52px;">
+                <span class="d-block" style="width:100%;">About Us</span>
+            </h1>
+
+            <p style="font-size:25px">Welcome to 3Sixty Shows - Your Premier Entertainment Experience!</p>
+        </div>
+    </div>
+</section>
+
+<!-- ==========About us content========== -->
+<section class="event-about padding-bottom" style="padding-top:60px;">
+    <div class="container">
+        <div class="row justify-content-between">
+            <div class="col-lg-7 col-xl-12">
+                <div class="event-about-content">
+                    <div class="section-header-3 left-style m-0">
+
+                        <p>At 3Sixty Shows, we are your gateway to unforgettable entertainment experiences that transcend cultural boundaries. Our company operates at the intersection of innovation, creativity, and community engagement, offering a diverse range of entertainment services across various segments. From heart-pounding concerts to seamless ticketing solutions, and from captivating sponsorships to strategic advertising placements, we are your one-stop destination for all things entertainment.</p>
+
+                        <p>
+
+                            <span class="cate">Captivating Concerts, Endless Memories</span>
+                            In the realm of live entertainment, our Concerts segment takes center stage. We specialize in hosting and promoting electrifying live Bollywood events, featuring India's top artists and musical extravaganzas. Our passion for delivering world-class performances drives us to collaborate with renowned artists and curate breathtaking shows that leave our audiences mesmerized. We turn rented third-party venues into pulsating hubs of cultural celebration, where music, dance, and emotion collide to create unforgettable memories.
+                        </p>
+
+                        <p>
+                            <span class="cate">Seamless Ticketing, Effortless Access</span>
+                            Within the heart of our operations lies the Ticketing segment, where we make the process of accessing extraordinary events simple and efficient. Our ticketing operations encompass everything from providing cutting-edge ticketing software and services to clients, to ensuring online accessibility for customers seeking event information and tickets. Through our user-friendly website, ticket outlets, and telephone call centers, we empower individuals to effortlessly secure their place at the events that matter most.
+                        </p>
+
+                        <p>
+                            <span class="cate">Strategic Sponsorship & Impactful Advertising</span>
+                            The Sponsorship &amp; Advertising segment at 3Sixty Shows is dedicated to amplifying the reach and impact of brands, both on a local and global scale. We craft opportunities for international, national, and local sponsorships, seamlessly integrating them into our vast network of venues, events, and websites. Through imaginative promotional programs, eye-catching signage, and strategically placed banner ads, we connect brands with their desired audiences, creating memorable experiences that resonate far beyond the event itself.
+                        </p>
+
+                        <p>
+                            <span class="cate">Our Journey and Beyond</span>
+                            Founded in the vibrant city of Dallas, Texas, 3Sixty Shows has become a beacon of innovation and excellence in the entertainment industry. With an unwavering commitment to the South Asian Community, we have garnered a reputation as a household name, providing cinematic entertainment experiences that captivate the senses and forge lasting connections. As we expand our horizons internationally, our dedication to bringing cultures together through exceptional entertainment remains at the core of our mission.
+                        </p>
+                        <p>At 3Sixty Shows, we are not just creating events; we are crafting moments that last a lifetime. Join us on this incredible journey where creativity knows no bounds, and entertainment takes on a whole new dimension.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- ==========About us content========== -->
+
+
+=== partials/banner.blade.php ===
+
+<!-- ==========Banner-Section========== -->
+{{-- <section class="banner-section">
+    <div class="banner-bg bg_img bg-fixed"  data-background="assets/images/banner/banner01.jpg"></div>
+
+    <div class="container">
+        <div class="banner-content">
+            <h2 class="title  cd-headline clip"><span class="d-block">Get Your Tickets Now!</span>
+                <span class="color-theme cd-words-wrapper p-0 m-0">
+                    <b class="is-visible">Secure Your Spot</b>
+
+                </span>
+            </h2>
+            <p>Safe, secure, reliable ticketing.Your ticket to live entertainment!</p>
+        </div>
+    </div>
+</section> --}}
+<!-- ==========Banner-Section========== -->
+
+<section class="banner-section" style="padding-top:160px; padding-bottom:0px;">
+    <div class="banner-bg bg_img bg-fixed" data-background="assets/images/banner/banner01.jpg"></div>
+    <div class="container">
+        <div class="banner-content">
+            <h1 class="title cd-headline clip" style="font-size:52px;">
+                <span class="d-block" style="width:100%;">Get Your Tickets Now!</span>
+                <span class="color-theme cd-words-wrapper p-0 m-0">
+                    <b style="color:#F5407E;font-size:32px;" class="is-visible">Secure Your Spot</b>
+
+                </span>
+            </h1>
+
+            <p style="font-size:20px">Safe, secure, reliable, and trusted ticketing. Your ticket to live entertainment!</p>
+        </div>
+
+    </div>
+</section>
+
+=== partials/categorysection.blade.php ===
+
+<!-- ==========Category-Section========== -->
+<section class="event-section padding-top padding-bottom bg-four">
+    <div class="container">
+        <div class="tab">
+            <div class="section-header-2">
+                <div class="left">
+                    <h2 class="title heading-color">Events</h2>
+                    <p class="heading-color" style="font-size:12px;">Be sure not to miss these Event today.</p>
+                </div>
+                <ul class="tab-menu">
+                    <li class="active">
+                        now showing
+                    </li>
+                </ul>
+            </div>
+            <div class="tab-area mb-30-none">
+                    <div class="tab-item active">
+                        <div class="owl-carousel owl-theme tab-slider">
+                                <div class="item">
+                                    <div class="event-grid">
+                                        <div class="movie-thumb c-thumb">
+                                            <a target=&#39;_blank&#39; href="http://Linktr.ee/3sixtyshows">
+
+                                                <img src="{{ url('assets/images/posters/hrithik-flyer-3-atlanta.jpg') }}" height="420" alt="Rangotsav-Holi-Festival--Atlanta">
+                                            </a>
+                                            <div class="event-date">
+                                                <h6 class="date-title">4</h6>
+                                                <span style="color:white;">Apr</span>
+                                            </div>
+                                        </div>
+                                        <div class="movie-content bg-one">
+                                            <h5 class="title m-0" style="padding-bottom:0px; border:0px;">
+                                                <a target=&#39;_blank&#39; href="http://Linktr.ee/3sixtyshows">Rangotsav Holi Festi...</a>
+                                            </h5>
+                                            <div class="movie-rating-percent title" style="justify-content:center">
+                                                <span style="color:white;">Global Mall</span>
+                                            </div>
+                                            <div class="movie-rating-percent" style="justify-content:center">
+                                                <a target=&#39;_blank&#39; href="http://Linktr.ee/3sixtyshows" class="custom-button">book now</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="event-grid">
+                                        <div class="movie-thumb c-thumb">
+                                            <a target=&#39;_blank&#39; href="http://Linktr.ee/3sixtyshows">
+
+                                                <img src="{{ url('assets/images/posters/hrithik-flyer-3-dallas.jpg') }}" height="420" alt="Rangotsav-Holi-Festival--Dallas">
+                                            </a>
+                                            <div class="event-date">
+                                                <h6 class="date-title">5</h6>
+                                                <span style="color:white;">Apr</span>
+                                            </div>
+                                        </div>
+                                        <div class="movie-content bg-one">
+                                            <h5 class="title m-0" style="padding-bottom:0px; border:0px;">
+                                                <a target=&#39;_blank&#39; href="http://Linktr.ee/3sixtyshows">Rangotsav Holi Festi...</a>
+                                            </h5>
+                                            <div class="movie-rating-percent title" style="justify-content:center">
+                                                <span style="color:white;">Dew Events Center</span>
+                                            </div>
+                                            <div class="movie-rating-percent" style="justify-content:center">
+                                                <a target=&#39;_blank&#39; href="http://Linktr.ee/3sixtyshows" class="custom-button">book now</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="event-grid">
+                                        <div class="movie-thumb c-thumb">
+                                            <a target=&#39;_blank&#39; href="http://Linktr.ee/3sixtyshows">
+
+                                                <img src="{{ url('assets/images/posters/hrithik-flyer-3-houston.jpg') }}" height="420" alt="Rangotsav-Holi-Festival--Houston">
+                                            </a>
+                                            <div class="event-date">
+                                                <h6 class="date-title">6</h6>
+                                                <span style="color:white;">Apr</span>
+                                            </div>
+                                        </div>
+                                        <div class="movie-content bg-one">
+                                            <h5 class="title m-0" style="padding-bottom:0px; border:0px;">
+                                                <a target=&#39;_blank&#39; href="http://Linktr.ee/3sixtyshows">Rangotsav Holi Festi...</a>
+                                            </h5>
+                                            <div class="movie-rating-percent title" style="justify-content:center">
+                                                <span style="color:white;">BH Ranch</span>
+                                            </div>
+                                            <div class="movie-rating-percent" style="justify-content:center">
+                                                <a target=&#39;_blank&#39; href="http://Linktr.ee/3sixtyshows" class="custom-button">book now</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="event-grid">
+                                        <div class="movie-thumb c-thumb">
+                                            <a target=&#39;_blank&#39; href="http://Linktr.ee/3sixtyshows">
+
+                                                <img src="{{ url('assets/images/posters/hrithik-flyer-3-nj.jpg') }}" height="420" alt="Rangotsav-Holi-Festival--New-Jersey">
+                                            </a>
+                                            <div class="event-date">
+                                                <h6 class="date-title">10</h6>
+                                                <span style="color:white;">Apr</span>
+                                            </div>
+                                        </div>
+                                        <div class="movie-content bg-one">
+                                            <h5 class="title m-0" style="padding-bottom:0px; border:0px;">
+                                                <a target=&#39;_blank&#39; href="http://Linktr.ee/3sixtyshows">Rangotsav Holi Festi...</a>
+                                            </h5>
+                                            <div class="movie-rating-percent title" style="justify-content:center">
+                                                <span style="color:white;">ROYAL BALL ROOM</span>
+                                            </div>
+                                            <div class="movie-rating-percent" style="justify-content:center">
+                                                <a target=&#39;_blank&#39; href="http://Linktr.ee/3sixtyshows" class="custom-button">book now</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="event-grid">
+                                        <div class="movie-thumb c-thumb">
+                                            <a target=&#39;_blank&#39; href="http://Linktr.ee/3sixtyshows">
+
+                                                <img src="{{ url('assets/images/posters/hrithik-flyer-3-chicago.jpg') }}" height="420" alt="Rangotsav-Holi-Festival--Chicago">
+                                            </a>
+                                            <div class="event-date">
+                                                <h6 class="date-title">12</h6>
+                                                <span style="color:white;">Apr</span>
+                                            </div>
+                                        </div>
+                                        <div class="movie-content bg-one">
+                                            <h5 class="title m-0" style="padding-bottom:0px; border:0px;">
+                                                <a target=&#39;_blank&#39; href="http://Linktr.ee/3sixtyshows">Rangotsav Holi Festi...</a>
+                                            </h5>
+                                            <div class="movie-rating-percent title" style="justify-content:center">
+                                                <span style="color:white;">NATIONAL INDIA HUB</span>
+                                            </div>
+                                            <div class="movie-rating-percent" style="justify-content:center">
+                                                <a target=&#39;_blank&#39; href="http://Linktr.ee/3sixtyshows" class="custom-button">book now</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="event-grid">
+                                        <div class="movie-thumb c-thumb">
+                                            <a target=&#39;_blank&#39; href="http://Linktr.ee/3sixtyshows">
+
+                                                <img src="{{ url('assets/images/posters/hrithik-flyer-3-bayarea.jpg') }}" height="420" alt="Rangotsav-Holi-Festival--Bay-Area">
+                                            </a>
+                                            <div class="event-date">
+                                                <h6 class="date-title">13</h6>
+                                                <span style="color:white;">Apr</span>
+                                            </div>
+                                        </div>
+                                        <div class="movie-content bg-one">
+                                            <h5 class="title m-0" style="padding-bottom:0px; border:0px;">
+                                                <a target=&#39;_blank&#39; href="http://Linktr.ee/3sixtyshows">Rangotsav Holi Festi...</a>
+                                            </h5>
+                                            <div class="movie-rating-percent title" style="justify-content:center">
+                                                <span style="color:white;">NewPark Mall (Parkin...</span>
+                                            </div>
+                                            <div class="movie-rating-percent" style="justify-content:center">
+                                                <a target=&#39;_blank&#39; href="http://Linktr.ee/3sixtyshows" class="custom-button">book now</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                        </div>
+                    </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+=== partials/commingsoon.blade.php ===
+
+<!-- ==========Comming Soon Event Section========== -->
+<section class="event-section padding-top padding-bottom bg-four">
+    <div class="container">
+        <div class="tab">
+            <div class="section-header-2">
+                <div class="left">
+                    <h2 class="title heading-color">Coming Soon</h2>
+                    <p class="heading-color" style="font-size:12px;">Events that you must enjoy in future</p>
+                </div>
+            </div>
+            <div class="tab-area mb-30-none">
+                    <div class="row">
+                                                        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
+                                <div class="event-grid" style="text-align:center;">
+                                    <div class="movie-thumb c-thumb">
+                                        <a href="http://Linktr.ee/3sixtyshows">
+                                            <img src="//mtimages.blob.core.windows.net/cdn-live/images/event/hritik-nj.jpg" height="420" alt="Rangotsav-Holi-Festival--New-Jersey">
+                                            <img src="{{ url('assets/images/posters/hrithik-flyer-3-nj.jpg') }}" height="420" alt="Rangotsav-Holi-Festival--New-Jersey">
+                                        </a>
+
+                                        <div class="event-date">
+                                            <h6 class="date-title">10</h6>
+                                            <span style="color:white;">Apr</span>
+                                        </div>
+                                    </div>
+                                    <div class="movie-content bg-one">
+                                        <h5 class="title m-0">
+
+                                            <a href="http://Linktr.ee/3sixtyshows">Rangotsav Holi Festi...</a>
+                                        </h5>
+                                        <div class="movie-rating-percent">
+                                            <span style="color:white;">ROYAL BALL ROOM</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
+                                <div class="event-grid" style="text-align:center;">
+                                    <div class="movie-thumb c-thumb">
+                                        <a href="http://Linktr.ee/3sixtyshows">
+                                            {{-- <img src="//mtimages.blob.core.windows.net/cdn-live/images/event/hrithik flyer 3 bay area.jpg" height="420" alt="Rangotsav-Holi-Festival--Bay-Area"> --}}
+                                            <img src="{{ url('assets/images/posters/hrithik-flyer-3-bayarea.jpg') }}" height="430" alt="Rangotsav-Holi-Festival--Bay-Area">
+                                        </a>
+
+                                        <div class="event-date">
+                                            <h6 class="date-title">13</h6>
+                                            <span style="color:white;">Apr</span>
+                                        </div>
+                                    </div>
+                                    <div class="movie-content bg-one">
+                                        <h5 class="title m-0">
+
+                                            <a href="http://Linktr.ee/3sixtyshows">Rangotsav Holi Festi...</a>
+                                        </h5>
+                                        <div class="movie-rating-percent">
+                                            <span style="color:white;">NewPark Mall (Parkin...</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                    </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+=== partials/event-section.blade.php ===
+
+<!-- ==========Event-Section========== -->
+<section class="event-section padding-top padding-bottom bg-four">
+    <div class="container">
+        <div class="tab">
+            <div class="section-header-2">
+                <div class="left">
+                    <h2 class="title">events</h2>
+                    <p>Be sure not to miss these Event today.</p>
+                </div>
+                <ul class="tab-menu">
+                    <li class="active">
+                        now showing
+                    </li>
+                    <li>
+                        coming soon
+                    </li>
+                    <li>
+                        exclusive
+                    </li>
+                </ul>
+            </div>
+            <div class="tab-area mb-30-none">
+                <div class="tab-item active">
+                    <div class="owl-carousel owl-theme tab-slider">
+                        <div class="item">
+                            <div class="event-grid">
+                                <div class="movie-thumb c-thumb">
+                                    <a href="#0">
+                                        <img src="assets/images/event/event01.jpg" alt="event">
+                                    </a>
+                                    <div class="event-date">
+                                        <h6 class="date-title">28</h6>
+                                        <span>Dec</span>
+                                    </div>
+                                </div>
+                                <div class="movie-content bg-one">
+                                    <h5 class="title m-0">
+                                        <a href="#0">Digital Economy Conference 2020</a>
+                                    </h5>
+                                    <div class="movie-rating-percent">
+                                        <span>327 Montague Street</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="event-grid">
+                                <div class="movie-thumb c-thumb">
+                                    <a href="#0">
+                                        <img src="assets/images/event/event02.jpg" alt="event">
+                                    </a>
+                                    <div class="event-date">
+                                        <h6 class="date-title">28</h6>
+                                        <span>Dec</span>
+                                    </div>
+                                </div>
+                                <div class="movie-content bg-one">
+                                    <h5 class="title m-0">
+                                        <a href="#0">web design conference 2020</a>
+                                    </h5>
+                                    <div class="movie-rating-percent">
+                                        <span>327 Montague Street</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="event-grid">
+                                <div class="movie-thumb c-thumb">
+                                    <a href="#0">
+                                        <img src="assets/images/event/event03.jpg" alt="event">
+                                    </a>
+                                    <div class="event-date">
+                                        <h6 class="date-title">28</h6>
+                                        <span>Dec</span>
+                                    </div>
+                                </div>
+                                <div class="movie-content bg-one">
+                                    <h5 class="title m-0">
+                                        <a href="#0">digital thinkers meetup</a>
+                                    </h5>
+                                    <div class="movie-rating-percent">
+                                        <span>327 Montague Street</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="event-grid">
+                                <div class="movie-thumb c-thumb">
+                                    <a href="#0">
+                                        <img src="assets/images/event/event04.jpg" alt="event">
+                                    </a>
+                                    <div class="event-date">
+                                        <h6 class="date-title">28</h6>
+                                        <span>Dec</span>
+                                    </div>
+                                </div>
+                                <div class="movie-content bg-one">
+                                    <h5 class="title m-0">
+                                        <a href="#0">world digital conference 2020</a>
+                                    </h5>
+                                    <div class="movie-rating-percent">
+                                        <span>327 Montague Street</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-item">
+                    <div class="owl-carousel owl-theme tab-slider">
+                        <div class="item">
+                            <div class="event-grid">
+                                <div class="movie-thumb c-thumb">
+                                    <a href="#0">
+                                        <img src="assets/images/event/event01.jpg" alt="event">
+                                    </a>
+                                    <div class="event-date">
+                                        <h6 class="date-title">28</h6>
+                                        <span>Dec</span>
+                                    </div>
+                                </div>
+                                <div class="movie-content bg-one">
+                                    <h5 class="title m-0">
+                                        <a href="#0">Digital Economy Conference 2020</a>
+                                    </h5>
+                                    <div class="movie-rating-percent">
+                                        <span>327 Montague Street</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="event-grid">
+                                <div class="movie-thumb c-thumb">
+                                    <a href="#0">
+                                        <img src="assets/images/event/event02.jpg" alt="event">
+                                    </a>
+                                    <div class="event-date">
+                                        <h6 class="date-title">28</h6>
+                                        <span>Dec</span>
+                                    </div>
+                                </div>
+                                <div class="movie-content bg-one">
+                                    <h5 class="title m-0">
+                                        <a href="#0">web design conference 2020</a>
+                                    </h5>
+                                    <div class="movie-rating-percent">
+                                        <span>327 Montague Street</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="event-grid">
+                                <div class="movie-thumb c-thumb">
+                                    <a href="#0">
+                                        <img src="assets/images/event/event03.jpg" alt="event">
+                                    </a>
+                                    <div class="event-date">
+                                        <h6 class="date-title">28</h6>
+                                        <span>Dec</span>
+                                    </div>
+                                </div>
+                                <div class="movie-content bg-one">
+                                    <h5 class="title m-0">
+                                        <a href="#0">digital thinkers meetup</a>
+                                    </h5>
+                                    <div class="movie-rating-percent">
+                                        <span>327 Montague Street</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="event-grid">
+                                <div class="movie-thumb c-thumb">
+                                    <a href="#0">
+                                        <img src="assets/images/event/event04.jpg" alt="event">
+                                    </a>
+                                    <div class="event-date">
+                                        <h6 class="date-title">28</h6>
+                                        <span>Dec</span>
+                                    </div>
+                                </div>
+                                <div class="movie-content bg-one">
+                                    <h5 class="title m-0">
+                                        <a href="#0">world digital conference 2020</a>
+                                    </h5>
+                                    <div class="movie-rating-percent">
+                                        <span>327 Montague Street</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-item">
+                    <div class="owl-carousel owl-theme tab-slider">
+                        <div class="item">
+                            <div class="event-grid">
+                                <div class="movie-thumb c-thumb">
+                                    <a href="#0">
+                                        <img src="assets/images/event/event01.jpg" alt="event">
+                                    </a>
+                                    <div class="event-date">
+                                        <h6 class="date-title">28</h6>
+                                        <span>Dec</span>
+                                    </div>
+                                </div>
+                                <div class="movie-content bg-one">
+                                    <h5 class="title m-0">
+                                        <a href="#0">Digital Economy Conference 2020</a>
+                                    </h5>
+                                    <div class="movie-rating-percent">
+                                        <span>327 Montague Street</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="event-grid">
+                                <div class="movie-thumb c-thumb">
+                                    <a href="#0">
+                                        <img src="assets/images/event/event02.jpg" alt="event">
+                                    </a>
+                                    <div class="event-date">
+                                        <h6 class="date-title">28</h6>
+                                        <span>Dec</span>
+                                    </div>
+                                </div>
+                                <div class="movie-content bg-one">
+                                    <h5 class="title m-0">
+                                        <a href="#0">web design conference 2020</a>
+                                    </h5>
+                                    <div class="movie-rating-percent">
+                                        <span>327 Montague Street</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="event-grid">
+                                <div class="movie-thumb c-thumb">
+                                    <a href="#0">
+                                        <img src="assets/images/event/event03.jpg" alt="event">
+                                    </a>
+                                    <div class="event-date">
+                                        <h6 class="date-title">28</h6>
+                                        <span>Dec</span>
+                                    </div>
+                                </div>
+                                <div class="movie-content bg-one">
+                                    <h5 class="title m-0">
+                                        <a href="#0">digital thinkers meetup</a>
+                                    </h5>
+                                    <div class="movie-rating-percent">
+                                        <span>327 Montague Street</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="event-grid">
+                                <div class="movie-thumb c-thumb">
+                                    <a href="#0">
+                                        <img src="assets/images/event/event04.jpg" alt="event">
+                                    </a>
+                                    <div class="event-date">
+                                        <h6 class="date-title">28</h6>
+                                        <span>Dec</span>
+                                    </div>
+                                </div>
+                                <div class="movie-content bg-one">
+                                    <h5 class="title m-0">
+                                        <a href="#0">world digital conference 2020</a>
+                                    </h5>
+                                    <div class="movie-rating-percent">
+                                        <span>327 Montague Street</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- ==========Event-Section========== -->
+
+=== partials/footer.blade.php ===
+
+<!-- ==========Footer-Section-Start========== -->
+<footer class="footer-section">
+    <div class="newslater-section padding-bottom">
+        <div class="container">
+            <div class="newslater-container bg_img">
+                <div class="newslater-wrapper">
+                    <h5 class="cate">contact 3Sixty Shows LLC</h5>
+                    <h3 class="title">+1-855-360-SHOWS</h3>
+                    <!-- <form class="newslater-form">
+                        <input type="text" placeholder="Your Email Address">
+                        <button type="submit" style="color:white;">subscribe</button>
+                    </form> -->
+                    <p>info@3SixtyShows.com</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="footer-top">
+            <div class="logo">
+                <a href="index-1.html">
+                    <img src="{{ asset('assets/images/logo/footerlogo.png') }}" width="170" height: auto;  alt="footer">
+                </a>
+            </div>
+            <ul class="social-icons">
+                <li>
+                    <a href="https://www.facebook.com/3SixtyShows/" rel="alternate" target="_blank">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                </li>
+                <li>
+                    <a href="https://www.youtube.com/%403sixtyshows" rel="alternate" target="_blank">
+                        <i class="fab fa-youtube"></i>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="https://www.instagram.com/3sixtyshows/"  rel="alternate"  target="_blank">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="footer-bottom">
+            <div class="footer-bottom-area">
+                <div class="left">
+                    <p>Copyright © 2020.All Rights Reserved By <a href="#0"> 3Sixty Shows LLC </a></p>
+                </div>
+                <ul class="links">
+                    <li>
+                        <a href="#0">About</a>
+                    </li>
+                    <li>
+                        <a href="#0">Terms Of Use</a>
+                    </li>
+                    <li>
+                        <a href="#0">Privacy Policy</a>
+                    </li>
+                    <li>
+                        <a href="#0">FAQ</a>
+                    </li>
+                    <li>
+                        <a href="#0">Feedback</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- ==========Footer-Section-End========== -->
+
+
+<script src="{{ asset('assets/js/jquery-3.3.1.min.js') }}"></script>
+<script src="{{ asset('assets/js/modernizr-3.6.0.min.js') }}"></script>
+<script src="{{ asset('assets/js/plugins.js') }}"></script>
+<script src="{{ asset('assets/js/bootstrap.min.js') }}"></script>
+<script src="{{ asset('assets/js/heandline.js') }}"></script>
+<script src="{{ asset('assets/js/isotope.pkgd.min.js') }}"></script>
+<script src="{{ asset('assets/js/magnific-popup.min.js') }}"></script>
+<script src="{{ asset('assets/js/owl.carousel.min.js') }}"></script>
+<script src="{{ asset('assets/js/wow.min.js') }}"></script>
+<script src="{{ asset('assets/js/countdown.min.js') }}"></script>
+<script src="{{ asset('assets/js/odometer.min.js') }}"></script>
+<script src="{{ asset('assets/js/viewport.jquery.js') }}"></script>
+<script src="{{ asset('assets/js/nice-select.js') }}"></script>
+<script src="{{ asset('assets/js/main.js') }}"></script>
+<script src="{{ asset('assets/js/logoslider.js"></script>
+</body>
+
+
+<!-- Mirrored from pixner.net/boleto/demo/index.html by HTTrack Website Copier/3.x [XR&CO'2014], Thu, 17 Oct 2024 14:12:44 GMT -->
+</html>
+
+=== partials/header.blade.php ===
+
+<!DOCTYPE html>
+<html lang="en">
+
+
+<!-- Mirrored from pixner.net/boleto/demo/index.html by HTTrack Website Copier/3.x [XR&CO'2014], Thu, 17 Oct 2024 14:11:53 GMT -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="keywords" content="Rangotsav Holi Festival Tickets, Dew Events Center, Holi Celebration Tickets" />
+    <meta property="og:title" content="3Sixty Shows - The Premier Choice for Entertainment!" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="http://3sixtyshows.test/images/favicon.png" />
+    <meta property="og:url" content="http://3sixtyshows.test" />
+    <meta property="og:site_name" content="3sixtyshows" />
+    <meta property="og:description" content="At 3Sixty Shows, we go beyond organizing events; we create unforgettable experiences. Embark on an extraordinary journey with us, where imagination has no limits and entertainment reaches new heights. ENGAGING CONCERTS, LASTING MEMORIES, EASY TICKETING, HASSLE-FREE ACCESS, STRATEGIC PARTNERSHIPS &amp; POWERFUL ADVERTISING." />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="3sixtyshows" />
+    <meta name="twitter:title" content="3Sixty Shows - The Premier Choice for Entertainment!" />
+    <meta name="twitter:description" content="At 3Sixty Shows, we go beyond organizing events; we create unforgettable experiences. Embark on an extraordinary journey with us, where imagination has no limits and entertainment reaches new heights. ENGAGING CONCERTS, LASTING MEMORIES, EASY TICKETING, HASSLE-FREE ACCESS, STRATEGIC PARTNERSHIPS &amp; POWERFUL ADVERTISING." />
+    <meta name="twitter:image" content="http://3sixtyshows.test/images/favicon.png" />
+    <meta name="twitter:url" content="http://3sixtyshows.test" />
+    <meta name="description" content="At 3Sixty Shows, we go beyond organizing events; we create unforgettable experiences. Embark on an extraordinary journey with us, where imagination has no limits and entertainment reaches new heights. ENGAGING CONCERTS, LASTING MEMORIES, EASY TICKETING, HASSLE-FREE ACCESS, STRATEGIC PARTNERSHIPS &amp; POWERFUL ADVERTISING." />
+
+    <link rel="stylesheet" href="{{ asset('assets/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/all.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/animate.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/flaticon.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/magnific-popup.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/odometer.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/owl.carousel.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/owl.theme.default.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/nice-select.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/jquery.animatedheadline.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/main.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/logo-slider.css') }}" />
+
+    <link rel="shortcut icon" href="{{ asset('assets/images/favicon.png') }}" type="image/x-icon">
+
+    <title>3SixtyShows</title>
+
+
+</head>
+
+<body>
+    <!-- ==========Preloader========== -->
+    <div class="preloader">
+        <div class="preloader-inner">
+            <div class="preloader-icon">
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </div>
+    <!-- ==========Preloader========== -->
+    <!-- ==========Overlay========== -->
+    <div class="overlay"></div>
+    <a href="#0" class="scrollToTop">
+        <i class="fas fa-angle-up"></i>
+    </a>
+    <!-- ==========Overlay========== -->
+
+    <!-- ==========Header-Section========== -->
+    <header class="header-section">
+        <div class="container">
+            
+            <div class="header-wrapper">
+                <div class="logo">
+                    <a href="{{ route('index') }}">
+                        <img src="{{ asset('assets/images/logo/favicon.png') }}" alt="logo">
+                    </a>
+                </div>
+                <ul class="menu">
+                    <li>
+                        <a href="{{ route('index') }}" class="active">Home</a>
+                        {{-- <ul class="submenu">
+                            <li>
+                                <a href="#0" class="active">Home One</a>
+                            </li>
+                            <li>
+                                <a href="index-2.html">Home Two</a>
+                            </li>
+                        </ul> --}}
+                    </li>
+                    <li>
+                        <a href="{{ route('aboutus') }}">About</a>
+                    </li>
+                    <li>
+                        <a href="{{ route('activeevents') }}">Active Events</a>
+                    </li>
+                    {{-- <li>
+                        <a href="#0">movies</a>
+                        <ul class="submenu">
+                            <li>
+                                <a href="movie-grid.html">Movie Grid</a>
+                            </li>
+                            <li>
+                                <a href="movie-list.html">Movie List</a>
+                            </li>
+                            <li>
+                                <a href="movie-details.html">Movie Details</a>
+                            </li>
+                            <li>
+                                <a href="movie-details-2.html">Movie Details 2</a>
+                            </li>
+                            <li>
+                                <a href="movie-ticket-plan.html">Movie Ticket Plan</a>
+                            </li>
+                            <li>
+                                <a href="movie-seat-plan.html">Movie Seat Plan</a>
+                            </li>
+                            <li>
+                                <a href="movie-checkout.html">Movie Checkout</a>
+                            </li>
+                            <li>
+                                <a href="popcorn.html">Movie Food</a>
+                            </li>
+                        </ul>
+                    </li> --}}
+                    {{-- <li>
+                        <a href="#0">events</a>
+                        <ul class="submenu">
+                            <li>
+                                <a href="events.html">Events</a>
+                            </li>
+                            <li>
+                                <a href="event-details.html">Event Details</a>
+                            </li>
+                            <li>
+                                <a href="event-speaker.html">Event Speaker</a>
+                            </li>
+                            <li>
+                                <a href="event-ticket.html">Event Ticket</a>
+                            </li>
+                            <li>
+                                <a href="event-checkout.html">Event Checkout</a>
+                            </li>
+                        </ul>
+                    </li> --}}
+                    <li>
+                        <a href="#0">sports</a>
+                        <ul class="submenu">
+                            <li>
+                                <a href="sports.html">Sports</a>
+                            </li>
+                            <li>
+                                <a href="sport-details.html">Sport Details</a>
+                            </li>
+                            <li>
+                                <a href="sports-ticket.html">Sport Ticket</a>
+                            </li>
+                            <li>
+                                <a href="sports-checkout.html">Sport Checkout</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#0">pages</a>
+                        <ul class="submenu">
+                            <li>
+                                <a href="about.html">About Us</a>
+                            </li>
+                            <li>
+                                <a href="apps-download.html">Apps Download</a>
+                            </li>
+                            <li>
+                                <a href="sign-in.html">Sign In</a>
+                            </li>
+                            <li>
+                                <a href="sign-up.html">Sign Up</a>
+                            </li>
+                            <li>
+                                <a href="404.html">404</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#0">blog</a>
+                        <ul class="submenu">
+                            <li>
+                                <a href="blog.html">Blog</a>
+                            </li>
+                            <li>
+                                <a href="blog-details.html">Blog Single</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="contact.html">contact</a>
+                    </li>
+                    <li class="header-button pr-0">
+                        @auth
+                            <a href="{{ route('user_logout') }}"
+                               onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
+                               class="btn btn-link">Logout</a>
+                            <form id="logout-form" action="{{ route('user_logout') }}" method="GET" style="display: none;">
+                                @csrf
+                            </form>
+                        @else
+                            <a href="{{ route('user_login') }}">Join Us</a>
+                        @endauth
+                    </li>
+                </ul>
+                <div class="header-bar d-lg-none">
+					<span></span>
+					<span></span>
+					<span></span>
+				</div>
+            </div>
+        </div>
+    </header>
+    <!-- ==========Header-Section========== -->
+
+
+=== partials/pasteventsection.blade.php ===
+
+<!-- ==========Past Event Section========== -->
+<section class="event-section padding-top padding-bottom bg-four">
+    <div class="container">
+        <div class="tab">
+            <div class="section-header-2">
+                <div class="left">
+                    <h2 class="title heading-color">Past Events</h2>
+                    <p class="heading-color" style="font-size:12px;">Events that you enjoyed in the past</p>
+                </div>
+            </div>
+            <div class="tab-area mb-30-none">
+                    <div class="tab-item active">
+                        <div class="owl-carousel owl-theme owl-reponsive- breakpoint tab-slider ">
+                                <div class="item">
+                                    <div class="event-grid">
+                                        <div class="movie-thumb c-thumb">
+                                            <a href="https://3sixtyshows.com/us/schaumburg/events/rangotsav-holi-festival---chicago-at-to-be-announced?frm=pe">
+                                                <img src="//mtimages.blob.core.windows.net/cdn-live/images/event/hrithik flyer 3 chicago.jpg" height="420" alt="Rangotsav-Holi-Festival--Chicago">
+                                            </a>
+                                            <div class="event-date">
+                                                <h6 class="date-title">12</h6>
+                                                <span style="color:white;">Feb</span>
+                                                <span style="color:white;">2025</span>
+                                            </div>
+                                        </div>
+                                        <div class="movie-content bg-one">
+                                            <h5 class="title m-0">
+                                                <a href="https://3sixtyshows.com/us/schaumburg/events/rangotsav-holi-festival---chicago-at-to-be-announced?frm=pe">Rangotsav Holi Festi...</a>
+                                            </h5>
+                                            <div class="movie-rating-percent">
+                                                <span style="color:white;">NATIONAL INDIA HUB</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="event-grid">
+                                        <div class="movie-thumb c-thumb">
+                                            <a href="https://3sixtyshows.com/us/irving/events/aaj-ki-raat-nye-2025-at-rayleigh-underground?frm=pe">
+                                                <img src="//mtimages.blob.core.windows.net/cdn-live/images/event/tammana_2.png" height="420" alt="Aaj-Ki-Raat-NYE-2025">
+                                            </a>
+                                            <div class="event-date">
+                                                <h6 class="date-title">31</h6>
+                                                <span style="color:white;">Dec</span>
+                                                <span style="color:white;">2024</span>
+                                            </div>
+                                        </div>
+                                        <div class="movie-content bg-one">
+                                            <h5 class="title m-0">
+                                                <a href="https://3sixtyshows.com/us/irving/events/aaj-ki-raat-nye-2025-at-rayleigh-underground?frm=pe">Aaj Ki Raat NYE 2025</a>
+                                            </h5>
+                                            <div class="movie-rating-percent">
+                                                <span style="color:white;">Rayleigh Underground</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="event-grid">
+                                        <div class="movie-thumb c-thumb">
+                                            <a href="https://3sixtyshows.com/us/garland/events/game-changer-pre-release-event!-at-curtis-culwell-center?frm=pe">
+                                                <img src="//mtimages.blob.core.windows.net/cdn-live/images/event/gamechangerprerelease.jpg" height="420" alt="Game-Changer-Pre-Release-Event!">
+                                            </a>
+                                            <div class="event-date">
+                                                <h6 class="date-title">21</h6>
+                                                <span style="color:white;">Dec</span>
+                                                <span style="color:white;">2024</span>
+                                            </div>
+                                        </div>
+                                        <div class="movie-content bg-one">
+                                            <h5 class="title m-0">
+                                                <a href="https://3sixtyshows.com/us/garland/events/game-changer-pre-release-event!-at-curtis-culwell-center?frm=pe">Game Changer Pre Rel...</a>
+                                            </h5>
+                                            <div class="movie-rating-percent">
+                                                <span style="color:white;">Curtis Culwell Cente...</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="event-grid">
+                                        <div class="movie-thumb c-thumb">
+                                            <a href="https://3sixtyshows.com/us/irving/events/ayushmann-khurranna-live-in-dallas-at-rayleigh-underground?frm=pe">
+                                                <img src="//mtimages.blob.core.windows.net/cdn-live/images/event/ayushman khurana - 4x6.jpg" height="420" alt="Ayushmann-Khurranna-Live-in-Dallas">
+                                            </a>
+                                            <div class="event-date">
+                                                <h6 class="date-title">24</h6>
+                                                <span style="color:white;">Nov</span>
+                                                <span style="color:white;">2024</span>
+                                            </div>
+                                        </div>
+                                        <div class="movie-content bg-one">
+                                            <h5 class="title m-0">
+                                                <a href="https://3sixtyshows.com/us/irving/events/ayushmann-khurranna-live-in-dallas-at-rayleigh-underground?frm=pe">Ayushmann Khurranna ...</a>
+                                            </h5>
+                                            <div class="movie-rating-percent">
+                                                <span style="color:white;">Rayleigh Underground</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="event-grid">
+                                        <div class="movie-thumb c-thumb">
+                                            <a href="https://3sixtyshows.com/us/irving/events/after-party---ayushmann-khurranna-at-rayleigh-underground?frm=pe">
+                                                <img src="//mtimages.blob.core.windows.net/cdn-live/images/event/image.png" height="420" alt="After-Party--Ayushmann-Khurranna">
+                                            </a>
+                                            <div class="event-date">
+                                                <h6 class="date-title">24</h6>
+                                                <span style="color:white;">Nov</span>
+                                                <span style="color:white;">2024</span>
+                                            </div>
+                                        </div>
+                                        <div class="movie-content bg-one">
+                                            <h5 class="title m-0">
+                                                <a href="https://3sixtyshows.com/us/irving/events/after-party---ayushmann-khurranna-at-rayleigh-underground?frm=pe">After Party - Ayushm...</a>
+                                            </h5>
+                                            <div class="movie-rating-percent">
+                                                <span style="color:white;">Rayleigh Underground</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="event-grid">
+                                        <div class="movie-thumb c-thumb">
+                                            <a href="https://3sixtyshows.com/us/allen/concerts/bade-miyan-chhote-miyan-concert-at-credit-union-of-texas-event-center?frm=pe">
+                                                <img src="//mtimages.blob.core.windows.net/cdn-live/images/event/whatsapp image 2024-08-10 at 7.50.34 pm.jpeg" height="420" alt="Udit-and-Aditya-Narayan-Live-in-Concert">
+                                            </a>
+                                            <div class="event-date">
+                                                <h6 class="date-title">30</h6>
+                                                <span style="color:white;">Aug</span>
+                                                <span style="color:white;">2024</span>
+                                            </div>
+                                        </div>
+                                        <div class="movie-content bg-one">
+                                            <h5 class="title m-0">
+                                                <a href="https://3sixtyshows.com/us/allen/concerts/bade-miyan-chhote-miyan-concert-at-credit-union-of-texas-event-center?frm=pe">Udit and Aditya Nara...</a>
+                                            </h5>
+                                            <div class="movie-rating-percent">
+                                                <span style="color:white;">Credit Union of Texa...</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="event-grid">
+                                        <div class="movie-thumb c-thumb">
+                                            <a href="https://3sixtyshows.com/us/addison/concerts/queen-of-bollywood-madhuri-dixit-at-renaissance-dallas-addison-hotel?frm=pe">
+                                                <img src="//mtimages.blob.core.windows.net/cdn-live/images/event/whatsapp image 2024-07-27 at 1.51.20 pm.jpeg" height="420" alt="Queen-of-Bollywood-Madhuri-Dixit">
+                                            </a>
+                                            <div class="event-date">
+                                                <h6 class="date-title">9</h6>
+                                                <span style="color:white;">Aug</span>
+                                                <span style="color:white;">2024</span>
+                                            </div>
+                                        </div>
+                                        <div class="movie-content bg-one">
+                                            <h5 class="title m-0">
+                                                <a href="https://3sixtyshows.com/us/addison/concerts/queen-of-bollywood-madhuri-dixit-at-renaissance-dallas-addison-hotel?frm=pe">Queen of Bollywood M...</a>
+                                            </h5>
+                                            <div class="movie-rating-percent">
+                                                <span style="color:white;">Renaissance Dallas A...</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="event-grid">
+                                        <div class="movie-thumb c-thumb">
+                                            <a href="https://3sixtyshows.com/us/dallas/concerts/salim-sulaiman-live?frm=pe">
+                                                <img src="//mtimages.blob.core.windows.net/cdn-live/images/event/salim sulaiman.jpg" height="420" alt="Salim-Sulaiman-Live">
+                                            </a>
+                                            <div class="event-date">
+                                                <h6 class="date-title">3</h6>
+                                                <span style="color:white;">Jul</span>
+                                                <span style="color:white;">2024</span>
+                                            </div>
+                                        </div>
+                                        <div class="movie-content bg-one">
+                                            <h5 class="title m-0">
+                                                <a href="https://3sixtyshows.com/us/dallas/concerts/salim-sulaiman-live?frm=pe">Salim Sulaiman Live</a>
+                                            </h5>
+                                            <div class="movie-rating-percent">
+                                                <span style="color:white;">To Be Announced</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="event-grid">
+                                        <div class="movie-thumb c-thumb">
+                                            <a href="https://3sixtyshows.com/us/irving/concerts/hero-no-1-govinda-at-ali-baba-hookah-lounge?frm=pe">
+                                                <img src="//mtimages.blob.core.windows.net/cdn-live/images/event/govinda-new-herono1.jpg" height="420" alt="Hero-No-1-Govinda">
+                                            </a>
+                                            <div class="event-date">
+                                                <h6 class="date-title">27</h6>
+                                                <span style="color:white;">May</span>
+                                                <span style="color:white;">2024</span>
+                                            </div>
+                                        </div>
+                                        <div class="movie-content bg-one">
+                                            <h5 class="title m-0">
+                                                <a href="https://3sixtyshows.com/us/irving/concerts/hero-no-1-govinda-at-ali-baba-hookah-lounge?frm=pe">Hero No 1 Govinda</a>
+                                            </h5>
+                                            <div class="movie-rating-percent">
+                                                <span style="color:white;">Ali Baba Hookah Loun...</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="event-grid">
+                                        <div class="movie-thumb c-thumb">
+                                            <a href="https://3sixtyshows.com/us/allen/concerts/unforgettable-90s-kumar-sanu-and-sadhana-sargam-at-credit-union-of-texas-event-center?frm=pe">
+                                                <img src="//mtimages.blob.core.windows.net/cdn-live/images/event/unforgettable-90s-kumarsanu-sadhana.jpeg" height="420" alt="Unforgettable-90s-Kumar-Sanu-and-Sadhana-Sargam">
+                                            </a>
+                                            <div class="event-date">
+                                                <h6 class="date-title">12</h6>
+                                                <span style="color:white;">May</span>
+                                                <span style="color:white;">2024</span>
+                                            </div>
+                                        </div>
+                                        <div class="movie-content bg-one">
+                                            <h5 class="title m-0">
+                                                <a href="https://3sixtyshows.com/us/allen/concerts/unforgettable-90s-kumar-sanu-and-sadhana-sargam-at-credit-union-of-texas-event-center?frm=pe">Unforgettable 90s Ku...</a>
+                                            </h5>
+                                            <div class="movie-rating-percent">
+                                                <span style="color:white;">Credit Union of Texa...</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="event-grid">
+                                        <div class="movie-thumb c-thumb">
+                                            <a href="https://3sixtyshows.com/us/dallas/concerts/umrao-jaan-ada-dallas?frm=pe">
+                                                <img src="//mtimages.blob.core.windows.net/cdn-live/images/event/umrao jaan-dallas.jpg" height="420" alt="Umrao-Jaan-Ada">
+                                            </a>
+                                            <div class="event-date">
+                                                <h6 class="date-title">26</h6>
+                                                <span style="color:white;">Apr</span>
+                                                <span style="color:white;">2024</span>
+                                            </div>
+                                        </div>
+                                        <div class="movie-content bg-one">
+                                            <h5 class="title m-0">
+                                                <a href="https://3sixtyshows.com/us/dallas/concerts/umrao-jaan-ada-dallas?frm=pe">Umrao Jaan Ada</a>
+                                            </h5>
+                                            <div class="movie-rating-percent">
+                                                <span style="color:white;">Music Hall at Fair P...</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="event-grid">
+                                        <div class="movie-thumb c-thumb">
+                                            <a href="https://3sixtyshows.com/us/plano/concerts/dallas---bismil-ki-mehfil-at-sambuca-360?frm=pe">
+                                                <img src="//mtimages.blob.core.windows.net/cdn-live/images/event/bismil-24.jpg" height="420" alt="Dallas--Bismil-Ki-Mehfil">
+                                            </a>
+                                            <div class="event-date">
+                                                <h6 class="date-title">21</h6>
+                                                <span style="color:white;">Apr</span>
+                                                <span style="color:white;">2024</span>
+                                            </div>
+                                        </div>
+                                        <div class="movie-content bg-one">
+                                            <h5 class="title m-0">
+                                                <a href="https://3sixtyshows.com/us/plano/concerts/dallas---bismil-ki-mehfil-at-sambuca-360?frm=pe">Dallas - Bismil Ki M...</a>
+                                            </h5>
+                                            <div class="movie-rating-percent">
+                                                <span style="color:white;">Sambuca 360</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="event-grid">
+                                        <div class="movie-thumb c-thumb">
+                                            <a href="https://3sixtyshows.com/us/irving/concerts/jubin-nautiyal-in-concert-at-rayleigh-underground?frm=pe">
+                                                <img src="//mtimages.blob.core.windows.net/cdn-live/images/event/img_0016.jpeg" height="420" alt="Jubin-Nautiyal-in-Concert">
+                                            </a>
+                                            <div class="event-date">
+                                                <h6 class="date-title">3</h6>
+                                                <span style="color:white;">Mar</span>
+                                                <span style="color:white;">2024</span>
+                                            </div>
+                                        </div>
+                                        <div class="movie-content bg-one">
+                                            <h5 class="title m-0">
+                                                <a href="https://3sixtyshows.com/us/irving/concerts/jubin-nautiyal-in-concert-at-rayleigh-underground?frm=pe">Jubin Nautiyal in Co...</a>
+                                            </h5>
+                                            <div class="movie-rating-percent">
+                                                <span style="color:white;">Rayleigh Underground</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="event-grid">
+                                        <div class="movie-thumb c-thumb">
+                                            <a href="https://3sixtyshows.com/us/garland/concerts/atif-aslam-live-in-dallas-at-curtis-culwell-center?frm=pe">
+                                                <img src="//mtimages.blob.core.windows.net/cdn-live/images/event/384766782_792330306232144_7189034272363461330_n.jpg" height="420" alt="ATIF-ASLAM-LIVE-IN-DALLAS">
+                                            </a>
+                                            <div class="event-date">
+                                                <h6 class="date-title">28</h6>
+                                                <span style="color:white;">Oct</span>
+                                                <span style="color:white;">2023</span>
+                                            </div>
+                                        </div>
+                                        <div class="movie-content bg-one">
+                                            <h5 class="title m-0">
+                                                <a href="https://3sixtyshows.com/us/garland/concerts/atif-aslam-live-in-dallas-at-curtis-culwell-center?frm=pe">ATIF ASLAM LIVE IN D...</a>
+                                            </h5>
+                                            <div class="movie-rating-percent">
+                                                <span style="color:white;">Curtis Culwell Cente...</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="event-grid">
+                                        <div class="movie-thumb c-thumb">
+                                            <a href="https://3sixtyshows.com/us/garland/concerts/sid-sriram-dallas-at-curtis-culwell-center?frm=pe">
+                                                <img src="//mtimages.blob.core.windows.net/cdn-live/images/event/sidsiram.webp" height="420" alt="SID-SRIRAM-DALLAS">
+                                            </a>
+                                            <div class="event-date">
+                                                <h6 class="date-title">22</h6>
+                                                <span style="color:white;">Sep</span>
+                                                <span style="color:white;">2023</span>
+                                            </div>
+                                        </div>
+                                        <div class="movie-content bg-one">
+                                            <h5 class="title m-0">
+                                                <a href="https://3sixtyshows.com/us/garland/concerts/sid-sriram-dallas-at-curtis-culwell-center?frm=pe">SID SRIRAM DALLAS</a>
+                                            </h5>
+                                            <div class="movie-rating-percent">
+                                                <span style="color:white;">Curtis Culwell Cente...</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="event-grid">
+                                        <div class="movie-thumb c-thumb">
+                                            <a href="https://3sixtyshows.com/us/garland/concerts/the-sonu-nigam-show-in-dallas-at-curtis-culwell-center?frm=pe">
+                                                <img src="//mtimages.blob.core.windows.net/cdn-live/images/event/sonunigamdallas.jpg" height="420" alt="The-Sonu-Nigam-Show-In-Dallas">
+                                            </a>
+                                            <div class="event-date">
+                                                <h6 class="date-title">18</h6>
+                                                <span style="color:white;">Aug</span>
+                                                <span style="color:white;">2023</span>
+                                            </div>
+                                        </div>
+                                        <div class="movie-content bg-one">
+                                            <h5 class="title m-0">
+                                                <a href="https://3sixtyshows.com/us/garland/concerts/the-sonu-nigam-show-in-dallas-at-curtis-culwell-center?frm=pe">The Sonu Nigam Show ...</a>
+                                            </h5>
+                                            <div class="movie-rating-percent">
+                                                <span style="color:white;">Curtis Culwell Cente...</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="event-grid">
+                                        <div class="movie-thumb c-thumb">
+                                            <a href="https://3sixtyshows.com/us/plano/events/lol-tour-dallas-at-plano-event-center?frm=pe">
+                                                <img src="//mtimages.blob.core.windows.net/cdn-live/images/event/loltour.webp" height="420" alt="LOL-Tour-Dallas">
+                                            </a>
+                                            <div class="event-date">
+                                                <h6 class="date-title">28</h6>
+                                                <span style="color:white;">Jun</span>
+                                                <span style="color:white;">2023</span>
+                                            </div>
+                                        </div>
+                                        <div class="movie-content bg-one">
+                                            <h5 class="title m-0">
+                                                <a href="https://3sixtyshows.com/us/plano/events/lol-tour-dallas-at-plano-event-center?frm=pe">LOL Tour Dallas</a>
+                                            </h5>
+                                            <div class="movie-rating-percent">
+                                                <span style="color:white;">Plano Event Center</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="event-grid">
+                                        <div class="movie-thumb c-thumb">
+                                            <a href="https://3sixtyshows.com/us/dallas/concerts/bismil-ki-mehfil-at-south-stemmons-freeway?frm=pe">
+                                                <img src="//mtimages.blob.core.windows.net/cdn-live/images/event/bismil.jpg" height="420" alt="Bismil-ki-Mehfil">
+                                            </a>
+                                            <div class="event-date">
+                                                <h6 class="date-title">29</h6>
+                                                <span style="color:white;">Apr</span>
+                                                <span style="color:white;">2023</span>
+                                            </div>
+                                        </div>
+                                        <div class="movie-content bg-one">
+                                            <h5 class="title m-0">
+                                                <a href="https://3sixtyshows.com/us/dallas/concerts/bismil-ki-mehfil-at-south-stemmons-freeway?frm=pe">Bismil ki Mehfil</a>
+                                            </h5>
+                                            <div class="movie-rating-percent">
+                                                <span style="color:white;">South Stemmons Freew...</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="event-grid">
+                                        <div class="movie-thumb c-thumb">
+                                            <a href="https://3sixtyshows.com/us/dallas/concerts/holi-with-shezada-of-bollywood-kartik-aryan-at-lewisville?frm=pe">
+                                                <img src="//mtimages.blob.core.windows.net/cdn-live/images/event/KartikAryan_4march2023.jpg" height="420" alt="Holi-with-Shezada-of-Bollywood-Kartik-Aryan">
+                                            </a>
+                                            <div class="event-date">
+                                                <h6 class="date-title">4</h6>
+                                                <span style="color:white;">Mar</span>
+                                                <span style="color:white;">2023</span>
+                                            </div>
+                                        </div>
+                                        <div class="movie-content bg-one">
+                                            <h5 class="title m-0">
+                                                <a href="https://3sixtyshows.com/us/dallas/concerts/holi-with-shezada-of-bollywood-kartik-aryan-at-lewisville?frm=pe">Holi with Shezada of...</a>
+                                            </h5>
+                                            <div class="movie-rating-percent">
+                                                <span style="color:white;">LEWISVILLE</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="event-grid">
+                                        <div class="movie-thumb c-thumb">
+                                            <a href="https://3sixtyshows.com/us/richardson/events/dallas-fashion-gala-with-sara-ali-khan-at-doubletree-dallas?frm=pe">
+                                                <img src="//mtimages.blob.core.windows.net/cdn-live/images/event/saraalikhan.webp" height="420" alt="DALLAS-FASHION-GALA-with-SARA-ALI-KHAN">
+                                            </a>
+                                            <div class="event-date">
+                                                <h6 class="date-title">12</h6>
+                                                <span style="color:white;">Aug</span>
+                                                <span style="color:white;">2022</span>
+                                            </div>
+                                        </div>
+                                        <div class="movie-content bg-one">
+                                            <h5 class="title m-0">
+                                                <a href="https://3sixtyshows.com/us/richardson/events/dallas-fashion-gala-with-sara-ali-khan-at-doubletree-dallas?frm=pe">DALLAS FASHION GALA ...</a>
+                                            </h5>
+                                            <div class="movie-rating-percent">
+                                                <span style="color:white;">Doubletree Dallas/Ri...</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="event-grid">
+                                        <div class="movie-thumb c-thumb">
+                                            <a href="https://3sixtyshows.com/us/garland/concerts/neha-kakkar-live-in-dallas-at-curtis-culwell-center?frm=pe">
+                                                <img src="//mtimages.blob.core.windows.net/cdn-live/images/event/neha-kakkar.jpg" height="420" alt="NEHA-KAKKAR-Live-in-DALLAS">
+                                            </a>
+                                            <div class="event-date">
+                                                <h6 class="date-title">8</h6>
+                                                <span style="color:white;">Jul</span>
+                                                <span style="color:white;">2022</span>
+                                            </div>
+                                        </div>
+                                        <div class="movie-content bg-one">
+                                            <h5 class="title m-0">
+                                                <a href="https://3sixtyshows.com/us/garland/concerts/neha-kakkar-live-in-dallas-at-curtis-culwell-center?frm=pe">NEHA KAKKAR Live in ...</a>
+                                            </h5>
+                                            <div class="movie-rating-percent">
+                                                <span style="color:white;">Curtis Culwell Cente...</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="event-grid">
+                                        <div class="movie-thumb c-thumb">
+                                            <a href="https://3sixtyshows.com/us/plano/events/grand-tour-2022-afsana-khan,-saajz,-khuda-baksh-at-grand-center?frm=pe">
+                                                <img src="//mtimages.blob.core.windows.net/cdn-live/images/event/grand-us-tour.webp" height="420" alt="Grand-Tour-2022-Afsana-Khan,-Saajz,-Khuda-Baksh">
+                                            </a>
+                                            <div class="event-date">
+                                                <h6 class="date-title">12</h6>
+                                                <span style="color:white;">Jun</span>
+                                                <span style="color:white;">2022</span>
+                                            </div>
+                                        </div>
+                                        <div class="movie-content bg-one">
+                                            <h5 class="title m-0">
+                                                <a href="https://3sixtyshows.com/us/plano/events/grand-tour-2022-afsana-khan,-saajz,-khuda-baksh-at-grand-center?frm=pe">Grand Tour 2022 Afsa...</a>
+                                            </h5>
+                                            <div class="movie-rating-percent">
+                                                <span style="color:white;">Grand Center</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="event-grid">
+                                        <div class="movie-thumb c-thumb">
+                                            <a href="https://3sixtyshows.com/us/garland/concerts/arijit-singh-live-in-concert-at-curtis-culwell-center?frm=pe">
+                                                <img src="//mtimages.blob.core.windows.net/cdn-live/images/event/arijit+2022_n.jpg" height="420" alt="ARIJIT-SINGH-LIVE-IN-CONCERT">
+                                            </a>
+                                            <div class="event-date">
+                                                <h6 class="date-title">8</h6>
+                                                <span style="color:white;">May</span>
+                                                <span style="color:white;">2022</span>
+                                            </div>
+                                        </div>
+                                        <div class="movie-content bg-one">
+                                            <h5 class="title m-0">
+                                                <a href="https://3sixtyshows.com/us/garland/concerts/arijit-singh-live-in-concert-at-curtis-culwell-center?frm=pe">ARIJIT SINGH LIVE IN...</a>
+                                            </h5>
+                                            <div class="movie-rating-percent">
+                                                <span style="color:white;">Curtis Culwell Cente...</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="event-grid">
+                                        <div class="movie-thumb c-thumb">
+                                            <a href="https://3sixtyshows.com/us/dallas/events/eid-mela-with-ali-quli-mirza-and-alamgir-at-mar-thoma-event-center?frm=pe">
+                                                <img src="//mtimages.blob.core.windows.net/cdn-live/images/event/279935700_1267932900404180_291088381620529744_n.jpg" height="420" alt="Eid-Mela-with-Ali-Quli-Mirza-Alamgir">
+                                            </a>
+                                            <div class="event-date">
+                                                <h6 class="date-title">7</h6>
+                                                <span style="color:white;">May</span>
+                                                <span style="color:white;">2022</span>
+                                            </div>
+                                        </div>
+                                        <div class="movie-content bg-one">
+                                            <h5 class="title m-0">
+                                                <a href="https://3sixtyshows.com/us/dallas/events/eid-mela-with-ali-quli-mirza-and-alamgir-at-mar-thoma-event-center?frm=pe">Eid Mela with Ali Qu...</a>
+                                            </h5>
+                                            <div class="movie-rating-percent">
+                                                <span style="color:white;">Mar Thoma Event Cent...</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="event-grid">
+                                        <div class="movie-thumb c-thumb">
+                                            <a href="https://3sixtyshows.com/us/plano/events/the-intense-tour-indian-idols-12-dallas-at-plano-event-center?frm=pe">
+                                                <img src="//mtimages.blob.core.windows.net/cdn-live/images/event/273003154_1208481983015939_6988866223234056962_n.jpg" height="420" alt="The-Intense-Tour--Indian-Idols-12-(Dallas)">
+                                            </a>
+                                            <div class="event-date">
+                                                <h6 class="date-title">11</h6>
+                                                <span style="color:white;">Mar</span>
+                                                <span style="color:white;">2022</span>
+                                            </div>
+                                        </div>
+                                        <div class="movie-content bg-one">
+                                            <h5 class="title m-0">
+                                                <a href="https://3sixtyshows.com/us/plano/events/the-intense-tour-indian-idols-12-dallas-at-plano-event-center?frm=pe">The Intense Tour - I...</a>
+                                            </h5>
+                                            <div class="movie-rating-percent">
+                                                <span style="color:white;">Plano Event Center</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="event-grid">
+                                        <div class="movie-thumb c-thumb">
+                                            <a href="https://3sixtyshows.com/us/plano/events/zindagi-ka-safar-with-anupam-kher-at-grand-center?frm=pe">
+                                                <img src="//mtimages.blob.core.windows.net/cdn-live/images/event/anupamsafar.jpg" height="420" alt="Zindagi-Ka-Safar-with-Anupam-Kher">
+                                            </a>
+                                            <div class="event-date">
+                                                <h6 class="date-title">27</h6>
+                                                <span style="color:white;">Jul</span>
+                                                <span style="color:white;">2021</span>
+                                            </div>
+                                        </div>
+                                        <div class="movie-content bg-one">
+                                            <h5 class="title m-0">
+                                                <a href="https://3sixtyshows.com/us/plano/events/zindagi-ka-safar-with-anupam-kher-at-grand-center?frm=pe">&quot;Zindagi Ka Safar&quot; w...</a>
+                                            </h5>
+                                            <div class="movie-rating-percent">
+                                                <span style="color:white;">Grand Center</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="event-grid">
+                                        <div class="movie-thumb c-thumb">
+                                            <a href="https://3sixtyshows.com/us/carrollton/events/mere-pass-tum-ho-dallas-evening-gala-at-dallas-palms?frm=pe">
+                                                <img src="//mtimages.blob.core.windows.net/cdn-live/images/event/87288854_736365266894282_2219669515531190272_n.jpg" height="420" alt="Mere-Pass-Tum-Ho-Dallas-Evening-Gala">
+                                            </a>
+                                            <div class="event-date">
+                                                <h6 class="date-title">13</h6>
+                                                <span style="color:white;">Mar</span>
+                                                <span style="color:white;">2020</span>
+                                            </div>
+                                        </div>
+                                        <div class="movie-content bg-one">
+                                            <h5 class="title m-0">
+                                                <a href="https://3sixtyshows.com/us/carrollton/events/mere-pass-tum-ho-dallas-evening-gala-at-dallas-palms?frm=pe">Mere Pass Tum Ho-Dal...</a>
+                                            </h5>
+                                            <div class="movie-rating-percent">
+                                                <span style="color:white;">Dallas Palms</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="event-grid">
+                                        <div class="movie-thumb c-thumb">
+                                            <a href="https://3sixtyshows.com/us/plano/events/a-charity-gala-evening-with-hrithik-roshan-at-hilton-dallas-plano-granite-park?frm=pe">
+                                                <img src="//mtimages.blob.core.windows.net/cdn-live/images/event/81784416_1068363263509518_3105182727041712128_n.jpg" height="420" alt="A-Charity-Gala-Evening-with-Hrithik-Roshan">
+                                            </a>
+                                            <div class="event-date">
+                                                <h6 class="date-title">25</h6>
+                                                <span style="color:white;">Jan</span>
+                                                <span style="color:white;">2020</span>
+                                            </div>
+                                        </div>
+                                        <div class="movie-content bg-one">
+                                            <h5 class="title m-0">
+                                                <a href="https://3sixtyshows.com/us/plano/events/a-charity-gala-evening-with-hrithik-roshan-at-hilton-dallas-plano-granite-park?frm=pe">A Charity Gala Eveni...</a>
+                                            </h5>
+                                            <div class="movie-rating-percent">
+                                                <span style="color:white;">Hilton Dallas/ Plano...</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="event-grid">
+                                        <div class="movie-thumb c-thumb">
+                                            <a href="https://3sixtyshows.com/us/garland/concerts/shreya-ghoshal--dallas-at-curtis-culwell-center?frm=pe">
+                                                <img src="//mtimages.blob.core.windows.net/cdn-live/images/event/68961878_592021624661981_418626528151076864_n.jpg" height="420" alt="Shreya-Ghoshal-Dallas">
+                                            </a>
+                                            <div class="event-date">
+                                                <h6 class="date-title">25</h6>
+                                                <span style="color:white;">Aug</span>
+                                                <span style="color:white;">2019</span>
+                                            </div>
+                                        </div>
+                                        <div class="movie-content bg-one">
+                                            <h5 class="title m-0">
+                                                <a href="https://3sixtyshows.com/us/garland/concerts/shreya-ghoshal--dallas-at-curtis-culwell-center?frm=pe">Shreya Ghoshal- Dall...</a>
+                                            </h5>
+                                            <div class="movie-rating-percent">
+                                                <span style="color:white;">Curtis Culwell Cente...</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="event-grid">
+                                        <div class="movie-thumb c-thumb">
+                                            <a href="https://3sixtyshows.com/us/plano/concerts/guru-randhawa-sensational-tour-dallas-at-grand-center?frm=pe">
+                                                <img src="//mtimages.blob.core.windows.net/cdn-live/images/event/randhawa.jpg" height="420" alt="Guru-Randhawa-Sensational-Tour-Dallas">
+                                            </a>
+                                            <div class="event-date">
+                                                <h6 class="date-title">26</h6>
+                                                <span style="color:white;">Jul</span>
+                                                <span style="color:white;">2019</span>
+                                            </div>
+                                        </div>
+                                        <div class="movie-content bg-one">
+                                            <h5 class="title m-0">
+                                                <a href="https://3sixtyshows.com/us/plano/concerts/guru-randhawa-sensational-tour-dallas-at-grand-center?frm=pe">Guru Randhawa Sensat...</a>
+                                            </h5>
+                                            <div class="movie-rating-percent">
+                                                <span style="color:white;">Grand Center</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="event-grid">
+                                        <div class="movie-thumb c-thumb">
+                                            <a href="https://3sixtyshows.com/us/coppell/events/biggest-bollywood-party-by-akbar-sami-at-four-points-by-sheraton-dallas?frm=pe">
+                                                <img src="//mtimages.blob.core.windows.net/cdn-live/images/event/akdbarsami2_n.jpg" height="420" alt="Biggest-Bollywood-Party-By-Akbar-Sami">
+                                            </a>
+                                            <div class="event-date">
+                                                <h6 class="date-title">6</h6>
+                                                <span style="color:white;">Apr</span>
+                                                <span style="color:white;">2019</span>
+                                            </div>
+                                        </div>
+                                        <div class="movie-content bg-one">
+                                            <h5 class="title m-0">
+                                                <a href="https://3sixtyshows.com/us/coppell/events/biggest-bollywood-party-by-akbar-sami-at-four-points-by-sheraton-dallas?frm=pe">Biggest Bollywood Pa...</a>
+                                            </h5>
+                                            <div class="movie-rating-percent">
+                                                <span style="color:white;">Four Points by Shera...</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="event-grid">
+                                        <div class="movie-thumb c-thumb">
+                                            <a href="https://3sixtyshows.com/us/irving/events/new-years-eve&#39;s-with-chitrangada-singh-in-dallas-at-the-westin-dallas-fort-worth-airport?frm=pe">
+                                                <img src="//mtimages.blob.core.windows.net/cdn-live/images/event/chitrangada.jpg" height="420" alt="New-Years-Eves-with-Chitrangada-Singh-in-Dallas">
+                                            </a>
+                                            <div class="event-date">
+                                                <h6 class="date-title">31</h6>
+                                                <span style="color:white;">Dec</span>
+                                                <span style="color:white;">2018</span>
+                                            </div>
+                                        </div>
+                                        <div class="movie-content bg-one">
+                                            <h5 class="title m-0">
+                                                <a href="https://3sixtyshows.com/us/irving/events/new-years-eve&#39;s-with-chitrangada-singh-in-dallas-at-the-westin-dallas-fort-worth-airport?frm=pe">New Years Eve&#39;s with...</a>
+                                            </h5>
+                                            <div class="movie-rating-percent">
+                                                <span style="color:white;">The Westin Dallas Fo...</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                        </div>
+                    </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+=== partials/sponsors-section.blade.php ===
+
+<style>
+    .sponsor-logo-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 20px;
+        padding: 25px 0;
+    }
+    .sponsor-logo-wrapper {
+        width: 150px;
+        height: 150px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #f4f4f4;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+    .sponsor-logo-wrapper img {
+        max-width: 130px;
+        max-height: 130px;
+        object-fit: contain;
+    }
+</style>
+
+<div class="container">
+    <h2>Our Sponsors</h2>
+    <div class="sponsor-logo-container">
+        <div class="sponsor-logo-wrapper">
+            <img src="https://mtpcdn.azurewebsites.net/cdn/whitelabel/3sixtyshows/images/sponsorlogos/frog-roofing.jpg?mt=20250123" alt="Frog Roofing">
+        </div>
+        <div class="sponsor-logo-wrapper">
+            <img src="https://mtpcdn.azurewebsites.net/cdn/whitelabel/3sixtyshows/images/sponsorlogos/modern_touch.jpg?mt=20250123" alt="Modern Touch">
+        </div>
+        <div class="sponsor-logo-wrapper">
+            <img src="https://mtpcdn.azurewebsites.net/cdn/whitelabel/3sixtyshows/images/sponsorlogos/momo_kabab.jpg?mt=20250123" alt="Momo Kabab">
+        </div>
+        <div class="sponsor-logo-wrapper">
+            <img src="https://mtpcdn.azurewebsites.net/cdn/whitelabel/3sixtyshows/images/sponsorlogos/storenfixture.jpg?mt=20250123" alt="Store N Fixture">
+        </div>
+        <div class="sponsor-logo-wrapper">
+            <img src="https://mtpcdn.azurewebsites.net/cdn/whitelabel/3sixtyshows/images/sponsorlogos/true payment.jpg?mt=20250123" alt="True Payment">
+        </div>
+    </div>
+
+    <h2>Our Partners</h2>
+    <div class="sponsor-logo-container">
+        <div class="sponsor-logo-wrapper">
+            <img src="https://mtpcdn.azurewebsites.net/cdn/whitelabel/3sixtyshows/images/sponsorlogos/ajani_records.jpg?mt=20250123" alt="Ajani Records">
+        </div>
+        <div class="sponsor-logo-wrapper">
+            <img src="https://mtpcdn.azurewebsites.net/cdn/whitelabel/3sixtyshows/images/sponsorlogos/babay.jpg?mt=20250123" alt="Babay">
+        </div>
+        <div class="sponsor-logo-wrapper">
+            <img src="https://mtpcdn.azurewebsites.net/cdn/whitelabel/3sixtyshows/images/sponsorlogos/carbon_radio.jpg?mt=20250123" alt="Carbon Radio">
+        </div>
+        <div class="sponsor-logo-wrapper">
+            <img src="https://mtpcdn.azurewebsites.net/cdn/whitelabel/3sixtyshows/images/sponsorlogos/daami_entertainment.jpg?mt=20250123" alt="Daami Entertainment">
+        </div>
+        <div class="sponsor-logo-wrapper">
+            <img src="https://mtpcdn.azurewebsites.net/cdn/whitelabel/3sixtyshows/images/sponsorlogos/dhakal.jpg?mt=20250123" alt="Dhakal">
+        </div>
+        <div class="sponsor-logo-wrapper">
+            <img src="https://mtpcdn.azurewebsites.net/cdn/whitelabel/3sixtyshows/images/sponsorlogos/dhrr.jpg?mt=20250123" alt="DHRR">
+        </div>
+        <div class="sponsor-logo-wrapper">
+            <img src="https://mtpcdn.azurewebsites.net/cdn/whitelabel/3sixtyshows/images/sponsorlogos/funasia.jpg?mt=20250123" alt="Funasia">
+        </div>
+        <div class="sponsor-logo-wrapper">
+            <img src="https://mtpcdn.azurewebsites.net/cdn/whitelabel/3sixtyshows/images/sponsorlogos/heera_malik.jpg?mt=20250123" alt="Heera Malik">
+        </div>
+        <div class="sponsor-logo-wrapper">
+            <img src="https://mtpcdn.azurewebsites.net/cdn/whitelabel/3sixtyshows/images/sponsorlogos/jago_times.jpg?mt=20250123" alt="Jago Times">
+        </div>
+        <div class="sponsor-logo-wrapper">
+            <img src="https://mtpcdn.azurewebsites.net/cdn/whitelabel/3sixtyshows/images/sponsorlogos/najleen_makhani.jpg?mt=20250123" alt="Najleen Makhani">
+        </div>
+        <div class="sponsor-logo-wrapper">
+            <img src="https://mtpcdn.azurewebsites.net/cdn/whitelabel/3sixtyshows/images/sponsorlogos/soch_network.jpg?mt=20250123" alt="Soch Network">
+        </div>
+        <div class="sponsor-logo-wrapper">
+            <img src="https://mtpcdn.azurewebsites.net/cdn/whitelabel/3sixtyshows/images/sponsorlogos/topshot_events.jpg?mt=20250123" alt="Topshot Events">
+        </div>
+    </div>
+</div>
+
+=== partials/staff-section.blade.php ===
+
+<!-- ==========Our Team========== -->
+<section class="event-about padding-bottom">
+    <div class="container">
+        <div class="row justify-content-between">
+            <div class="col-lg-7 col-xl-12">
+                <div class="event-about-content">
+                    <div class="section-header-3 left-style m-0">
+                        <p>
+                            <span class="cate title">Meet The Team</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="p-lg-2 p-3">
+            <div class="team-row">
+
+                <div class="team teambg1">
+
+                    <img src="{{ asset('assets/images/team/chloejones.jpeg') }}" alt="Chloe Jones">
+                    <h4>Chloe Jones</h4>
+                    <div class="team-designation">President &amp; CEO</div>
+                    <div class="mt-1 mb-1">
+
+                    </div>
+                </div>
+
+                <div class="team teambg2">
+
+                    <img src="{{ asset('assets/images/team/mabbas.jpeg') }}" alt="Mohammad Abbas">
+                    <h4>Mohammad Abbas</h4>
+                    <div class="team-designation"> Managing Director</div>
+                    <div class="mt-1 mb-1">
+
+                    </div>
+                </div>
+
+                <div class="team teambg3">
+
+                    <img src="{{ asset('assets/images/team/nafizhossain.jpeg') }}" alt="Nafiz Hossain">
+                    <h4>Nafiz Hossain</h4>
+                    <div class="team-designation">Vice President & CFO</div>
+                    <div class="mt-1 mb-1">
+
+                    </div>
+                </div>
+
+                <div class="team teambg4">
+
+                    <img src="{{ asset('assets/images/team/uzmaabbas.jpg') }}" alt="Uzma Abbas">
+
+                    <h4>Uzma Abbas</h4>
+                    <div class="team-designation"> COO</div>
+                    <div class="mt-1 mb-1">
+
+                    </div>
+                </div>
+
+                <div class="team teambg5">
+
+                    <img src="{{ asset('assets/images/team/rachelsamuel.jpg') }}" alt="Rachel Samuel">
+                    <h4>Rachel Samuel</h4>
+                    <div class="team-designation">Director Operations</div>
+                    <div class="mt-1 mb-1">
+
+                    </div>
+                </div>
+
+                <div class="team teambg1">
+
+                    <img src="{{ asset('assets/images/team/shahabsiddiqui.jpeg') }}" alt="Shahab Siddiqi">
+                    <h4>Shahab Siddiqi</h4>
+                    <div class="team-designation">Marketing Director</div>
+                    <div class="mt-1 mb-1">
+
+                    </div>
+                </div>
+
+                <div class="team teambg2">
+
+                    <img src="{{ asset('assets/images/team/shahzadalidar.jpeg') }}" alt="Shahzad Ali Dar">
+                    <h4>Shahzad Ali Dar</h4>
+                    <div class="team-designation">Sales Director</div>
+                    <div class="mt-1 mb-1">
+
+                    </div>
+                </div>
+
+                <div class="team teambg3">
+
+                    <img src="{{ asset('assets/images/team/lalithchoudary.jpeg') }}" alt="Lalith Choudary">
+                    <h4>Lalith Choudary</h4>
+                    <div class="team-designation">Box Office & Ticketing Manager</div>
+                    <div class="mt-1 mb-1">
+
+                    </div>
+                </div>
+
+                <div class="team teambg4">
+
+                    <img src="{{ asset('assets/images/team/satwikreddy.jpeg') }}" alt="Satwik Reddy">
+                    <h4>Satwik Reddy</h4>
+                    <div class="team-designation">Marketing Manager</div>
+                    <div class="mt-1 mb-1">
+
+                    </div>
+                </div>
+
+                <div class="team teambg5">
+
+                    <img src="{{ asset('assets/images/team/milandhakal.jpeg') }}" alt="Milan Dhakal">
+                    <h4>Milan Dhakal</h4>
+                    <div class="team-designation">Director Cinematics</div>
+                    <div class="mt-1 mb-1">
+
+                    </div>
+                </div>
+
+
+
+                <div class="team teambg1">
+
+                    <img src="{{ asset('assets/images/team/rebeccasamuel.jpeg') }}" alt="Rebecca Samuel">
+                    <h4>Rebecca Samuel</h4>
+                    <div class="team-designation">Transportation Coordinator</div>
+                    <div class="mt-1 mb-1">
+
+                    </div>
+                </div>
+
+                <div class="team teambg2">
+
+                    <img src="{{ asset('assets/images/team/sarahesther.jpeg') }}" alt="Sarah Esther">
+                    <h4>Sarah Esther</h4>
+                    <div class="team-designation">Transportation Coordinator</div>
+                    <div class="mt-1 mb-1">
+
+                    </div>
+                </div>
+
+
+
+
+
+
+
+
+                <div class="team teambg5">
+                    <img src="https://mtpcdn.azurewebsites.net/cdn/whitelabel/3sixtyshows/images/team/latestimages/rebeccasamuel.jpeg?mt=20250123" alt="Rebecca Samuel">
+                    <h4>Rebecca Samuel</h4>
+                    <div class="team-designation">Transportation Coordinator</div>
+                    <div class="mt-1 mb-1">
+
+                    </div>
+                </div>
+                <div class="team teambg1">
+                    <img src="https://mtpcdn.azurewebsites.net/cdn/whitelabel/3sixtyshows/images/team/latestimages/sarahesther.jpeg?mt=20250123" alt="Sarah Esther">
+                    <h4>Sarah Esther</h4>
+                    <div class="team-designation">On-Site Event Manager</div>
+                    <div class="mt-1 mb-1">
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+<!-- ==========Our Team========== -->
+
+
+=== partials/ticket-search.blade.php ===
+
+<!-- ==========Ticket-Search========== -->
+<section class="search-ticket-section padding-top pt-lg-0">
+    <div class="container">
+        <div class="search-tab bg_img" data-background="assets/images/ticket/ticket-bg01.jpg">
+            <div class="row align-items-center mb--20">
+                <div class="col-lg-6 mb-20">
+                    <div class="search-ticket-header">
+                        <h6 class="category">welcome to Boleto </h6>
+                        <h3 class="title">what are you looking for</h3>
+                    </div>
+                </div>
+                <div class="col-lg-6 mb-20">
+                    <ul class="tab-menu ticket-tab-menu">
+                        <li class="active">
+                            <div class="tab-thumb">
+                                <img src="{{ asset('assets/images/ticket/ticket-tab01.png') }} " alt="ticket">
+                            </div>
+                            <span>movie</span>
+                        </li>
+                        <li>
+                            <div class="tab-thumb">
+                                <img src="{{ asset('assets/images/ticket/ticket-tab02.png') }} " alt="ticket">
+                            </div>
+                            <span>events</span>
+                        </li>
+                        <li>
+                            <div class="tab-thumb">
+                                <img src="{{ asset('assets/images/ticket/ticket-tab03.png') }} " alt="ticket">
+                            </div>
+                            <span>sports</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="tab-area">
+                <div class="tab-item active">
+                    <form class="ticket-search-form">
+                        <div class="form-group large">
+                            <input type="text" placeholder="Search for Movies">
+                            <button type="submit"><i class="fas fa-search"></i></button>
+                        </div>
+                        <div class="form-group">
+                            <div class="thumb">
+                                <img src="{{ asset('assets/images/ticket/city.png') }} " alt="ticket">
+                            </div>
+                            <span class="type">city</span>
+                            <select class="select-bar">
+                                <option value="london">London</option>
+                                <option value="dhaka">dhaka</option>
+                                <option value="rosario">rosario</option>
+                                <option value="madrid">madrid</option>
+                                <option value="koltaka">kolkata</option>
+                                <option value="rome">rome</option>
+                                <option value="khoksa">khoksa</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <div class="thumb">
+                                <img src="{{ asset('assets/images/ticket/date.png') }} " alt="ticket">
+                            </div>
+                            <span class="type">date</span>
+                            <select class="select-bar">
+                                <option value="26-12-19">23/10/2020</option>
+                                <option value="26-12-19">24/10/2020</option>
+                                <option value="26-12-19">25/10/2020</option>
+                                <option value="26-12-19">26/10/2020</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <div class="thumb">
+                                <img src="{{ asset('assets/images/ticket/cinema.png') }} " alt="ticket">
+                            </div>
+                            <span class="type">cinema</span>
+                            <select class="select-bar">
+                                <option value="Awaken">Awaken</option>
+                                <option value="dhaka">dhaka</option>
+                                <option value="rosario">rosario</option>
+                                <option value="madrid">madrid</option>
+                                <option value="koltaka">kolkata</option>
+                                <option value="rome">rome</option>
+                                <option value="khoksa">khoksa</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="tab-item">
+                    <form class="ticket-search-form">
+                        <div class="form-group large">
+                            <input type="text" placeholder="Search for Events">
+                            <button type="submit"><i class="fas fa-search"></i></button>
+                        </div>
+                        <div class="form-group">
+                            <div class="thumb">
+                                <img src="{{ asset('assets/images/ticket/city.png') }} " alt="ticket">
+                            </div>
+                            <span class="type">city</span>
+                            <select class="select-bar">
+                                <option value="london">London</option>
+                                <option value="dhaka">dhaka</option>
+                                <option value="rosario">rosario</option>
+                                <option value="madrid">madrid</option>
+                                <option value="koltaka">kolkata</option>
+                                <option value="rome">rome</option>
+                                <option value="khoksa">khoksa</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <div class="thumb">
+                                <img src="{{ asset('assets/images/ticket/date.png') }} " alt="ticket">
+                            </div>
+                            <span class="type">date</span>
+                            <select class="select-bar">
+                                <option value="26-12-19">23/10/2020</option>
+                                <option value="26-12-19">24/10/2020</option>
+                                <option value="26-12-19">25/10/2020</option>
+                                <option value="26-12-19">26/10/2020</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <div class="thumb">
+                                <img src="{{ asset('assets/images/ticket/cinema.png') }} " alt="ticket">
+                            </div>
+                            <span class="type">event</span>
+                            <select class="select-bar">
+                                <option value="angular">angular</option>
+                                <option value="startup">startup</option>
+                                <option value="rosario">rosario</option>
+                                <option value="madrid">madrid</option>
+                                <option value="koltaka">kolkata</option>
+                                <option value="Last-First">Last-First</option>
+                                <option value="wish">wish</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="tab-item">
+                    <form class="ticket-search-form">
+                        <div class="form-group large">
+                            <input type="text" placeholder="Search fo Sports">
+                            <button type="submit"><i class="fas fa-search"></i></button>
+                        </div>
+                        <div class="form-group">
+                            <div class="thumb">
+                                <img src="{{ asset('assets/images/ticket/city.png') }} " alt="ticket">
+                            </div>
+                            <span class="type">city</span>
+                            <select class="select-bar">
+                                <option value="london">London</option>
+                                <option value="dhaka">dhaka</option>
+                                <option value="rosario">rosario</option>
+                                <option value="madrid">madrid</option>
+                                <option value="koltaka">kolkata</option>
+                                <option value="rome">rome</option>
+                                <option value="khoksa">khoksa</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <div class="thumb">
+                                <img src="{{ asset('assets/images/ticket/date.png') }} " alt="ticket">
+                            </div>
+                            <span class="type">date</span>
+                            <select class="select-bar">
+                                <option value="26-12-19">23/10/2020</option>
+                                <option value="26-12-19">24/10/2020</option>
+                                <option value="26-12-19">25/10/2020</option>
+                                <option value="26-12-19">26/10/2020</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <div class="thumb">
+                                <img src="{{ asset('assets/images/ticket/cinema.png') }} " alt="ticket">
+                            </div>
+                            <span class="type">sports</span>
+                            <select class="select-bar">
+                                <option value="football">football</option>
+                                <option value="cricket">cricket</option>
+                                <option value="cabadi">cabadi</option>
+                                <option value="madrid">madrid</option>
+                                <option value="gadon">gadon</option>
+                                <option value="rome">rome</option>
+                                <option value="khoksa">khoksa</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- ==========Ticket-Search========== -->

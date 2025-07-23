@@ -30,7 +30,9 @@ use App\Http\Controllers\Admin\CustomerController;
 
 
 
-
+// Route::view('/welcome', 'welcome');
+// Route::view('/seat-selection', 'seat-selection');
+Route::get('/seatselection', [PageController::class, 'selection'])->name('seatselection');
 Route::get('/', [PageController::class, 'index'])->name('index');
 Route::get('/aboutus', [PageController::class, 'aboutus'])->name('aboutus');
 Route::get('/contact', [PageController::class, 'contact'])->name('contact');
@@ -229,3 +231,4 @@ Route::middleware(['web'])->group(function () {
 //     // Order update route
 //     Route::post('/update-order', [PhotosinGalleryController::class, 'updateOrder'])->name('update-order');
 // });
+
