@@ -1,46 +1,69 @@
 <?php
-
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Seat extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
         'venue_id', 'seat_category_id', 'section', 'row', 'seat_number',
-        'status', 'coordinates_x', 'coordinates_y', 'is_active'
+        'coordinates_x', 'coordinates_y', 'status', 'is_active', 'is_accessible',
+        'seat_metadata'
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
-        'coordinates_x' => 'integer',
-        'coordinates_y' => 'integer',
+        'is_accessible' => 'boolean',
+        'coordinates_x' => 'float',
+        'coordinates_y' => 'float',
+        'seat_metadata' => 'array',
     ];
 
-    // A seat belongs to a venue
+    // Seat statuses
+    const STATUS_AVAILABLE = 'available';
+    const STATUS_RESERVED = 'reserved';
+    const STATUS_SOLD = 'sold';
+    const STATUS_BLOCKED = 'blocked';
+
     public function venue()
     {
         return $this->belongsTo(Venue::class);
     }
 
-    // A seat belongs to a category
     public function category()
     {
         return $this->belongsTo(SeatCategory::class, 'seat_category_id');
     }
 
-    // A seat has many seat reservations for different shows
     public function reservations()
     {
         return $this->hasMany(SeatReservation::class);
     }
 
-    // Get full seat identifier (e.g., "Orchestra A-12")
-    public function getFullSeatIdentifierAttribute()
+    // Get seat identifier
+    public function getIdentifierAttribute()
     {
-        return $this->section . ' ' . $this->row . '-' . $this->seat_number;
+        return $this->section . '-' . $this->row . '-' . $this->seat_number;
+    }
+
+    // Check if seat is available for specific show
+    public function isAvailableForShow($showId)
+    {
+        if (!$this->is_active) return false;
+
+        return !$this->reservations()
+            ->where('show_id', $showId)
+            ->whereIn('status', ['reserved', 'sold', 'blocked'])
+            ->exists();
+    }
+
+    // Get seat status for specific show
+    public function getStatusForShow($showId)
+    {
+        $reservation = $this->reservations()
+            ->where('show_id', $showId)
+            ->first();
+
+        return $reservation ? $reservation->status : self::STATUS_AVAILABLE;
     }
 }

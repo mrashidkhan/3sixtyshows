@@ -1,50 +1,65 @@
 <?php
-
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class SeatReservation extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
-        'show_id', 'seat_id', 'ticket_id', 'booking_id', 'status',
-        'reserved_by', 'reserved_until', 'notes'
+        'show_id', 'seat_id', 'user_id', 'booking_id', 'status',
+        'reserved_until', 'price_paid', 'reservation_metadata'
     ];
 
     protected $casts = [
         'reserved_until' => 'datetime',
+        'price_paid' => 'decimal:2',
+        'reservation_metadata' => 'array',
     ];
 
-    // Seat reservation for a specific show
+    // Reservation statuses
+    const STATUS_TEMPORARY = 'temporary';
+    const STATUS_RESERVED = 'reserved';
+    const STATUS_SOLD = 'sold';
+    const STATUS_BLOCKED = 'blocked';
+    const STATUS_CANCELLED = 'cancelled';
+
     public function show()
     {
         return $this->belongsTo(Show::class);
     }
 
-    // The seat being reserved
     public function seat()
     {
         return $this->belongsTo(Seat::class);
     }
 
-    // The ticket associated with this reservation (if any)
-    public function ticket()
+    public function user()
     {
-        return $this->belongsTo(Ticket::class);
+        return $this->belongsTo(User::class);
     }
 
-    // The booking associated with this reservation (if any)
     public function booking()
     {
         return $this->belongsTo(Booking::class);
     }
 
-    // Admin who made the reservation (if any)
-    public function reservedBy()
+    // Scope for active reservations
+    public function scopeActive($query)
     {
-        return $this->belongsTo(User::class, 'reserved_by');
+        return $query->whereIn('status', [self::STATUS_RESERVED, self::STATUS_SOLD]);
+    }
+
+    // Scope for expired temporary reservations
+    public function scopeExpired($query)
+    {
+        return $query->where('status', self::STATUS_TEMPORARY)
+                    ->where('reserved_until', '<', now());
+    }
+
+    // Check if reservation is expired
+    public function isExpired()
+    {
+        return $this->status === self::STATUS_TEMPORARY &&
+               $this->reserved_until < now();
     }
 }

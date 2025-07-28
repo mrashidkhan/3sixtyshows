@@ -17,91 +17,32 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
-        'email',
-        'password',
-        'role',
+        'name', 'email', 'password', 'role', 'email_verified_at', 'is_active'
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
-    protected $hidden = [
-        'password',
-        'remember_token',
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'is_active' => 'boolean',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
+    public function hasRole($role)
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+        return $this->role === $role;
     }
 
-    // Add these relationships to your User model
-
-public function bookings()
-{
-    return $this->hasMany(Booking::class);
-}
-
-public function getIsAdminAttribute()
-{
-    // You should implement your own admin detection here
-    // This is just a placeholder
-    return $this->email === 'admin@example.com';
-}
-
-private function authorizeAdmin()
-{
-    if (!Auth::check() || !Auth::user()->isAdmin()) {
-        return redirect()->route('user_login')->with('error', 'You are not authorized to access this page.');
-    }
-}
-public function isAdmin()
+    public function isAdmin()
     {
         return $this->role === 'admin';
     }
 
-    /**
-     * Get the customer profile associated with the user.
-     */
-    public function customer()
+    public function isActive()
     {
-        return $this->hasOne(Customer::class);
+        return $this->is_active;
     }
 
-    /**
-     * Check if the user has a customer profile.
-     */
-    public function hasCustomerProfile()
+    // Add scope for active users
+    public function scopeActive($query)
     {
-        return $this->customer()->exists();
-    }
-
-    /**
-     * Create a customer profile if one doesn't exist.
-     */
-    public function createCustomerProfile(array $attributes = [])
-    {
-        if (!$this->hasCustomerProfile()) {
-            // Pre-fill name and email from user if not provided
-            $defaults = [
-                'name' => $attributes['name'] ?? $this->name,
-                'email' => $attributes['email'] ?? $this->email
-            ];
-
-            return $this->customer()->create(array_merge($defaults, $attributes));
-        }
-
-        return $this->customer;
+        return $query->where('is_active', true);
     }
 }

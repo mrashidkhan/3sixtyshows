@@ -212,23 +212,127 @@ Route::middleware(['web'])->group(function () {
     Route::post('shows/confirm-reservation', [SeatSelectionController::class, 'confirmReservation'])->name('shows.confirm-reservation');
 });
 
-// Add these routes to your routes/web.php file
+use App\Http\Controllers\BookingController;
+use App\Http\Controllers\TicketController;
+use App\Http\Controllers\SeatMapController;
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\Admin\AdminBookingController;
+use App\Http\Controllers\Admin\TicketTypeController;
 
-// PhotosinGallery routes - nested under photo galleries
-// Route::prefix('admin/gallery/{galleryId}/photos')->name('photos.gallery.')->middleware(['auth', 'admin'])->group(function () {
-//     Route::get('/', [PhotosinGalleryController::class, 'index'])->name('index');
-//     Route::get('/create', [PhotosinGalleryController::class, 'create'])->name('create');
-//     Route::post('/', [PhotosinGalleryController::class, 'store'])->name('store');
-//     Route::get('/{id}', [PhotosinGalleryController::class, 'show'])->name('show');
-//     Route::get('/{id}/edit', [PhotosinGalleryController::class, 'edit'])->name('edit');
-//     Route::put('/{id}', [PhotosinGalleryController::class, 'update'])->name('update');
-//     Route::delete('/{id}', [PhotosinGalleryController::class, 'destroy'])->name('delete');
+// ==================== BOOKING SYSTEM ROUTES ====================
 
-//     // Bulk upload routes
-//     Route::get('/bulk-upload', [PhotosinGalleryController::class, 'bulkUpload'])->name('bulk-upload');
-//     Route::post('/bulk-upload', [PhotosinGalleryController::class, 'processBulkUpload'])->name('process-bulk-upload');
+// Public Show Details (modify existing if needed)
+Route::get('/shows/{slug}', [PageController::class, 'showDetails'])->name('show.details');
 
-//     // Order update route
-//     Route::post('/update-order', [PhotosinGalleryController::class, 'updateOrder'])->name('update-order');
-// });
+// Booking Routes (Authenticated Users)
+Route::middleware(['auth'])->group(function () {
 
+    // Main Booking Flow
+    Route::get('/shows/{show}/book', [BookingController::class, 'selectSeats'])->name('booking.select-seats');
+    Route::post('/shows/{show}/book/seats', [BookingController::class, 'reserveSeats'])->name('booking.reserve-seats');
+    Route::get('/shows/{show}/book/checkout', [BookingController::class, 'checkout'])->name('booking.checkout');
+    Route::post('/shows/{show}/book/confirm', [BookingController::class, 'confirmBooking'])->name('booking.confirm');
+
+    // AJAX Routes for Seat Management
+    Route::get('/api/shows/{show}/seats', [SeatMapController::class, 'getSeats'])->name('api.seats.get');
+    Route::post('/api/shows/{show}/seats/reserve', [SeatMapController::class, 'reserveSeats'])->name('api.seats.reserve');
+    Route::delete('/api/shows/{show}/seats/release', [SeatMapController::class, 'releaseSeats'])->name('api.seats.release');
+    Route::get('/api/shows/{show}/availability', [SeatMapController::class, 'checkAvailability'])->name('api.seats.availability');
+
+    // User Booking Management
+    Route::get('/my-bookings', [BookingController::class, 'myBookings'])->name('bookings.my');
+    Route::get('/bookings/{booking}', [BookingController::class, 'show'])->name('bookings.show');
+    Route::post('/bookings/{booking}/cancel', [BookingController::class, 'cancel'])->name('bookings.cancel');
+
+    // Ticket Management
+    Route::get('/bookings/{booking}/tickets', [TicketController::class, 'download'])->name('tickets.download');
+    Route::get('/bookings/{booking}/tickets/pdf', [TicketController::class, 'downloadPdf'])->name('tickets.pdf');
+    Route::get('/tickets/{ticket}/qr', [TicketController::class, 'qrCode'])->name('tickets.qr');
+    Route::get('/tickets/{ticket}/view', [TicketController::class, 'view'])->name('tickets.view');
+});
+
+// Payment Routes
+Route::middleware(['auth'])->prefix('payment')->name('payment.')->group(function () {
+    Route::post('/process', [PaymentController::class, 'process'])->name('process');
+    Route::get('/success/{booking}', [PaymentController::class, 'success'])->name('success');
+    Route::get('/cancel/{booking}', [PaymentController::class, 'cancel'])->name('cancel');
+    Route::get('/failed/{booking}', [PaymentController::class, 'failed'])->name('failed');
+});
+
+// Payment Webhooks (no auth needed)
+Route::post('/webhooks/payment/stripe', [PaymentController::class, 'stripeWebhook'])->name('webhooks.stripe');
+Route::post('/webhooks/payment/paypal', [PaymentController::class, 'paypalWebhook'])->name('webhooks.paypal');
+
+// ==================== ADMIN BOOKING ROUTES ====================
+
+// Add to your existing admin middleware group
+Route::group(['middleware' => 'auth'], function () {
+
+    // Ticket Types Management
+    Route::get('/admin/shows/{show}/ticket-types', [TicketTypeController::class, 'index'])->name('admin.ticket-types.index');
+    Route::get('/admin/shows/{show}/ticket-types/create', [TicketTypeController::class, 'create'])->name('admin.ticket-types.create');
+    Route::post('/admin/shows/{show}/ticket-types', [TicketTypeController::class, 'store'])->name('admin.ticket-types.store');
+    Route::get('/admin/ticket-types/{ticketType}/edit', [TicketTypeController::class, 'edit'])->name('admin.ticket-types.edit');
+    Route::put('/admin/ticket-types/{ticketType}', [TicketTypeController::class, 'update'])->name('admin.ticket-types.update');
+    Route::delete('/admin/ticket-types/{ticketType}', [TicketTypeController::class, 'destroy'])->name('admin.ticket-types.delete');
+
+    // Booking Management
+    Route::get('/admin/bookings', [AdminBookingController::class, 'index'])->name('admin.bookings.index');
+    Route::get('/admin/bookings/{booking}', [AdminBookingController::class, 'show'])->name('admin.bookings.show');
+    Route::patch('/admin/bookings/{booking}/status', [AdminBookingController::class, 'updateStatus'])->name('admin.bookings.update-status');
+    Route::post('/admin/bookings/{booking}/refund', [AdminBookingController::class, 'refund'])->name('admin.bookings.refund');
+    Route::post('/admin/bookings/{booking}/resend-confirmation', [AdminBookingController::class, 'resendConfirmation'])->name('admin.bookings.resend-confirmation');
+
+    // Booking Exports
+    Route::get('/admin/bookings/export/csv', [AdminBookingController::class, 'exportCsv'])->name('admin.bookings.export.csv');
+    Route::get('/admin/bookings/export/excel', [AdminBookingController::class, 'exportExcel'])->name('admin.bookings.export.excel');
+    Route::get('/admin/shows/{show}/bookings/export', [AdminBookingController::class, 'exportShowBookings'])->name('admin.show-bookings.export');
+
+    // Reports
+    Route::get('/admin/reports/sales', [AdminBookingController::class, 'salesReport'])->name('admin.reports.sales');
+    Route::get('/admin/reports/attendance', [AdminBookingController::class, 'attendanceReport'])->name('admin.reports.attendance');
+    Route::get('/admin/reports/revenue', [AdminBookingController::class, 'revenueReport'])->name('admin.reports.revenue');
+
+    // Ticket Scanning & Validation
+    Route::get('/admin/scan', [AdminBookingController::class, 'scanTicket'])->name('admin.scan');
+    Route::post('/admin/scan/validate', [AdminBookingController::class, 'validateTicket'])->name('admin.scan.validate');
+    Route::get('/admin/shows/{show}/scan', [AdminBookingController::class, 'showScanPage'])->name('admin.show.scan');
+
+    // Seat Map Management for Shows
+    Route::get('/admin/shows/{show}/seat-map', [AdminBookingController::class, 'showSeatMap'])->name('admin.show.seat-map');
+    Route::get('/admin/shows/{show}/reservations', [AdminBookingController::class, 'showReservations'])->name('admin.show.reservations');
+    Route::post('/admin/reservations/{reservation}/release', [AdminBookingController::class, 'releaseReservation'])->name('admin.reservations.release');
+
+    // Bulk Operations
+    Route::post('/admin/bookings/bulk-cancel', [AdminBookingController::class, 'bulkCancel'])->name('admin.bookings.bulk-cancel');
+    Route::post('/admin/bookings/bulk-confirm', [AdminBookingController::class, 'bulkConfirm'])->name('admin.bookings.bulk-confirm');
+    Route::post('/admin/reservations/cleanup-expired', [AdminBookingController::class, 'cleanupExpiredReservations'])->name('admin.reservations.cleanup');
+});
+
+// ==================== API ROUTES (Optional - for mobile/external) ====================
+
+Route::middleware(['auth:sanctum'])->prefix('api/v1')->name('api.')->group(function () {
+    // Shows
+    Route::get('/shows', [\App\Http\Controllers\Api\ShowController::class, 'index'])->name('');
+    Route::get('/shows/{show}', [\App\Http\Controllers\Api\ShowController::class, 'show'])->name('shows.show');
+    Route::get('/shows/{show}/availability', [\App\Http\Controllers\Api\ShowController::class, 'availability'])->name('shows.availability');
+
+    // Bookings
+    Route::get('/bookings', [\App\Http\Controllers\Api\BookingController::class, 'index'])->name('bookings.index');
+    Route::post('/bookings', [\App\Http\Controllers\Api\BookingController::class, 'store'])->name('bookings.store');
+    Route::get('/bookings/{booking}', [\App\Http\Controllers\Api\BookingController::class, 'show'])->name('bookings.show');
+    Route::patch('/bookings/{booking}/cancel', [\App\Http\Controllers\Api\BookingController::class, 'cancel'])->name('bookings.cancel');
+
+    // Tickets
+    Route::get('/tickets/{ticket}', [\App\Http\Controllers\Api\TicketController::class, 'show'])->name('tickets.show');
+    Route::post('/tickets/{ticket}/validate', [\App\Http\Controllers\Api\TicketController::class, 'validate'])->name('tickets.validate');
+});
+
+// ==================== CRON/MAINTENANCE ROUTES ====================
+
+// These should be protected by middleware or run via artisan commands
+Route::middleware(['auth', 'admin'])->prefix('admin/maintenance')->name('admin.maintenance.')->group(function () {
+    Route::post('/cleanup-expired-reservations', [AdminBookingController::class, 'cleanupExpiredReservations'])->name('cleanup-reservations');
+    Route::post('/cleanup-expired-bookings', [AdminBookingController::class, 'cleanupExpiredBookings'])->name('cleanup-bookings');
+    Route::post('/update-show-statuses', [AdminBookingController::class, 'updateShowStatuses'])->name('update-show-statuses');
+});
