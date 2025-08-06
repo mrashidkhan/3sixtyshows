@@ -28,46 +28,103 @@
                     <!-- Filter Options -->
                     <div class="row mb-3">
                         <div class="col-md-12">
-                            <form action="{{ route('show.index') }}" method="GET" class="form-inline">
-                                <div class="form-group mr-2">
-                                    <select name="category" class="form-control form-control-sm">
-                                        <option value="">All Categories</option>
-                                        @foreach($categories as $category)
-                                            <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>
-                                                {{ $category->name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">
+                                        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#filterCollapse" aria-expanded="true">
+                                            <i class="fa fa-filter"></i> Filters
+                                        </button>
+                                    </h5>
                                 </div>
-                                <div class="form-group mr-2">
-                                    <select name="status" class="form-control form-control-sm">
-                                        <option value="">All Statuses</option>
-                                        <option value="upcoming" {{ request('status') == 'upcoming' ? 'selected' : '' }}>Upcoming</option>
-                                        <option value="ongoing" {{ request('status') == 'ongoing' ? 'selected' : '' }}>Ongoing</option>
-                                        <option value="past" {{ request('status') == 'past' ? 'selected' : '' }}>Past</option>
-                                        <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
-                                    </select>
+                                <div id="filterCollapse" class="collapse show">
+                                    <div class="card-body">
+                                        <form action="{{ route('show.index') }}" method="GET" id="filterForm">
+                                            <div class="row">
+                                                <div class="col-md-2">
+                                                    <div class="form-group">
+                                                        <label for="category">Category</label>
+                                                        <select name="category" id="category" class="form-control form-control-sm">
+                                                            <option value="">All Categories</option>
+                                                            @foreach($categories as $category)
+                                                                <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>
+                                                                    {{ $category->name }}
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <div class="form-group">
+                                                        <label for="venue">Venue</label>
+                                                        <select name="venue" id="venue" class="form-control form-control-sm">
+                                                            <option value="">All Venues</option>
+                                                            @foreach($venues as $venue)
+                                                                <option value="{{ $venue->id }}" {{ request('venue') == $venue->id ? 'selected' : '' }}>
+                                                                    {{ $venue->name }}
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <div class="form-group">
+                                                        <label for="status">Status</label>
+                                                        <select name="status" id="status" class="form-control form-control-sm">
+                                                            <option value="">All Statuses</option>
+                                                            <option value="upcoming" {{ request('status') == 'upcoming' ? 'selected' : '' }}>Upcoming</option>
+                                                            <option value="ongoing" {{ request('status') == 'ongoing' ? 'selected' : '' }}>Ongoing</option>
+                                                            <option value="past" {{ request('status') == 'past' ? 'selected' : '' }}>Past</option>
+                                                            <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <div class="form-group">
+                                                        <label for="is_active">Active Status</label>
+                                                        <select name="is_active" id="is_active" class="form-control form-control-sm">
+                                                            <option value="">All</option>
+                                                            <option value="1" {{ request('is_active') == '1' ? 'selected' : '' }}>Active</option>
+                                                            <option value="0" {{ request('is_active') == '0' ? 'selected' : '' }}>Inactive</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <div class="form-group">
+                                                        <label for="redirect">Redirect</label>
+                                                        <select name="redirect" id="redirect" class="form-control form-control-sm">
+                                                            <option value="">All</option>
+                                                            <option value="1" {{ request('redirect') == '1' ? 'selected' : '' }}>With Redirect</option>
+                                                            <option value="0" {{ request('redirect') == '0' ? 'selected' : '' }}>No Redirect</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <div class="form-group">
+                                                        <label for="search">Search</label>
+                                                        <input type="text" name="search" id="search" class="form-control form-control-sm" placeholder="Search titles..." value="{{ request('search') }}">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <button type="submit" class="btn btn-primary btn-sm">
+                                                        <i class="fa fa-search"></i> Apply Filters
+                                                    </button>
+                                                    <a href="{{ route('show.index') }}" class="btn btn-default btn-sm">
+                                                        <i class="fa fa-refresh"></i> Reset
+                                                    </a>
+                                                    <span class="ml-3 text-muted">
+                                                        Showing {{ $shows->count() }} show(s)
+                                                        @if(request()->anyFilled(['category', 'venue', 'status', 'is_active', 'redirect', 'search']))
+                                                            (filtered)
+                                                        @endif
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
                                 </div>
-                                <div class="form-group mr-2">
-                                    <select name="is_active" class="form-control form-control-sm">
-                                        <option value="">All</option>
-                                        <option value="1" {{ request('is_active') == '1' ? 'selected' : '' }}>Active</option>
-                                        <option value="0" {{ request('is_active') == '0' ? 'selected' : '' }}>Inactive</option>
-                                    </select>
-                                </div>
-                                <div class="form-group mr-2">
-                                    <select name="redirect" class="form-control form-control-sm">
-                                        <option value="">All</option>
-                                        <option value="1" {{ request('redirect') == '1' ? 'selected' : '' }}>With Redirect</option>
-                                        <option value="0" {{ request('redirect') == '0' ? 'selected' : '' }}>No Redirect</option>
-                                    </select>
-                                </div>
-                                <div class="form-group mr-2">
-                                    <input type="text" name="search" class="form-control form-control-sm" placeholder="Search titles..." value="{{ request('search') }}">
-                                </div>
-                                <button type="submit" class="btn btn-primary btn-sm">Filter</button>
-                                <a href="{{ route('show.index') }}" class="btn btn-default btn-sm ml-2">Reset</a>
-                            </form>
+                            </div>
                         </div>
                     </div>
 
@@ -100,42 +157,61 @@
                                         @endif
                                     </td>
                                     <td>
-                                        {{ $show->title }}
-                                        @if($show->is_featured)
-                                            <span class="badge badge-warning ml-1">Featured</span>
-                                        @endif
-                                        @if($show->redirect)
-                                            <span class="badge badge-info ml-1" title="{{ $show->redirect_url }}">Redirect</span>
-                                        @endif
-                                    </td>
-                                    <td>{{ $show->category->name ?? 'None' }}</td>
-                                    <td>{{ $show->venue->name ?? 'None' }}</td>
-                                    <td>
-                                        <small>
-                                            <strong>Start:</strong> {{ $show->start_date->format('M d, Y H:i') }}<br>
-                                            <strong>End:</strong> {{ $show->end_date->format('M d, Y H:i') }}
-                                        </small>
+                                        <strong>{{ $show->title }}</strong>
+                                        <div class="mt-1">
+                                            @if($show->is_featured)
+                                                <span class="badge badge-warning">Featured</span>
+                                            @endif
+                                            @if($show->redirect)
+                                                <span class="badge badge-info" title="{{ $show->redirect_url }}">Redirect</span>
+                                            @endif
+                                        </div>
                                     </td>
                                     <td>
-                                        @if($show->status == 'upcoming')
-                                            <span class="badge badge-info">Upcoming</span>
-                                        @elseif($show->status == 'ongoing')
-                                            <span class="badge badge-success">Ongoing</span>
-                                        @elseif($show->status == 'past')
-                                            <span class="badge badge-secondary">Past</span>
-                                        @elseif($show->status == 'cancelled')
-                                            <span class="badge badge-danger">Cancelled</span>
-                                        @endif
-
-                                        @if(!$show->is_active)
-                                            <span class="badge badge-dark">Inactive</span>
-                                        @endif
+                                        <span class="badge badge-light">
+                                            {{ $show->category->name ?? 'None' }}
+                                        </span>
                                     </td>
-                                    <td>{{ $show->formatted_price }}</td>
+                                    <td>
+                                        <span class="badge badge-light">
+                                            {{ $show->venue->name ?? 'None' }}
+                                        </span>
+                                    </td>
+                                    <td>
+    <small>
+        <strong>Start:</strong> {{ $show->start_date->format('M d, Y H:i') }}<br>
+        @if($show->end_date)
+            <strong>End:</strong> {{ $show->end_date->format('M d, Y H:i') }}
+        @endif
+    </small>
+</td>
+                                    <td>
+                                        <div>
+                                            @if($show->status == 'upcoming')
+                                                <span class="badge badge-info">Upcoming</span>
+                                            @elseif($show->status == 'ongoing')
+                                                <span class="badge badge-success">Ongoing</span>
+                                            @elseif($show->status == 'past')
+                                                <span class="badge badge-secondary">Past</span>
+                                            @elseif($show->status == 'cancelled')
+                                                <span class="badge badge-danger">Cancelled</span>
+                                            @endif
+                                        </div>
+                                        <div class="mt-1">
+                                            @if(!$show->is_active)
+                                                <span class="badge badge-dark">Inactive</span>
+                                            @else
+                                                <span class="badge badge-success">Active</span>
+                                            @endif
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <strong>{{ $show->formatted_price }}</strong>
+                                    </td>
                                     <td>
                                         @if($show->available_tickets)
                                             <small>
-                                                Sold: {{ $show->sold_tickets ?? 0 }}/{{ $show->available_tickets }}<br>
+                                                <strong>Sold:</strong> {{ $show->sold_tickets ?? 0 }}/{{ $show->available_tickets }}<br>
                                                 @if($show->sold_out)
                                                     <span class="badge badge-danger">Sold Out</span>
                                                 @else
@@ -154,20 +230,36 @@
                                             <a href="{{ route('shows.show', $show->id) }}" class="btn btn-primary btn-sm" title="View">
                                                 <i class="fa fa-eye"></i>
                                             </a>
-                                            <a href="javascript:void(0)" data-id="{{ $show->id }}" class="btn btn-danger btn-sm show-delete" title="Delete">
-                                                <i class="fa fa-trash"></i>
-                                            </a>
+                                            <form action="{{ route('show.delete', $show->id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this show? This action cannot be undone.')">
+                                                @csrf
+                                                <button type="submit" class="btn btn-danger btn-sm" title="Delete">
+                                                    <i class="fa fa-trash"></i>
+                                                </button>
+                                            </form>
                                         </div>
                                     </td>
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="10" class="text-center">No shows found</td>
+                                    <td colspan="10" class="text-center">
+                                        <div class="py-4">
+                                            <i class="fa fa-calendar-times-o fa-3x text-muted mb-3"></i>
+                                            <h5>No shows found</h5>
+                                            <p class="text-muted">
+                                                @if(request()->anyFilled(['category', 'venue', 'status', 'is_active', 'redirect', 'search']))
+                                                    Try adjusting your filters or <a href="{{ route('show.index') }}">clear all filters</a>
+                                                @else
+                                                    <a href="{{ route('show.create') }}" class="btn btn-primary">Create your first show</a>
+                                                @endif
+                                            </p>
+                                        </div>
+                                    </td>
                                 </tr>
                                 @endforelse
                             </tbody>
                         </table>
 
+                        {{-- Uncomment for pagination --}}
                         {{-- <div class="d-flex justify-content-center">
                             {{ $shows->appends(request()->query())->links() }}
                         </div> --}}
@@ -181,46 +273,20 @@
 @section('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Delete show functionality
-        var deleteButtons = document.querySelectorAll('.show-delete');
-
-        deleteButtons.forEach(function(button) {
-            button.addEventListener('click', function() {
-                var id = this.getAttribute('data-id');
-
-                if (confirm('Are you sure you want to delete this show? This action cannot be undone.')) {
-                    // Create a form dynamically
-                    var form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = '/admin/show/' + id;
-                    form.style.display = 'none';
-
-                    // Add CSRF token
-                    var csrfToken = document.createElement('input');
-                    csrfToken.type = 'hidden';
-                    csrfToken.name = '_token';
-                    csrfToken.value = '{{ csrf_token() }}';
-                    form.appendChild(csrfToken);
-
-                    // Add method field
-                    var methodField = document.createElement('input');
-                    methodField.type = 'hidden';
-                    methodField.name = '_method';
-                    methodField.value = 'DELETE';
-                    form.appendChild(methodField);
-
-                    // Add to document and submit
-                    document.body.appendChild(form);
-                    form.submit();
-                }
+        // Auto-submit filter form when select fields change (optional)
+        document.querySelectorAll('#filterForm select').forEach(function(select) {
+            select.addEventListener('change', function() {
+                // Uncomment the line below if you want auto-submit on change
+                 this.form.submit();
             });
         });
 
-        // Auto-submit filter form when select fields change
-        document.querySelectorAll('select[name="category"], select[name="status"], select[name="is_active"], select[name="redirect"]').forEach(function(select) {
-            select.addEventListener('change', function() {
+        // Search on Enter key
+        document.getElementById('search').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
                 this.form.submit();
-            });
+            }
         });
     });
 </script>

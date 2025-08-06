@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\PhotoGallery;
+use App\Models\PhotosinGallery;
 use App\Models\Show;
 use Illuminate\Http\Request;
 
@@ -17,6 +18,49 @@ class PhotoGalleryController extends Controller
 
         return view('admin.photo_gallery.index', compact('galleries'));
     }
+
+//     public function clientIndex()
+// {
+//     // $photos = PhotosinGallery::paginate(12);
+//     // return view('pages.photo-galleries', compact('photos'));
+//     $photos = PhotosinGallery::all();
+
+
+//     return view('pages.photo-galleries', compact('photos'));
+// }
+
+public function clientIndex()
+{
+    $photos = PhotosinGallery::select([
+        'id',
+        'photo_gallery_id',
+        'image',
+        'description',
+        'display_order',
+        'created_at'
+    ])
+    ->with([
+        'photoGallery' => function($query) {
+            $query->select('id', 'title', 'description', 'is_featured', 'show_id')
+                  ->where('is_active', true);
+        },
+        'photoGallery.show' => function($query) {
+            $query->select('id', 'title', 'start_date', 'end_date', 'venue_id');
+        },
+        'photoGallery.show.venue' => function($query) {
+            $query->select('id', 'name');
+        }
+    ])
+    ->active() // Only active photos
+    ->withActiveGallery() // Only photos from active galleries
+    ->withImages() // Only photos that have images
+    ->latest()
+    ->paginate(12);
+
+    return view('pages.photo-galleries', compact('photos'));
+}
+
+
 
     public function create()
     {

@@ -34,7 +34,7 @@
     <link rel="stylesheet" href="{{ asset('assets/css/nice-select.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/jquery.animatedheadline.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/main.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/logo-slider.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/css/logo-slider.css') }}">
 
     <link rel="shortcut icon" href="{{ asset('assets/images/favicon.png') }}" type="image/x-icon">
 
@@ -64,7 +64,7 @@
     <!-- ==========Header-Section========== -->
     <header class="header-section">
         <div class="container">
-            
+
             <div class="header-wrapper">
                 <div class="logo">
                     <a href="{{ route('index') }}">
@@ -73,122 +73,36 @@
                 </div>
                 <ul class="menu">
                     <li>
-                        <a href="{{ route('index') }}" class="active">Home</a>
-                        {{-- <ul class="submenu">
-                            <li>
-                                <a href="#0" class="active">Home One</a>
-                            </li>
-                            <li>
-                                <a href="index-2.html">Home Two</a>
-                            </li>
-                        </ul> --}}
+                        <a href="{{ route('index') }}" class="{{ Route::is('index') ? 'active' : '' }}">Home</a>
                     </li>
                     <li>
-                        <a href="{{ route('aboutus') }}">About</a>
+                        <a href="{{ route('activeevents') }}" class="{{ Route::is('activeevents') ? 'active' : '' }}">Events</a>
                     </li>
                     <li>
-                        <a href="{{ route('activeevents') }}">Active Events</a>
+                        <a href="{{ route('posters') }}" class="{{ Route::is('posters') ? 'active' : '' }}">Posters</a>
                     </li>
-                    {{-- <li>
-                        <a href="#0">movies</a>
-                        <ul class="submenu">
-                            <li>
-                                <a href="movie-grid.html">Movie Grid</a>
-                            </li>
-                            <li>
-                                <a href="movie-list.html">Movie List</a>
-                            </li>
-                            <li>
-                                <a href="movie-details.html">Movie Details</a>
-                            </li>
-                            <li>
-                                <a href="movie-details-2.html">Movie Details 2</a>
-                            </li>
-                            <li>
-                                <a href="movie-ticket-plan.html">Movie Ticket Plan</a>
-                            </li>
-                            <li>
-                                <a href="movie-seat-plan.html">Movie Seat Plan</a>
-                            </li>
-                            <li>
-                                <a href="movie-checkout.html">Movie Checkout</a>
-                            </li>
-                            <li>
-                                <a href="popcorn.html">Movie Food</a>
-                            </li>
-                        </ul>
-                    </li> --}}
-                    {{-- <li>
-                        <a href="#0">events</a>
-                        <ul class="submenu">
-                            <li>
-                                <a href="events.html">Events</a>
-                            </li>
-                            <li>
-                                <a href="event-details.html">Event Details</a>
-                            </li>
-                            <li>
-                                <a href="event-speaker.html">Event Speaker</a>
-                            </li>
-                            <li>
-                                <a href="event-ticket.html">Event Ticket</a>
-                            </li>
-                            <li>
-                                <a href="event-checkout.html">Event Checkout</a>
-                            </li>
-                        </ul>
-                    </li> --}}
                     <li>
-                        <a href="#0">sports</a>
+                        <a href="#0" class="{{ Route::is('photo-galleries') || Route::is('video-galleries') ? 'active' : '' }}">Galleries</a>
                         <ul class="submenu">
                             <li>
-                                <a href="sports.html">Sports</a>
+                                <a href="{{ route('photo-galleries') }}" class="{{ Route::is('photo-galleries') ? 'active' : '' }}">Photo Galleries</a>
                             </li>
                             <li>
-                                <a href="sport-details.html">Sport Details</a>
-                            </li>
-                            <li>
-                                <a href="sports-ticket.html">Sport Ticket</a>
-                            </li>
-                            <li>
-                                <a href="sports-checkout.html">Sport Checkout</a>
+                                <a href="{{ route('video-galleries') }}" class="{{ Route::is('video-galleries') ? 'active' : '' }}">Video Galleries</a>
                             </li>
                         </ul>
                     </li>
                     <li>
-                        <a href="#0">pages</a>
-                        <ul class="submenu">
-                            <li>
-                                <a href="about.html">About Us</a>
-                            </li>
-                            <li>
-                                <a href="apps-download.html">Apps Download</a>
-                            </li>
-                            <li>
-                                <a href="sign-in.html">Sign In</a>
-                            </li>
-                            <li>
-                                <a href="sign-up.html">Sign Up</a>
-                            </li>
-                            <li>
-                                <a href="404.html">404</a>
-                            </li>
-                        </ul>
+                        <a href="{{ route('aboutus') }}" class="{{ Route::is('aboutus') ? 'active' : '' }}">About Us</a>
                     </li>
                     <li>
-                        <a href="#0">blog</a>
-                        <ul class="submenu">
-                            <li>
-                                <a href="blog.html">Blog</a>
-                            </li>
-                            <li>
-                                <a href="blog-details.html">Blog Single</a>
-                            </li>
-                        </ul>
+                        <a href="{{ route('contact') }}" class="{{ Route::is('contact') ? 'active' : '' }}">Contact Us</a>
                     </li>
-                    <li>
-                        <a href="contact.html">contact</a>
-                    </li>
+                    @auth
+                        {{-- <li>
+                            <a href="{{ route('bookings.my') }}" class="{{ Route::is('bookings.my') ? 'active' : '' }}">My Bookings</a>
+                        </li> --}}
+                    @endauth
                     <li class="header-button pr-0">
                         @auth
                             <a href="{{ route('user_logout') }}"

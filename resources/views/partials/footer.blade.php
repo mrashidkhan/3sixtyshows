@@ -4,7 +4,13 @@
         <div class="container">
             <div class="newslater-container bg_img">
                 <div class="newslater-wrapper">
-                    <h5 class="cate">contact 3Sixty Shows LLC</h5>
+                    <h5 class="cate">Get in Touch 3Sixty Shows LLC</h5>
+
+                    {{-- <h5 class="cate">Contact Us</h5> --}}
+                    {{-- <p class="mb-0">
+                    <i class="fas fa-phone me-2"></i> Call Us: +1-855-360-SHOWS
+                </p> --}}
+                    {{-- <p class="mb-1">3Sixty Shows LLC</p> --}}
                     <h3 class="title">+1-855-360-SHOWS</h3>
                     <!-- <form class="newslater-form">
                         <input type="text" placeholder="Your Email Address">
@@ -44,24 +50,33 @@
         <div class="footer-bottom">
             <div class="footer-bottom-area">
                 <div class="left">
-                    <p>Copyright © 2020.All Rights Reserved By <a href="#0"> 3Sixty Shows LLC </a></p>
+                    {{-- <p>Copyright © 2020.All Rights Reserved By <a href="#0"> 3Sixty Shows LLC </a></p> --}}
+                    <p class="copyright">
+    &copy; {{ date('Y') }} 3Sixtyshows LLC. All Rights Reserved.
+</p>
                 </div>
                 <ul class="links">
                     <li>
-                        <a href="#0">About</a>
+                        <a href="{{ route('index') }}">Home</a>
                     </li>
                     <li>
-                        <a href="#0">Terms Of Use</a>
+                        <a href="{{ route('aboutus') }}">About</a>
                     </li>
+                    {{-- <li>
+                        <a href="{{ route('contact') }}">Contact Us</a>
+                    </li> --}}
                     <li>
-                        <a href="#0">Privacy Policy</a>
+                        <a href="{{ route('privacy.policy') }}">Privacy Policy</a>
                     </li>
+                    {{-- <li>
+                        <a href="{{ route('posters') }}">Posters</a>
+                    </li> --}}
                     <li>
-                        <a href="#0">FAQ</a>
+                        <a href="{{ route('activeevents') }}">Active Events</a>
                     </li>
-                    <li>
-                        <a href="#0">Feedback</a>
-                    </li>
+                    {{-- <li>
+                        <a href="{{ route('activeevents') }}">Past Events</a>
+                    </li> --}}
                 </ul>
             </div>
         </div>

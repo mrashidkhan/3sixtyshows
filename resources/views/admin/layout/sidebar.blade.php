@@ -28,130 +28,173 @@
             <!-- sidebar menu -->
             <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
                 <div class="menu_section">
-                    <h3>General</h3>
+                    <h3>Dashboard</h3>
                     <ul class="nav side-menu">
                         <li>
                             <a href="{{ route('admin.dashboard') }}">
-                                <i class="fa fa-index"></i> Dashboard
-                                <span class="fa fa-chevron-down"></span>
+                                <i class="fa fa-dashboard"></i> Dashboard
                             </a>
                         </li>
-                        <li>
-                            <a>
-                                <i class="fa fa-list"></i> Category Manager
-                                <span class="fa fa-chevron-down"></span>
-                            </a>
-                            <ul class="nav child_menu" style="display: none;">
-                                <li><a href="{{ route('showcategory.list') }}">List</a></li>
-                                <li><a href="{{ route('showcategory.create') }}">Create</a></li>
-                            </ul>
-                        </li>
+                    </ul>
+                </div>
 
+                <div class="menu_section">
+                    <h3>Content Management</h3>
+                    <ul class="nav side-menu">
                         <li>
                             <a>
-                                <i class="fa fa-product-hunt"></i> Venue Manager
+                                <i class="fa fa-tags"></i> Show Categories
                                 <span class="fa fa-chevron-down"></span>
                             </a>
                             <ul class="nav child_menu" style="display: none;">
-                                <li><a href="{{ route('venues.index') }}">List</a></li>
-                                <li><a href="{{ route('venue.create') }}">Create</a></li>
+                                <li><a href="{{ route('showcategory.list') }}">All Categories</a></li>
+                                <li><a href="{{ route('showcategory.create') }}">Add Category</a></li>
                             </ul>
                         </li>
 
                         <li>
                             <a>
-                                <i class="fa fa-product-hunt"></i> Shows Manager
+                                <i class="fa fa-building"></i> Venue Management
                                 <span class="fa fa-chevron-down"></span>
                             </a>
                             <ul class="nav child_menu" style="display: none;">
-                                <li><a href="{{ route('show.index') }}">List</a></li>
-                                <li><a href="{{ route('show.create') }}">Create</a></li>
+                                <li><a href="{{ route('venues.index') }}">All Venues</a></li>
+                                <li><a href="{{ route('venue.create') }}">Add Venue</a></li>
                             </ul>
                         </li>
 
                         <li>
                             <a>
-                                <i class="fa fa-product-hunt"></i> Photo Gallery Manager
+                                <i class="fa fa-calendar"></i> Shows Management
                                 <span class="fa fa-chevron-down"></span>
                             </a>
                             <ul class="nav child_menu" style="display: none;">
-                                <li><a href="{{ route('photogallery.list') }}">List</a></li>
-                                <li><a href="{{ route('photogallery.create') }}">Create</a></li>
+                                <li><a href="{{ route('show.index') }}">All Shows</a></li>
+                                <li><a href="{{ route('show.create') }}">Add Show</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="menu_section">
+                    <h3>Booking System</h3>
+                    <ul class="nav side-menu">
+                        <li>
+                            <a>
+                                <i class="fa fa-ticket"></i> Bookings
+                                <span class="fa fa-chevron-down"></span>
+                            </a>
+                            <ul class="nav child_menu" style="display: none;">
+                                <li><a href="{{ route('admin.bookings.index') }}">All Bookings</a></li>
+                                <li><a href="{{ route('admin.scan') }}">Scan Tickets</a></li>
                             </ul>
                         </li>
 
                         <li>
                             <a>
-                                <i class="fa fa-product-hunt"></i> Photos in Gallery
+                                <i class="fa fa-users"></i> Customer Management
                                 <span class="fa fa-chevron-down"></span>
                             </a>
                             <ul class="nav child_menu" style="display: none;">
-                                <li><a href="{{ route('photosingallery.list') }}">List</a></li>
-                                <li><a href="{{ route('photosingallery.create') }}">Create</a></li>
+                                <li><a href="{{ route('customer.index') }}">All Customers</a></li>
+                                <li><a href="{{ route('customer.create') }}">Add Customer</a></li>
                             </ul>
                         </li>
 
                         <li>
                             <a>
-                                <i class="fa fa-product-hunt"></i> Video Gallery Manager
+                                <i class="fa fa-credit-card"></i> Payments
                                 <span class="fa fa-chevron-down"></span>
                             </a>
                             <ul class="nav child_menu" style="display: none;">
-                                <li><a href="{{ route('videogallery.list') }}">List</a></li>
-                                <li><a href="{{ route('videogallery.create') }}">Create</a></li>
+                                <li><a href="{{ route('admin.bookings.index') }}?filter=payments">Payment History</a></li>
+                                <li><a href="{{ route('admin.bookings.index') }}?filter=refunds">Refunds</a></li>
                             </ul>
                         </li>
 
                         <li>
                             <a>
-                                <i class="fa fa-product-hunt"></i> Videos in Gallery
+                                <i class="fa fa-cogs"></i> Seat Management
                                 <span class="fa fa-chevron-down"></span>
                             </a>
                             <ul class="nav child_menu" style="display: none;">
-                                <li><a href="{{ route('videosingallery.list') }}">List</a></li>
-                                <li><a href="{{ route('videosingallery.create') }}">Create</a></li>
+                                <li><a href="{{ route('admin.bookings.index') }}">View Bookings</a></li>
+                                <li><a href="{{ route('admin.scan') }}">Scan Tickets</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="menu_section">
+                    <h3>Reports & Analytics</h3>
+                    <ul class="nav side-menu">
+                        <li>
+                            <a>
+                                <i class="fa fa-bar-chart"></i> Reports
+                                <span class="fa fa-chevron-down"></span>
+                            </a>
+                            <ul class="nav child_menu" style="display: none;">
+                                <li><a href="{{ route('admin.reports.sales') }}">Sales Report</a></li>
+                                <li><a href="{{ route('admin.reports.attendance') }}">Attendance Report</a></li>
+                                <li><a href="{{ route('admin.reports.revenue') }}">Revenue Report</a></li>
                             </ul>
                         </li>
 
-                        {{-- <li>
+                        <li>
                             <a>
-                                <i class="fa fa-product-hunt"></i> Customer Manager
+                                <i class="fa fa-download"></i> Export Data
                                 <span class="fa fa-chevron-down"></span>
                             </a>
                             <ul class="nav child_menu" style="display: none;">
-                                <li><a href="{{ route('customer.index') }}">List</a></li>
-                                <li><a href="{{ route('customer.create') }}">Create</a></li>
+                                <li><a href="{{ route('admin.bookings.export.csv') }}">Export Bookings (CSV)</a></li>
+                                <li><a href="{{ route('admin.bookings.export.excel') }}">Export Bookings (Excel)</a></li>
                             </ul>
-                        </li> --}}
+                        </li>
+                    </ul>
+                </div>
 
-
-                        {{-- <li>
+                <div class="menu_section">
+                    <h3>Media Management</h3>
+                    <ul class="nav side-menu">
+                        <li>
                             <a>
-                                <i class="fa fa-product-hunt"></i> Orders Manager
+                                <i class="fa fa-camera"></i> Photo Galleries
                                 <span class="fa fa-chevron-down"></span>
                             </a>
                             <ul class="nav child_menu" style="display: none;">
-                                <li><a href="{{ route('index') }}">Order List</a></li>
-                                <li><a href="{{ route('index') }}">Direct Order List</a></li>
+                                <li><a href="{{ route('photogallery.list') }}">All Galleries</a></li>
+                                <li><a href="{{ route('photogallery.create') }}">Create Gallery</a></li>
+                                <li><a href="{{ route('photosingallery.list') }}">Manage Photos</a></li>
+                                <li><a href="{{ route('photosingallery.create') }}">Upload Photos</a></li>
                             </ul>
-                        </li> --}}
-
-                        {{-- <li>
-                            <a>
-                                <i class="fa fa-ticket"></i> Coupon Manager
-                                <span class="fa fa-chevron-down"></span>
-                            </a>
-                            <ul class="nav child_menu" style="display: none;">
-                                <li><a href="{{ route('index') }}">List</a></li>
-                                <li><a href="{{ route('index') }}">Create</a></li>
-                            </ul>
-                        </li> --}}
+                        </li>
 
                         <li>
-                            <a><i class="fa fa-product-hunt"></i> User Manager<span class="fa fa-chevron-down"></span></a>
+                            <a>
+                                <i class="fa fa-video-camera"></i> Video Galleries
+                                <span class="fa fa-chevron-down"></span>
+                            </a>
                             <ul class="nav child_menu" style="display: none;">
-                                <li><a href="{{ route('index') }}">List</a></li>
+                                <li><a href="{{ route('videogallery.list') }}">All Galleries</a></li>
+                                <li><a href="{{ route('videogallery.create') }}">Create Gallery</a></li>
+                                <li><a href="{{ route('videosingallery.list') }}">Manage Videos</a></li>
+                                <li><a href="{{ route('videosingallery.create') }}">Upload Videos</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
 
+                <div class="menu_section">
+                    <h3>System Management</h3>
+                    <ul class="nav side-menu">
+                        <li>
+                            <a>
+                                <i class="fa fa-wrench"></i> System Tools
+                                <span class="fa fa-chevron-down"></span>
+                            </a>
+                            <ul class="nav child_menu" style="display: none;">
+                                <li><a href="{{ route('admin.bookings.index') }}">System Status</a></li>
+                                <li><a href="{{ route('admin.dashboard') }}">Admin Dashboard</a></li>
                             </ul>
                         </li>
                     </ul>

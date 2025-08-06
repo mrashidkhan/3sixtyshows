@@ -1,6 +1,6 @@
 <!-- ==========Banner-Section========== -->
 <section class="banner-section" style="padding-top:150px; padding-bottom:0px;">
-    <div class="banner-bg bg_img bg-fixed" data-background="https://mtpcdn.azurewebsites.net/cdn/whitelabel/3sixtyshows/images/banner/banner01.jpg?mt=20250123"></div>
+    <div class="banner-bg bg_img bg-fixed" data-background="{{ asset('assets/images/banner/banner01.jpg') }}"></div>
     <div class="container">
         <div class="banner-content">
             <h1 class="title cd-headline clip" style="font-size:52px;">

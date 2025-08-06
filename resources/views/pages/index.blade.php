@@ -7,10 +7,11 @@
 @section('content')
 
     @include('partials.banner')
-    @include('partials.categorysection')
-    @include('partials.commingsoon')
+    @include('partials.recentsection')
+    {{-- @include('partials.commingsoon') --}}
     @include('partials.pasteventssection')
-    {{-- @include('partials.ticket-search') --}}
+    @include('partials.posters.bannersection')
+    @include('partials.posterssection')
     {{-- @include('partials.movie-section') --}}
     {{-- @include('partials.event-section') --}}
     {{-- @include('partials.sports-section') --}}

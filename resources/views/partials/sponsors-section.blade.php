@@ -27,59 +27,59 @@
     <h2>Our Sponsors</h2>
     <div class="sponsor-logo-container">
         <div class="sponsor-logo-wrapper">
-            <img src="https://mtpcdn.azurewebsites.net/cdn/whitelabel/3sixtyshows/images/sponsorlogos/frog-roofing.jpg?mt=20250123" alt="Frog Roofing">
+            <img src="{{ asset('assets/images/sponsorlogos/frog-roofing.jpg') }}" alt="Frog Roofing">
         </div>
         <div class="sponsor-logo-wrapper">
-            <img src="https://mtpcdn.azurewebsites.net/cdn/whitelabel/3sixtyshows/images/sponsorlogos/modern_touch.jpg?mt=20250123" alt="Modern Touch">
+            <img src="{{ asset('assets/images/sponsorlogos/modern_touch.jpg') }}" alt="Modern Touch">
         </div>
         <div class="sponsor-logo-wrapper">
-            <img src="https://mtpcdn.azurewebsites.net/cdn/whitelabel/3sixtyshows/images/sponsorlogos/momo_kabab.jpg?mt=20250123" alt="Momo Kabab">
+            <img src="{{ asset('assets/images/sponsorlogos/momo_kabab.jpg') }}" alt="Momo Kabab">
         </div>
         <div class="sponsor-logo-wrapper">
-            <img src="https://mtpcdn.azurewebsites.net/cdn/whitelabel/3sixtyshows/images/sponsorlogos/storenfixture.jpg?mt=20250123" alt="Store N Fixture">
+            <img src="{{ asset('assets/images/sponsorlogos/storenfixture.jpg') }}" alt="Store N Fixture">
         </div>
         <div class="sponsor-logo-wrapper">
-            <img src="https://mtpcdn.azurewebsites.net/cdn/whitelabel/3sixtyshows/images/sponsorlogos/true payment.jpg?mt=20250123" alt="True Payment">
+            <img src="{{ asset('assets/images/sponsorlogos/true_payment.jpg') }}" alt="True Payment">
         </div>
     </div>
 
     <h2>Our Partners</h2>
     <div class="sponsor-logo-container">
         <div class="sponsor-logo-wrapper">
-            <img src="https://mtpcdn.azurewebsites.net/cdn/whitelabel/3sixtyshows/images/sponsorlogos/ajani_records.jpg?mt=20250123" alt="Ajani Records">
+            <img src="{{ asset('assets/images/ourpartners/ajani_records.jpg') }}" alt="Ajani Records">
         </div>
         <div class="sponsor-logo-wrapper">
-            <img src="https://mtpcdn.azurewebsites.net/cdn/whitelabel/3sixtyshows/images/sponsorlogos/babay.jpg?mt=20250123" alt="Babay">
+            <img src="{{ asset('assets/images/ourpartners/babay.jpg') }}" alt="Babay">
         </div>
         <div class="sponsor-logo-wrapper">
-            <img src="https://mtpcdn.azurewebsites.net/cdn/whitelabel/3sixtyshows/images/sponsorlogos/carbon_radio.jpg?mt=20250123" alt="Carbon Radio">
+            <img src="{{ asset('assets/images/ourpartners/carbon_radio.jpg') }}" alt="Carbon Radio">
         </div>
         <div class="sponsor-logo-wrapper">
-            <img src="https://mtpcdn.azurewebsites.net/cdn/whitelabel/3sixtyshows/images/sponsorlogos/daami_entertainment.jpg?mt=20250123" alt="Daami Entertainment">
+            <img src="{{ asset('assets/images/ourpartners/daami_entertainment.jpg') }}" alt="Daami Entertainment">
         </div>
         <div class="sponsor-logo-wrapper">
-            <img src="https://mtpcdn.azurewebsites.net/cdn/whitelabel/3sixtyshows/images/sponsorlogos/dhakal.jpg?mt=20250123" alt="Dhakal">
+            <img src="{{ asset('assets/images/ourpartners/dhakal.jpg') }}" alt="Dhakal">
         </div>
         <div class="sponsor-logo-wrapper">
-            <img src="https://mtpcdn.azurewebsites.net/cdn/whitelabel/3sixtyshows/images/sponsorlogos/dhrr.jpg?mt=20250123" alt="DHRR">
+            <img src="{{ asset('assets/images/ourpartners/dhrr.jpg') }}" alt="DHRR">
         </div>
         <div class="sponsor-logo-wrapper">
-            <img src="https://mtpcdn.azurewebsites.net/cdn/whitelabel/3sixtyshows/images/sponsorlogos/funasia.jpg?mt=20250123" alt="Funasia">
+            <img src="{{ asset('assets/images/ourpartners/funasia.jpg') }}" alt="Funasia">
         </div>
         <div class="sponsor-logo-wrapper">
-            <img src="https://mtpcdn.azurewebsites.net/cdn/whitelabel/3sixtyshows/images/sponsorlogos/heera_malik.jpg?mt=20250123" alt="Heera Malik">
+            <img src="{{ asset('assets/images/ourpartners/heera_malik.jpg') }}" alt="Heera Malik">
         </div>
         <div class="sponsor-logo-wrapper">
-            <img src="https://mtpcdn.azurewebsites.net/cdn/whitelabel/3sixtyshows/images/sponsorlogos/jago_times.jpg?mt=20250123" alt="Jago Times">
+            <img src="{{ asset('assets/images/ourpartners/jago_times.jpg') }}" alt="Jago Times">
         </div>
         <div class="sponsor-logo-wrapper">
-            <img src="https://mtpcdn.azurewebsites.net/cdn/whitelabel/3sixtyshows/images/sponsorlogos/najleen_makhani.jpg?mt=20250123" alt="Najleen Makhani">
+            <img src="{{ asset('assets/images/ourpartners/najleen_makhani.jpg') }}" alt="Najleen Makhani">
         </div>
         <div class="sponsor-logo-wrapper">
-            <img src="https://mtpcdn.azurewebsites.net/cdn/whitelabel/3sixtyshows/images/sponsorlogos/soch_network.jpg?mt=20250123" alt="Soch Network">
+            <img src="{{ asset('assets/images/ourpartners/soch_network.jpg') }}" alt="Soch Network">
         </div>
         <div class="sponsor-logo-wrapper">
-            <img src="https://mtpcdn.azurewebsites.net/cdn/whitelabel/3sixtyshows/images/sponsorlogos/topshot_events.jpg?mt=20250123" alt="Topshot Events">
+            <img src="{{ asset('assets/images/ourpartners/topshot_events.jpg') }}" alt="Topshot Events">
         </div>
     </div>
 </div>

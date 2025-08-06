@@ -1,18 +1,18 @@
 <!-- ==========Our Team========== -->
 <section class="event-about padding-bottom">
     <div class="container">
-        <div class="row justify-content-between">
-            <div class="col-lg-7 col-xl-12">
-                <div class="event-about-content">
-                    <div class="section-header-3 left-style m-0">
-                        <p>
-                            <span class="cate title">Meet The Team</span>
-                        </p>
-                    </div>
+    <div class="row justify-content-center">
+        <div class="col-lg-12">
+            <div class="event-about-content text-center">
+                <div class="section-header-3 m-0">
+                    <p>
+                        <span class="cate title">Our Leadership Team</span>
+                    </p>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
     <div class="container">
         <div class="p-lg-2 p-3">
@@ -141,29 +141,7 @@
                     </div>
                 </div>
 
-
-
-
-
-
-
-
-                <div class="team teambg5">
-                    <img src="https://mtpcdn.azurewebsites.net/cdn/whitelabel/3sixtyshows/images/team/latestimages/rebeccasamuel.jpeg?mt=20250123" alt="Rebecca Samuel">
-                    <h4>Rebecca Samuel</h4>
-                    <div class="team-designation">Transportation Coordinator</div>
-                    <div class="mt-1 mb-1">
-
-                    </div>
-                </div>
-                <div class="team teambg1">
-                    <img src="https://mtpcdn.azurewebsites.net/cdn/whitelabel/3sixtyshows/images/team/latestimages/sarahesther.jpeg?mt=20250123" alt="Sarah Esther">
-                    <h4>Sarah Esther</h4>
-                    <div class="team-designation">On-Site Event Manager</div>
-                    <div class="mt-1 mb-1">
-
-                    </div>
-                </div>
+                
 
             </div>
         </div>

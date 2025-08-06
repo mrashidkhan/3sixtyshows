@@ -29,12 +29,13 @@ class PhotosinGalleryController extends Controller
 
     public function store(Request $request)
     {
-        // $request->validate([
-        //     'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-        //     'description' => 'nullable|string',
-        //     'display_order' => 'nullable|integer',
-        //     'is_active' => 'nullable|boolean',
-        // ]);
+        $request->validate([
+    'photo_gallery_id' => 'required|exists:photo_galleries,id',
+    'image.*' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+    'description' => 'nullable|string',
+    'display_order' => 'nullable|integer',
+    'is_active' => 'nullable|boolean',
+]);
 
         // $gallery = PhotoGallery::findOrFail($galleryId);
 

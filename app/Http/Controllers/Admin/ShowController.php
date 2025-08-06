@@ -19,18 +19,64 @@ class ShowController extends Controller
         // Add your admin middleware here
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        // $venues = Venue::withCount('shows')
-        //               ->orderBy('name')
-        //               ->paginate(10);
+        // Get all venues and categories for filter dropdowns
         $venues = Venue::all();
         $categories = ShowCategory::all();
-        $shows = Show::all();
 
-        return view('admin.show.index', compact('venues','categories','shows'));
+        // Start with base query
+        $query = Show::with(['category', 'venue']);
+
+        // Apply filters based on request parameters
+
+        // Filter by category
+        if ($request->filled('category')) {
+            $query->where('category_id', $request->category);
+        }
+
+        // Filter by status
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        // Filter by active/inactive
+        if ($request->filled('is_active')) {
+            $query->where('is_active', $request->is_active == '1');
+        }
+
+        // Filter by redirect
+        if ($request->filled('redirect')) {
+            $query->where('redirect', $request->redirect == '1');
+        }
+
+        // Filter by venue (if you want to add venue filter)
+        if ($request->filled('venue')) {
+            $query->where('venue_id', $request->venue);
+        }
+
+        // Search functionality
+        if ($request->filled('search')) {
+            $searchTerm = $request->search;
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('title', 'LIKE', '%' . $searchTerm . '%')
+                  ->orWhere('description', 'LIKE', '%' . $searchTerm . '%')
+                  ->orWhere('short_description', 'LIKE', '%' . $searchTerm . '%')
+                  ->orWhere('performers', 'LIKE', '%' . $searchTerm . '%');
+            });
+        }
+
+        // Order by most recent first
+        $query->orderBy('created_at', 'desc');
+
+        // Get paginated results (uncomment if you want pagination)
+        // $shows = $query->paginate(10);
+
+        // Or get all results
+        $shows = $query->get();
+
+        return view('admin.show.index', compact('venues', 'categories', 'shows'));
     }
-
 
     public function create()
     {
@@ -40,42 +86,42 @@ class ShowController extends Controller
     }
 
     public function store(Request $request)
-{
-    $validated = $request->validate([
-        'title' => 'required|string|max:255',
-        'category_id' => 'required|exists:show_categories,id',
-        'venue_id' => 'required|exists:venues,id',
-        'description' => 'required|string',
-        'short_description' => 'nullable|string|max:500',
-        'featured_image' => 'required|image|mimes:jpeg,png,jpg|max:2048',
-        'start_date' => 'required|date',
-        'end_date' => 'nullable|date|after_or_equal:start_date',
-        'price' => 'nullable|numeric|min:0',
-        'available_tickets' => 'nullable|integer|min:0',
-        'is_featured' => 'boolean',
-        'status' => 'required|in:upcoming,ongoing,past,cancelled',
-        'performers' => 'nullable|string',
-        'duration' => 'nullable|string|max:50',
-        'age_restriction' => 'nullable|string|max:50',
-        'is_active' => 'boolean',
-        'redirect' => 'boolean',
-        'redirect_url' => 'nullable|url|required_if:redirect,1',
-    ]);
+    {
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'category_id' => 'required|exists:show_categories,id',
+            'venue_id' => 'required|exists:venues,id',
+            'description' => 'required|string',
+            'short_description' => 'nullable|string|max:500',
+            'featured_image' => 'required|image|mimes:jpeg,png,webp,jpg|max:2048',
+            'start_date' => 'required|date',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
+            'price' => 'nullable|numeric|min:0',
+            'available_tickets' => 'nullable|integer|min:0',
+            'is_featured' => 'boolean',
+            'status' => 'required|in:upcoming,ongoing,past,cancelled',
+            'performers' => 'nullable|string',
+            'duration' => 'nullable|string|max:50',
+            'age_restriction' => 'nullable|string|max:50',
+            'is_active' => 'boolean',
+            'redirect' => 'boolean',
+            'redirect_url' => 'nullable|url|required_if:redirect,1',
+        ]);
 
-    // Simple image upload without manipulation
-    if ($request->hasFile('featured_image')) {
-        $file = $request->file('featured_image');
-        $filename = time() . '.' . $file->getClientOriginalExtension();
-        $path=$file->storeAs('shows', $filename);
-        $validated['featured_image'] = $path;
+        // Simple image upload without manipulation
+        if ($request->hasFile('featured_image')) {
+            $file = $request->file('featured_image');
+            $filename = time() . '.' . $file->getClientOriginalExtension();
+            $path=$file->storeAs('shows', $filename);
+            $validated['featured_image'] = $path;
+        }
+
+        // Create show
+        $show = Show::create($validated);
+
+        return redirect()->route('show.index')
+                        ->with('success', 'Show created successfully!');
     }
-
-    // Create show
-    $show = Show::create($validated);
-
-    return redirect()->route('show.index')
-                    ->with('success', 'Show created successfully!');
-}
 
     public function show($id)
     {
@@ -97,85 +143,85 @@ class ShowController extends Controller
     }
 
     public function update(Request $request, $id)
-{
-    $show = Show::findOrFail($id);
+    {
+        $show = Show::findOrFail($id);
 
-    $validated = $request->validate([
-        'title' => 'required|string|max:255',
-        'slug' => 'required|string|max:255|unique:shows,slug,' . $id,
-        'category_id' => 'required|exists:show_categories,id',
-        'venue_id' => 'required|exists:venues,id',
-        'description' => 'required|string',
-        'short_description' => 'required|string|max:500',
-        'featured_image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-        'start_date' => 'required|date',
-        'end_date' => 'required|date|after_or_equal:start_date',
-        'price' => 'required|numeric|min:0',
-        'available_tickets' => 'nullable|integer|min:0',
-        'is_featured' => 'required|boolean',
-        'status' => 'required|in:upcoming,ongoing,past,cancelled',
-        'performers' => 'nullable|string',
-        'duration' => 'nullable|string|max:50',
-        'age_restriction' => 'nullable|string|max:50',
-        'is_active' => 'required|boolean',
-        'redirect' => 'boolean',
-        'redirect_url' => 'nullable|url|required_if:redirect,1', // URL required if redirect is enabled
-    ]);
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'slug' => 'required|string|max:255|unique:shows,slug,' . $id,
+            'category_id' => 'required|exists:show_categories,id',
+            'venue_id' => 'required|exists:venues,id',
+            'description' => 'required|string',
+            'short_description' => 'required|string|max:500',
+            'featured_image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+            'price' => 'required|numeric|min:0',
+            'available_tickets' => 'nullable|integer|min:0',
+            'is_featured' => 'required|boolean',
+            'status' => 'required|in:upcoming,ongoing,past,cancelled',
+            'performers' => 'nullable|string',
+            'duration' => 'nullable|string|max:50',
+            'age_restriction' => 'nullable|string|max:50',
+            'is_active' => 'required|boolean',
+            'redirect' => 'boolean',
+            'redirect_url' => 'nullable|url|required_if:redirect,1', // URL required if redirect is enabled
+        ]);
 
-    // Handle the additional_info array (from additional_info_json hidden field)
-    if ($request->has('additional_info_json')) {
-        $validated['additional_info'] = json_decode($request->additional_info_json, true);
-    } elseif ($request->has('additional_info')) {
-        // Fallback in case the JavaScript processing didn't work
-        $lines = explode("\n", $request->additional_info);
-        $additionalInfo = [];
+        // Handle the additional_info array (from additional_info_json hidden field)
+        if ($request->has('additional_info_json')) {
+            $validated['additional_info'] = json_decode($request->additional_info_json, true);
+        } elseif ($request->has('additional_info')) {
+            // Fallback in case the JavaScript processing didn't work
+            $lines = explode("\n", $request->additional_info);
+            $additionalInfo = [];
 
-        foreach ($lines as $line) {
-            $parts = explode(':', $line, 2);
-            if (count($parts) === 2) {
-                $key = trim($parts[0]);
-                $value = trim($parts[1]);
-                if (!empty($key) && !empty($value)) {
-                    $additionalInfo[$key] = $value;
+            foreach ($lines as $line) {
+                $parts = explode(':', $line, 2);
+                if (count($parts) === 2) {
+                    $key = trim($parts[0]);
+                    $value = trim($parts[1]);
+                    if (!empty($key) && !empty($value)) {
+                        $additionalInfo[$key] = $value;
+                    }
                 }
             }
+
+            $validated['additional_info'] = $additionalInfo;
         }
 
-        $validated['additional_info'] = $additionalInfo;
-    }
+        // Handle image upload if present
+        if ($request->hasFile('featured_image')) {
+            // Delete old image if exists
+            if ($show->featured_image) {
+                Storage::delete('public/shows/' . $show->featured_image);
+            }
 
-    // Handle image upload if present
-    if ($request->hasFile('featured_image')) {
-        // Delete old image if exists
-        if ($show->featured_image) {
-            Storage::delete('public/shows/' . $show->featured_image);
+            // Upload new image
+            $image = $request->file('featured_image');
+            $filename = time() . '.' . $image->getClientOriginalExtension();
+
+            // Store image
+            $path = $image->storeAs('shows', $filename);
+
+            // Save filename to database
+            $validated['featured_image'] = $path;
         }
 
-        // Upload new image
-        $image = $request->file('featured_image');
-        $filename = time() . '.' . $image->getClientOriginalExtension();
+        // Clear redirect URL if redirect is disabled
+        if (!$request->has('redirect') || !$request->redirect) {
+            $validated['redirect_url'] = null;
+        }
 
-        // Store image
-        $path = $image->storeAs('shows', $filename);
+        // Update show
+        $show->update($validated);
 
-        // Save filename to database
-        $validated['featured_image'] = $path;
+        // Update the show status based on dates
+        $show->updateStatus();
+
+        return redirect()->route('show.index')
+                        ->with('success', 'Show updated successfully!');
     }
-
-    // Clear redirect URL if redirect is disabled
-    if (!$request->has('redirect') || !$request->redirect) {
-        $validated['redirect_url'] = null;
-    }
-
-    // Update show
-    $show->update($validated);
-
-    // Update the show status based on dates
-    $show->updateStatus();
-
-    return redirect()->route('show.index')
-                    ->with('success', 'Show updated successfully!');
-}
 
     public function destroy($id)
     {

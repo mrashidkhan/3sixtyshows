@@ -118,7 +118,7 @@
         <!-- Top Bar Start -->
         <div class="top-bar row gx-0 align-items-center bg-success text-white d-none d-md-flex">
             <div class="col-md-6 px-5 text-start">
-                <small><i class="fa fa-map-marker-alt me-2 text-warning"></i>Welcome to 3SixtyShows - Admin Portal</small>
+                <small><i class="fa fa-map-marker-alt me-2 text-warning"></i>Welcome to 3SixtyShows - Your Entertainment Hub</small>
                 <small class="ms-4"><i class="fa fa-envelope me-2"></i>info@3SixtyShows.com</small>
             </div>
             <div class="col-md-6 px-5 text-end">
@@ -140,26 +140,38 @@
 
             <div class="collapse navbar-collapse" id="navbarCollapse">
                 <div class="navbar-nav ms-auto p-2 p-lg-0">
-                    <a href="{{ route('index') }}" class="nav-item nav-link text-success fw-bold" aria-label="index">index</a>
-                    {{-- <a href="{{ route('shop') }}" class="nav-item nav-link text-success" aria-label="Products">Shop</a> --}}
-                    <a href="{{ route('aboutus') }}" class="nav-item nav-link text-success" aria-label="About Us">About Us</a>
-                    {{-- @auth
-    <a href="{{ route('my.orders') }}" class="nav-item nav-link text-success" aria-label="My Orders">My Orders</a>
-@endauth --}}
+                    <a href="{{ route('index') }}" class="nav-item nav-link text-success fw-bold" aria-label="Home">
+                        <i class="fas fa-home"></i> Home
+                    </a>
+                    <a href="{{ route('activeevents') }}" class="nav-item nav-link text-success" aria-label="Shows">
+                        <i class="fas fa-calendar-alt"></i> Shows & Events
+                    </a>
+                    <a href="{{ route('aboutus') }}" class="nav-item nav-link text-success" aria-label="About Us">
+                        <i class="fas fa-info-circle"></i> About Us
+                    </a>
+                    <a href="{{ route('contact') }}" class="nav-item nav-link text-success" aria-label="Contact">
+                        <i class="fas fa-envelope"></i> Contact Us
+                    </a>
 
-                    {{-- <a href="{{ route('index') }}" class="nav-item nav-link text-success" aria-label="Contact Us">Contact Us</a> --}}
-                    {{-- <a href="{{ route('cart.view') }}" class="nav-item nav-link text-success" aria-label="Cart"><i class="bi bi-cart fs-6"></i> Cart</a> --}}
                     @if (Auth::check())
-                        <a href="{{ route('user_logout') }}" class="nav-item nav-link text-success" aria-label="Log Out"><i class="fas fa-sign-out-alt"></i> Log Out</a>
+                        <a href="{{ route('bookings.my') }}" class="nav-item nav-link text-success" aria-label="My Bookings">
+                            <i class="fas fa-ticket-alt"></i> My Bookings
+                        </a>
+                        <div class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-success" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-user"></i> {{ Auth::user()->name }}
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="userDropdown">
+                                <li><a class="dropdown-item" href="{{ route('bookings.my') }}"><i class="fas fa-ticket-alt"></i> My Bookings</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{{ route('user_logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                            </ul>
+                        </div>
                     @else
-                        <a href="{{ route('user_login') }}" class="nav-item nav-link text-success" aria-label="Log In"><i class="fas fa-sign-in-alt"></i> Login</a>
+                        <a href="{{ route('user_login') }}" class="nav-item nav-link text-success" aria-label="Log In">
+                            <i class="fas fa-sign-in-alt"></i> Login
+                        </a>
                     @endif
-                    @if (Auth::check())
-                <span class="navbar-text text-success me-3">
-                    Welcome, {{ Auth::user()->name }} <!-- Display the authenticated user's name -->
-                </span>
-                @endif
-
                 </div>
             </div>
         </nav>

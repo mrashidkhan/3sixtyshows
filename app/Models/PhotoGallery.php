@@ -24,4 +24,10 @@ class PhotoGallery extends Model
     {
         return $this->belongsTo(Show::class);
     }
+
+    // A photo gallery has many photos
+    public function photos()
+    {
+        return $this->hasMany(PhotosinGallery::class, 'photo_gallery_id');
+    }
 }

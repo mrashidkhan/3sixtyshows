@@ -71,6 +71,11 @@ class Booking extends Model
         return $this->hasOne(Payment::class)->latest();
     }
 
+    public function payment()
+    {
+        return $this->hasOne(Payment::class)->latest();
+    }
+
     // Auto-generate booking number
     protected static function boot()
     {

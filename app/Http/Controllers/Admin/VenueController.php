@@ -20,10 +20,14 @@ class VenueController extends Controller
         // $venues = Venue::withCount('shows')
         //               ->orderBy('name')
         //               ->paginate(10);
+
+        // Get all venues with shows count for filter dropdowns
+        $query = Venue::withCount('shows');
+
         $venues = Venue::all();
         $countries = $this->getCountriesList();
 
-        return view('admin.venue.index', compact('venues','countries'));
+        return view('admin.venue.index', compact('venues','countries','query'));
     }
 
     public function create()

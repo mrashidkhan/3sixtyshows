@@ -32,6 +32,12 @@ public function seatMap()
     return $this->hasOne(SeatMap::class);
 }
 
+public function generalAdmissionAreas()
+{
+    return $this->hasMany(GeneralAdmissionArea::class);
+}
+
+
     // Get full address
     public function getFullAddressAttribute()
     {
