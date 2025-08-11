@@ -64,7 +64,8 @@ public function clientIndex()
 
     public function create()
     {
-        $shows = Show::where('is_active', true)->orderBy('title')->get();
+        // $shows = Show::where('is_active', true)->orderBy('title')->get();
+        $shows = Show::orderBy('title')->get();
         return view('admin.photo_gallery.create', compact('shows'));
     }
 

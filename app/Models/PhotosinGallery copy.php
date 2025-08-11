@@ -5,30 +5,26 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class PhotoGallery extends Model
+class PhotosinGallery extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'show_id', 'title', 'image', 'description',
-        'display_order', 'is_featured', 'is_active'
+        'photo_gallery_id', // Foreign key to PhotoGallery
+        'image',            // Path to the image
+        'description',      // Description of the photo
+        'display_order',    // Order in which the photo should be displayed
+        'is_active',        // Status of the photo
     ];
 
     protected $casts = [
-        'is_featured' => 'boolean',
         'is_active' => 'boolean',
     ];
 
-    // A photo belongs to a show
-    public function show()
+    // A photo belongs to a photo gallery
+    public function photoGallery()
     {
-        return $this->belongsTo(Show::class);
-    }
-
-    // A photo gallery has many photos
-    public function photos()
-    {
-        return $this->hasMany(PhotosinGallery::class, 'photo_gallery_id');
+        return $this->belongsTo(PhotoGallery::class);
     }
 
     // Accessor for image URL
@@ -69,8 +65,28 @@ class PhotoGallery extends Model
         return 'data:image/svg+xml;base64,' . base64_encode('
             <svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
                 <rect width="400" height="300" fill="#f8f9fa"/>
-                <text x="200" y="150" text-anchor="middle" fill="#6c757d" font-family="Arial" font-size="16">No Gallery Cover</text>
+                <text x="200" y="150" text-anchor="middle" fill="#6c757d" font-family="Arial" font-size="16">No Image Available</text>
             </svg>
         ');
+    }
+
+    // Scope for active photos
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
+
+    // Scope for photos with active galleries
+    public function scopeWithActiveGallery($query)
+    {
+        return $query->whereHas('photoGallery', function($q) {
+            $q->where('is_active', true);
+        });
+    }
+
+    // Scope for photos with images
+    public function scopeWithImages($query)
+    {
+        return $query->whereNotNull('image')->where('image', '!=', '');
     }
 }

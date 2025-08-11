@@ -7,7 +7,7 @@
                 <span class="d-block" style="width:100%;">Active Events</span>
             </h1>
 
-            <p style="font-size:25px">Be sure not to miss these Event today</p>
+            <p style="font-size:25px">Experience our active shows today!</p>
         </div>
 
     </div>

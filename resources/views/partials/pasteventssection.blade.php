@@ -47,12 +47,12 @@
                                             @else
                                                 <a href="{{ route('show.details', $show->slug) }}">
                                             @endif
-                                                {{ Str::limit($show->title, 20, '...') }}
+                                                {{ strlen($show->title) > 20 ? substr($show->title, 0, 20).'...' : $show->title }}
                                             </a>
                                         </h5>
                                         <div class="movie-rating-percent">
                                             <span style="color:white;">
-                                                {{ $show->venue ? Str::limit($show->venue->name, 20, '...') : 'Venue TBA' }}
+                                                {{-- {{ optional($show->venue)->name ? Str::limit($show->venue->name, 20, '...') : 'Venue TBA' }} --}}
                                             </span>
                                         </div>
                                     </div>

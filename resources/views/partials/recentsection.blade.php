@@ -54,13 +54,14 @@
                                             @else
                                                 <a href="{{ route('show.details', $event->slug) }}">
                                             @endif
-                                                {{ Str::limit($event->title, 20, '...') }}
+                                                {{ Str::substr($event->title, 0, 20) }}@if(Str::length($event->title) > 20)...@endif
                                             </a>
                                         </h5>
                                         <div class="movie-rating-percent title" style="justify-content:center">
                                             <span style="color:white;">
-                                                {{ $event->venue ? Str::limit($event->venue->name, 20, '...') : 'Venue TBA' }}
-                                            </span>
+    @php $venueName = $event->venue?->name ?? 'Venue TBA'; @endphp
+    {{ strlen($venueName) > 20 ? substr($venueName, 0, 20) . '...' : $venueName }}
+</span>
                                         </div>
                                         <div class="movie-rating-percent" style="justify-content:center">
                                             @if($event->redirect && $event->redirect_url)

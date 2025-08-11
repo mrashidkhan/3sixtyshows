@@ -27,6 +27,8 @@ use App\Http\Controllers\Admin\PhotosinGalleryController;
 use App\Http\Controllers\Admin\VideosinGalleryController;
 use App\Http\Controllers\Admin\CustomerController;
 
+
+
 // Public Routes
 Route::get('/seatselection', [PageController::class, 'selection'])->name('seatselection');
 Route::get('/', [PageController::class, 'index'])->name('index');
@@ -122,7 +124,9 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/videosingallery/edit/{id}', [VideosinGalleryController::class, 'edit'])->name('videosingallery.edit');
     Route::post('/videosingallery/edit/{id}', [VideosinGalleryController::class, 'update'])->name('videosingallery.update');
     Route::get('/videosingallery/{id}', [VideosinGalleryController::class, 'show'])->name('videosingallery.show');
-    Route::post('/videosingallery/delete/{id}', [VideosinGalleryController::class, 'destroy'])->name('videosingallery.delete');
+    // Route::delete('/videosingallery/delete/{id}', [VideosinGalleryController::class, 'destroy'])->name('videosingallery.delete');
+    // routes/web.php
+    Route::delete('/videosingallery/delete/{id}', [VideosinGalleryController::class, 'destroy'])->name('videosingallery.delete');
 
     // Video Gallery Management
     Route::get('/videogallery/list', [VideoGalleryController::class, 'index'])->name('videogallery.list');
@@ -252,3 +256,22 @@ Route::middleware(['auth', 'admin'])->prefix('admin/maintenance')->name('admin.m
     Route::post('/update-show-statuses', [AdminBookingController::class, 'updateShowStatuses'])->name('update-show-statuses');
 });
 
+// routes/web.php
+use App\Http\Controllers\BookingPageController;
+
+// Use slug for booking
+Route::get('/shows/{show:slug}/book', [BookingPageController::class, 'showSeatSelection'])
+    ->name('booking.seat-selection');
+
+// API routes with slug
+Route::prefix('api')->group(function () {
+    Route::get('/shows/{show:slug}/seating', [BookingController::class, 'getAvailableSeating']);
+    Route::post('/shows/{show:slug}/hold-tickets', [BookingController::class, 'holdTickets']);
+});
+
+
+use App\Http\Controllers\GalleryController;
+
+// Gallery routes
+Route::get('/galleries', [GalleryController::class, 'index'])->name('galleries.index');
+Route::get('/gallery/{galleryId}/photos', [GalleryController::class, 'getGalleryPhotos'])->name('gallery.photos');

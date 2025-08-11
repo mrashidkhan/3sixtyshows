@@ -19,20 +19,21 @@ class VideoGalleryController extends Controller
     }
 
     public function clientIndex(Request $request)
-    {
-        $videos = \App\Models\VideosinGallery::with(['gallery', 'gallery.show'])
-            ->whereHas('gallery', function($query) {
-                $query->where('is_active', true);
-            })
-            ->orderBy('created_at', 'desc')
-            ->paginate(12);
+{
+    $videos = \App\Models\VideosinGallery::with(['videoGallery', 'videoGallery.show'])
+        ->whereHas('videoGallery', function($query) {
+            $query->where('is_active', true);
+        })
+        ->orderBy('created_at', 'desc')
+        ->paginate(12);
 
-        return view('pages.video-galleries', compact('videos'));
-    }
+    return view('pages.video-galleries', compact('videos'));
+}
 
     public function create()
     {
-        $shows = Show::where('is_active', true)->orderBy('title')->get();
+        // $shows = Show::where('is_active', true)->orderBy('title')->get();
+        $shows = Show::orderBy('title')->get();
         return view('admin.video_gallery.create', compact('shows'));
     }
 

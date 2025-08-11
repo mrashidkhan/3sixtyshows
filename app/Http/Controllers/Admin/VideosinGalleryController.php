@@ -119,22 +119,20 @@ class VideosinGalleryController extends Controller
         ->with('success', 'video updated successfully.');
 }
 
-    public function destroy($galleryId, $id)
-    {
-        $video = VideosinGallery::where('video_gallery_id', $galleryId)
-            ->where('id', $id)
-            ->firstOrFail();
+    public function destroy($id) // Remove $galleryId parameter
+{
+    $video = VideosinGallery::findOrFail($id);
 
-        // Delete the image file
-        if ($video->image && Storage::disk('public')->exists($video->image)) {
-            Storage::disk('public')->delete($video->image);
-        }
-
-        $video->delete();
-
-        return redirect()->route('videos.gallery.index', $galleryId)
-            ->with('success', 'video removed from gallery successfully.');
+    // Delete the image file
+    if ($video->image && Storage::disk('public')->exists(str_replace('/storage/', '', $video->image))) {
+        Storage::disk('public')->delete(str_replace('/storage/', '', $video->image));
     }
+
+    $video->delete();
+
+    return redirect()->route('videosingallery.list')
+        ->with('success', 'Video removed from gallery successfully.');
+}
 
     public function bulkUpload($galleryId)
     {

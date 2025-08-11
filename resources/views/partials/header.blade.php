@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 
-
-<!-- Mirrored from pixner.net/boleto/demo/index.html by HTTrack Website Copier/3.x [XR&CO'2014], Thu, 17 Oct 2024 14:11:53 GMT -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -40,7 +38,6 @@
 
     <title>3SixtyShows</title>
 
-
 </head>
 
 <body>
@@ -64,7 +61,6 @@
     <!-- ==========Header-Section========== -->
     <header class="header-section">
         <div class="container">
-
             <div class="header-wrapper">
                 <div class="logo">
                     <a href="{{ route('index') }}">
@@ -81,11 +77,11 @@
                     <li>
                         <a href="{{ route('posters') }}" class="{{ Route::is('posters') ? 'active' : '' }}">Posters</a>
                     </li>
-                    <li>
-                        <a href="#0" class="{{ Route::is('photo-galleries') || Route::is('video-galleries') ? 'active' : '' }}">Galleries</a>
+                    <li class="{{ Route::is('galleries.index') || Route::is('video-galleries') ? 'active' : '' }}">
+                        <a href="#0" class="{{ Route::is('galleries.index') || Route::is('video-galleries') ? 'active' : '' }}">Galleries</a>
                         <ul class="submenu">
                             <li>
-                                <a href="{{ route('photo-galleries') }}" class="{{ Route::is('photo-galleries') ? 'active' : '' }}">Photo Galleries</a>
+                                <a href="{{ route('galleries.index') }}" class="{{ Route::is('galleries.index') ? 'active' : '' }}">Photo Galleries</a>
                             </li>
                             <li>
                                 <a href="{{ route('video-galleries') }}" class="{{ Route::is('video-galleries') ? 'active' : '' }}">Video Galleries</a>
@@ -95,9 +91,9 @@
                     <li>
                         <a href="{{ route('aboutus') }}" class="{{ Route::is('aboutus') ? 'active' : '' }}">About Us</a>
                     </li>
-                    <li>
+                    {{-- <li>
                         <a href="{{ route('contact') }}" class="{{ Route::is('contact') ? 'active' : '' }}">Contact Us</a>
-                    </li>
+                    </li> --}}
                     @auth
                         {{-- <li>
                             <a href="{{ route('bookings.my') }}" class="{{ Route::is('bookings.my') ? 'active' : '' }}">My Bookings</a>
@@ -125,3 +121,5 @@
         </div>
     </header>
     <!-- ==========Header-Section========== -->
+</body>
+</html>

@@ -7,10 +7,10 @@
     <div class="container">
         <div class="details-banner-wrapper">
             <div class="details-banner-content">
-                <h1 class="title">{{ $show->title ?? 'Event Title' }}</h1>
+                <h1 class="title">{{ $show->title }}</h1>
                 <div class="tags">
-                    <a href="#">{{ $show->category?->name ?? 'Event' }}</a>
-                    @if($show->venue?->name)
+                    <a href="#">{{ $show->category ? $show->category->name : 'Event' }}</a>
+                    @if($show->venue)
                         <a href="#">{{ $show->venue->name }}</a>
                     @endif
                 </div>
@@ -27,7 +27,7 @@
             <div class="col-lg-8">
                 <div class="event-about-content">
                     <div class="section-header-3 left-style">
-                        <span class="cate">{{ $show->category?->name ?? 'Event' }}</span>
+                        <span class="cate">{{ $show->category ? $show->category->name : 'Event' }}</span>
                         <h2 class="title">About The Event</h2>
                         @if($show->description)
                             <p>{!! nl2br(e($show->description)) !!}</p>
@@ -41,25 +41,11 @@
                             <div class="info-box">
                                 <div class="info-left">
                                     <h6>Start Date & Time</h6>
-                                    <p>
-                                        @if($show->start_date)
-                                            {{ $show->start_date->format('M d, Y') }}<br>
-                                            {{ $show->start_date->format('g:i A') }}
-                                        @else
-                                            Date TBA
-                                        @endif
-                                    </p>
+                                    <p>{{ $formattedStartDate }}<br>{{ $formattedStartTime }}</p>
                                 </div>
                                 <div class="info-right">
                                     <h6>End Date & Time</h6>
-                                    <p>
-                                        @if($show->end_date)
-                                            {{ $show->end_date->format('M d, Y') }}<br>
-                                            {{ $show->end_date->format('g:i A') }}
-                                        @else
-                                            End Time TBA
-                                        @endif
-                                    </p>
+                                    <p>{{ $formattedEndDate }}<br>{{ $formattedEndTime }}</p>
                                 </div>
                             </div>
                         </div>
@@ -72,11 +58,11 @@
                                 @if($show->venue->address)
                                     <p>{{ $show->venue->address }}</p>
                                 @endif
-                                @if($show->venue->city || $show->venue->state || $show->venue->postal_code)
+                                @if($show->venue->city || $show->venue->state || $show->venue->zip)
                                     <p>
                                         {{ $show->venue->city ? $show->venue->city . ', ' : '' }}
                                         {{ $show->venue->state ?? '' }}
-                                        {{ $show->venue->postal_code ?? '' }}
+                                        {{ $show->venue->zip ?? '' }}
                                     </p>
                                 @endif
                             </div>
@@ -111,13 +97,8 @@
                                 <h4>Book Your Tickets</h4>
                             </div>
                             <div class="widget-content">
-                                @php
-                                    $isSoldOut = $show->available_tickets !== null && $show->sold_tickets >= $show->available_tickets;
-                                    $eventPassed = $show->end_date && $show->end_date < now();
-                                @endphp
-
                                 @if($show->redirect && $show->redirect_url)
-                                    <a href="{{ $show->redirect_url }}" target="_blank" rel="noopener" class="custom-button" style="width: 100%; text-align: center;">
+                                    <a href="{{ $show->redirect_url }}" target="_blank" class="custom-button" style="width: 100%; text-align: center;">
                                         Book Now
                                     </a>
                                 @elseif($isSoldOut)
@@ -129,7 +110,7 @@
                                         Event Passed
                                     </button>
                                 @else
-                                    <a href="{{ route('booking.seat-selection', $show->slug) }}" class="custom-button" style="width: 100%; text-align: center;">
+                                    <a href="{{ route('show.booking', $show->slug) }}" class="custom-button" style="width: 100%; text-align: center;">
                                         @if($show->price == 0 || $show->price === null)
                                             Register for Free
                                         @else
@@ -138,14 +119,14 @@
                                     </a>
                                 @endif
 
-                                @if($show->start_date && !$eventPassed)
-                                    <div class="event-countdown" style="margin-top: 20px;">
+                                <div class="event-countdown" style="margin-top: 20px;">
+                                    @if(!$eventPassed)
                                         <h6 style="text-align: center; margin-bottom: 15px;">Event Starts In:</h6>
                                         <div class="countdown" data-date="{{ $show->start_date->format('Y-m-d H:i:s') }}">
                                             <!-- Countdown will be inserted by JavaScript -->
                                         </div>
-                                    </div>
-                                @endif
+                                    @endif
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -159,22 +140,22 @@
                             <div class="widget-content">
                                 <ul class="social-icons" style="justify-content: center;">
                                     <li>
-                                        <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(request()->url()) }}" target="_blank" rel="noopener">
+                                        <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(request()->url()) }}" target="_blank">
                                             <i class="fab fa-facebook-f"></i>
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="https://twitter.com/intent/tweet?url={{ urlencode(request()->url()) }}&text={{ urlencode($show->title ?? 'Event') }}" target="_blank" rel="noopener">
+                                        <a href="https://twitter.com/intent/tweet?url={{ urlencode(request()->url()) }}&text={{ urlencode($show->title) }}" target="_blank">
                                             <i class="fab fa-twitter"></i>
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="https://www.linkedin.com/shareArticle?mini=true&url={{ urlencode(request()->url()) }}&title={{ urlencode($show->title ?? 'Event') }}" target="_blank" rel="noopener">
+                                        <a href="https://www.linkedin.com/shareArticle?mini=true&url={{ urlencode(request()->url()) }}&title={{ urlencode($show->title) }}" target="_blank">
                                             <i class="fab fa-linkedin-in"></i>
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="whatsapp://send?text={{ urlencode(($show->title ?? 'Event') . ' - ' . request()->url()) }}" target="_blank" rel="noopener">
+                                        <a href="whatsapp://send?text={{ urlencode($show->title . ' - ' . request()->url()) }}" target="_blank">
                                             <i class="fab fa-whatsapp"></i>
                                         </a>
                                     </li>
@@ -190,7 +171,7 @@
 <!-- ==========Event-Details-End========== -->
 
 <!-- ==========Related Events========== -->
-@if(isset($relatedShows) && $relatedShows->count() > 0)
+@if($relatedShows->count() > 0)
 <section class="event-section padding-top padding-bottom bg-four">
     <div class="container">
         <div class="section-header-3">
@@ -203,49 +184,30 @@
                     <div class="event-grid">
                         <div class="movie-thumb c-thumb">
                             <a href="{{ route('show.details', $relatedShow->slug) }}">
-                                @if($relatedShow->featured_image && file_exists(storage_path('app/public/' . $relatedShow->featured_image)))
+                                @if($relatedShow->featured_image)
                                     <img src="{{ asset('storage/' . $relatedShow->featured_image) }}"
                                          height="320"
-                                         alt="{{ $relatedShow->title ?? 'Event Image' }}"
-                                         loading="lazy">
+                                         alt="{{ $relatedShow->title }}">
                                 @else
                                     <div class="no-image-placeholder" style="height: 320px;">
                                         <i class="fas fa-calendar-alt"></i>
-                                        @php
-                                            $relatedTitle = $relatedShow->title ?? 'Event';
-                                            $displayTitle = mb_strlen($relatedTitle) > 15 ? mb_substr($relatedTitle, 0, 15) . '...' : $relatedTitle;
-                                        @endphp
-                                        <p>{{ $displayTitle }}</p>
+                                        <p>{{ Str::limit($relatedShow->title, 15) }}</p>
                                     </div>
                                 @endif
                             </a>
-                            @if($relatedShow->start_date)
-                                <div class="event-date">
-                                    <h6 class="date-title">{{ $relatedShow->start_date->format('d') }}</h6>
-                                    <span>{{ $relatedShow->start_date->format('M') }}</span>
-                                </div>
-                            @endif
+                            <div class="event-date">
+                                <h6 class="date-title">{{ $relatedShow->start_date->format('d') }}</h6>
+                                <span>{{ $relatedShow->start_date->format('M') }}</span>
+                            </div>
                         </div>
                         <div class="movie-content bg-one">
                             <h5 class="title m-0">
                                 <a href="{{ route('show.details', $relatedShow->slug) }}">
-                                    @php
-                                        $relatedTitle = $relatedShow->title ?? 'Event';
-                                        $displayTitle = mb_strlen($relatedTitle) > 20 ? mb_substr($relatedTitle, 0, 20) . '...' : $relatedTitle;
-                                    @endphp
-                                    {{ $displayTitle }}
+                                    {{ Str::limit($relatedShow->title, 20, '...') }}
                                 </a>
                             </h5>
                             <div class="movie-rating-percent">
-                                @if($relatedShow->venue?->name)
-                                    @php
-                                        $venueName = $relatedShow->venue->name;
-                                        $displayVenue = mb_strlen($venueName) > 20 ? mb_substr($venueName, 0, 20) . '...' : $venueName;
-                                    @endphp
-                                    <span title="{{ $venueName }}">{{ $displayVenue }}</span>
-                                @else
-                                    <span>Venue TBA</span>
-                                @endif
+                                <span>{{ $relatedShow->venue ? Str::limit($relatedShow->venue->name, 20, '...') : 'Venue TBA' }}</span>
                             </div>
                         </div>
                     </div>
@@ -324,64 +286,10 @@
     opacity: 0.8;
 }
 
-.custom-button {
-    display: inline-block;
-    padding: 12px 30px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    text-decoration: none;
-    border-radius: 25px;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    border: none;
-    cursor: pointer;
-}
-
-.custom-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
-    color: white;
-    text-decoration: none;
-}
-
-.countdown ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.countdown li {
-    background: rgba(49, 215, 169, 0.1);
-    border-radius: 8px;
-    padding: 10px;
-    margin: 0 5px;
-}
-
-.countdown h2 {
-    font-size: 24px;
-    margin: 0;
-    color: #31d7a9;
-}
-
-.countdown p {
-    font-size: 12px;
-    margin: 5px 0 0 0;
-    color: #dbe2fb;
-}
-
 @media (max-width: 767px) {
     .info-left, .info-right {
         width: 100%;
         margin-bottom: 15px;
-    }
-
-    .countdown li {
-        margin: 0 2px;
-        padding: 8px;
-    }
-
-    .countdown h2 {
-        font-size: 18px;
     }
 }
 </style>
@@ -392,7 +300,7 @@
 // Countdown functionality
 document.addEventListener('DOMContentLoaded', function() {
     const countdownElement = document.querySelector('.countdown');
-    if (countdownElement && countdownElement.dataset.date) {
+    if (countdownElement) {
         const eventDate = new Date(countdownElement.dataset.date).getTime();
 
         const countdown = setInterval(function() {
@@ -401,7 +309,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (distance < 0) {
                 clearInterval(countdown);
-                countdownElement.innerHTML = '<p style="text-align: center; color: #31d7a9; font-weight: 600;">Event has started!</p>';
+                countdownElement.innerHTML = '<p style="text-align: center;">Event has started!</p>';
                 return;
             }
 
@@ -433,29 +341,5 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 1000);
     }
 });
-
-// Share functionality with fallback
-function shareEvent(platform, url, title) {
-    // Check if Web Share API is available (modern browsers)
-    if (navigator.share && platform === 'native') {
-        navigator.share({
-            title: title,
-            url: url
-        }).catch(console.error);
-        return;
-    }
-
-    // Fallback to traditional sharing
-    const shareUrls = {
-        facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
-        twitter: `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title)}`,
-        linkedin: `https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(url)}&title=${encodeURIComponent(title)}`,
-        whatsapp: `whatsapp://send?text=${encodeURIComponent(title + ' - ' + url)}`
-    };
-
-    if (shareUrls[platform]) {
-        window.open(shareUrls[platform], '_blank', 'width=600,height=400');
-    }
-}
 </script>
 @endpush

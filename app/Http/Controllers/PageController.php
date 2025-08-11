@@ -29,8 +29,12 @@ class PageController extends Controller
             ->limit(15) // Limit for carousel performance
             ->get();
 
+            // $shows = Show::with(['category', 'venue'])
+            //      ->where('is_active', true)
+            //      ->orderBy('start_date', 'desc')
+            //      ->get();
+
             $shows = Show::with(['category', 'venue'])
-                 ->where('is_active', true)
                  ->orderBy('start_date', 'desc')
                  ->get();
 

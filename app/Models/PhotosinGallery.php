@@ -11,7 +11,7 @@ class PhotosinGallery extends Model
 
     protected $fillable = [
         'photo_gallery_id', // Foreign key to PhotoGallery
-        'image',            // Path to the image
+        'image',            // Complete URL/path to the image
         'description',      // Description of the photo
         'display_order',    // Order in which the photo should be displayed
         'is_active',        // Status of the photo
@@ -27,25 +27,22 @@ class PhotosinGallery extends Model
         return $this->belongsTo(PhotoGallery::class);
     }
 
-    // Accessor for image URL
+    // Accessor for image URL - since you store complete URLs
     public function getImageUrlAttribute()
     {
         if (!$this->image) {
-            return null; // Return null instead of placeholder to avoid infinite loops
+            return null;
         }
 
-        // If image already contains full URL, return as is
+        // If image already contains full URL (starts with http), return as is
         if (str_starts_with($this->image, 'http')) {
             return $this->image;
         }
 
-        // If image path starts with 'storage/', use asset() directly
-        if (str_starts_with($this->image, 'storage/')) {
-            return asset($this->image);
-        }
-
-        // Otherwise, assume it's in storage folder
-        return asset('storage/' . $this->image);
+        // For paths like /storage/uploads/... or storage/uploads/...
+        // Remove leading slash and use asset() helper
+        $imagePath = ltrim($this->image, '/');
+        return asset($imagePath);
     }
 
     // Check if image exists

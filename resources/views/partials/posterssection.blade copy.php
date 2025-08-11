@@ -2,34 +2,40 @@
 <section class="event-posters-section padding-top padding-bottom" style="padding-top:60px;">
     <div class="banner-bg bg_img bg-fixed" data-background="{{ asset('assets/images/banner/banner01.jpg') }}"></div>
     <div class="container">
+        <!-- Section Header -->
+        {{-- <div class="section-header text-center mb-5 mt-5">
+            <h2 class="title heading-color">Event Posters</h2>
+            <p class="subtitle heading-color">Explore our collection of vibrant event posters</p>
+            <div class="divider mx-auto"></div>
+        </div> --}}
+
         <!-- Filter Tabs -->
         <div class="filter-tabs mb-4">
             <ul class="nav nav-pills justify-content-center" id="posterTabs" role="tablist">
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="all-tab" data-bs-toggle="pill" data-bs-target="#all" type="button" role="tab" data-filter="all">
-                        All
+                    <button class="nav-link active" id="all-tab" data-bs-toggle="pill" data-bs-target="#all" type="button" role="tab">
+                        All Events
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="upcoming-tab" data-bs-toggle="pill" data-bs-target="#upcoming" type="button" role="tab" data-filter="upcoming">
-                        Coming
+                    <button class="nav-link" id="upcoming-tab" data-bs-toggle="pill" data-bs-target="#upcoming" type="button" role="tab">
+                        Upcoming
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="past-tab" data-bs-toggle="pill" data-bs-target="#past" type="button" role="tab" data-filter="past">
-                        Past
+                    <button class="nav-link" id="past-tab" data-bs-toggle="pill" data-bs-target="#past" type="button" role="tab">
+                        Past Events
                     </button>
                 </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="events-tab" data-bs-toggle="pill" data-bs-target="#events" type="button" role="tab" data-filter="events">
-                        Events
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="concerts-tab" data-bs-toggle="pill" data-bs-target="#concerts" type="button" role="tab" data-filter="concerts">
-                        Concerts
-                    </button>
-                </li>
+                @if(isset($categories) && $categories->count() > 0)
+                    @foreach($categories as $category)
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="category-{{ $category->id }}-tab" data-bs-toggle="pill" data-bs-target="#category-{{ $category->id }}" type="button" role="tab">
+                                {{ $category->name ?? 'Category' }}
+                            </button>
+                        </li>
+                    @endforeach
+                @endif
             </ul>
         </div>
 
@@ -39,26 +45,9 @@
             <div class="tab-pane fade show active" id="all" role="tabpanel">
                 <div class="row" id="postersGrid">
                     @forelse($shows->sortByDesc('start_date') as $show)
-                        @php
-                            // Determine show type based on category or title
-                            $showType = 'events'; // default
-                            if($show->category) {
-                                $categoryName = strtolower($show->category->name);
-                                if(str_contains($categoryName, 'concert') || str_contains($categoryName, 'music')) {
-                                    $showType = 'concerts';
-                                }
-                            }
-
-                            // Determine status based on date
-                            $showStatus = 'upcoming'; // default
-                            if($show->start_date) {
-                                $showStatus = $show->start_date->isPast() ? 'past' : 'upcoming';
-                            }
-                        @endphp
-
                         <div class="col-lg-3 col-md-4 col-sm-6 col-6 mb-4 poster-item"
-                             data-type="{{ $showType }}"
-                             data-status="{{ $showStatus }}"
+                             data-category="{{ $show->category_id ?? '' }}"
+                             data-status="{{ $show->status ?? 'upcoming' }}"
                              data-aos="fade-up"
                              data-aos-delay="{{ $loop->index * 100 }}">
                             <div class="poster-card">
@@ -123,26 +112,26 @@
                                     </div>
 
                                     <!-- Status Badge -->
-                                    <div class="status-badge">
-                                        @if($showStatus === 'upcoming')
-                                            <span class="badge bg-success">Upcoming</span>
-                                        @else
-                                            <span class="badge bg-secondary">Past</span>
-                                        @endif
-                                    </div>
-
-                                    <!-- Type Badge -->
-                                    <div class="type-badge">
-                                        @if($showType === 'concerts')
-                                            <span class="badge bg-warning">
-                                                <i class="fas fa-music"></i> Concert
-                                            </span>
-                                        @else
-                                            <span class="badge bg-info">
-                                                <i class="fas fa-calendar-alt"></i> Event
-                                            </span>
-                                        @endif
-                                    </div>
+                                    @if(isset($show->status))
+                                        <div class="status-badge">
+                                            @switch($show->status)
+                                                @case('upcoming')
+                                                    <span class="badge bg-success">Upcoming</span>
+                                                    @break
+                                                @case('ongoing')
+                                                    <span class="badge bg-warning">Live</span>
+                                                    @break
+                                                @case('past')
+                                                    <span class="badge bg-secondary">Past</span>
+                                                    @break
+                                                @case('cancelled')
+                                                    <span class="badge bg-danger">Cancelled</span>
+                                                    @break
+                                                @default
+                                                    <span class="badge bg-info">Event</span>
+                                            @endswitch
+                                        </div>
+                                    @endif
 
                                     <!-- Featured Badge -->
                                     @if($show->is_featured ?? false)
@@ -219,6 +208,26 @@
 .event-posters-section {
     background: #05103D;
     min-height: 100vh;
+}
+
+.section-header .title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 1rem;
+}
+
+.section-header .subtitle {
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 2rem;
+}
+
+.divider {
+    width: 80px;
+    height: 4px;
+    background: linear-gradient(45deg, #ff6b6b, #ffd93d);
+    border-radius: 2px;
 }
 
 /* Filter Tabs */
@@ -350,16 +359,9 @@
     z-index: 2;
 }
 
-.type-badge {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    z-index: 2;
-}
-
 .featured-badge {
     position: absolute;
-    top: 50px;
+    top: 10px;
     left: 10px;
     z-index: 2;
 }
@@ -374,6 +376,13 @@
 .poster-info {
     padding: 20px;
     text-align: center;
+}
+
+.poster-card-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
 }
 
 .poster-card-date {
@@ -423,13 +432,17 @@
     border-radius: 10px;
 }
 
-/* Hidden items for filtering */
-.poster-item.filtered-hidden {
-    display: none !important;
+/* Error handling for broken images */
+.poster-image[src=""], .poster-image:not([src]) {
+    display: none;
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
+    .section-header .title {
+        font-size: 2rem;
+    }
+
     .poster-image-wrapper {
         height: 250px;
     }
@@ -471,6 +484,12 @@
     animation: fadeInUp 0.6s ease forwards;
 }
 
+/* Hidden items for load more functionality */
+.poster-item.hidden {
+    display: none !important;
+}
+
+/* Fade in animation */
 .fade-in {
     animation: fadeInUp 0.4s ease forwards;
 }
@@ -478,7 +497,7 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize AOS if available
+    // Initialize AOS (Animate On Scroll) if available
     if (typeof AOS !== 'undefined') {
         AOS.init({
             duration: 800,
@@ -487,50 +506,57 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Filter functionality
-    const filterButtons = document.querySelectorAll('[data-filter]');
+    const filterButtons = document.querySelectorAll('[data-bs-toggle="pill"]');
     const posterItems = document.querySelectorAll('.poster-item');
 
     filterButtons.forEach(button => {
         button.addEventListener('click', function() {
-            const filter = this.getAttribute('data-filter');
-            filterPosters(filter);
+            const target = this.getAttribute('data-bs-target');
+
+            if (target === '#all') {
+                showAllPosters();
+            } else if (target === '#upcoming') {
+                filterByStatus('upcoming');
+            } else if (target === '#past') {
+                filterByStatus('past');
+            } else if (target && target.includes('category-')) {
+                const categoryId = target.replace('#category-', '');
+                filterByCategory(categoryId);
+            }
         });
     });
 
-    function filterPosters(filter) {
+    function showAllPosters() {
         posterItems.forEach(item => {
-            item.classList.remove('filtered-hidden');
+            item.style.display = 'block';
+            item.classList.add('fade-in');
+        });
+    }
 
-            if (filter === 'all') {
-                // Show all items
+    function filterByStatus(status) {
+        posterItems.forEach(item => {
+            const itemStatus = item.getAttribute('data-status');
+            if (itemStatus === status) {
                 item.style.display = 'block';
-            } else if (filter === 'upcoming' || filter === 'past') {
-                // Filter by status
-                const itemStatus = item.getAttribute('data-status');
-                if (itemStatus === filter) {
-                    item.style.display = 'block';
-                } else {
-                    item.classList.add('filtered-hidden');
-                }
-            } else if (filter === 'events' || filter === 'concerts') {
-                // Filter by type
-                const itemType = item.getAttribute('data-type');
-                if (itemType === filter) {
-                    item.style.display = 'block';
-                } else {
-                    item.classList.add('filtered-hidden');
-                }
+                item.classList.add('fade-in');
+            } else {
+                item.style.display = 'none';
+                item.classList.remove('fade-in');
             }
         });
+    }
 
-        // Add fade-in animation to visible items
-        setTimeout(() => {
-            posterItems.forEach(item => {
-                if (!item.classList.contains('filtered-hidden')) {
-                    item.classList.add('fade-in');
-                }
-            });
-        }, 100);
+    function filterByCategory(categoryId) {
+        posterItems.forEach(item => {
+            const itemCategory = item.getAttribute('data-category');
+            if (itemCategory === categoryId) {
+                item.style.display = 'block';
+                item.classList.add('fade-in');
+            } else {
+                item.style.display = 'none';
+                item.classList.remove('fade-in');
+            }
+        });
     }
 
     // Poster click to open modal
@@ -547,6 +573,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     modalImage.alt = this.alt;
                     modalTitle.textContent = this.alt;
 
+                    // Get date from parent poster item
                     const posterCard = this.closest('.poster-item');
                     const dateElement = posterCard ? posterCard.querySelector('.poster-card-date') : null;
                     modalDate.textContent = dateElement ? dateElement.textContent : '';
@@ -594,6 +621,7 @@ document.addEventListener('DOMContentLoaded', function() {
             document.body.removeChild(link);
         } catch (error) {
             console.error('Download failed:', error);
+            // Fallback: open in new tab
             window.open(url, '_blank');
         }
     }
@@ -607,18 +635,17 @@ document.addEventListener('DOMContentLoaded', function() {
         // Hide items beyond initial count
         allItems.forEach((item, index) => {
             if (index >= itemsToShow) {
-                item.style.display = 'none';
+                item.classList.add('hidden');
             }
         });
 
         loadMoreBtn.addEventListener('click', function() {
-            const hiddenItems = Array.from(allItems).filter(item =>
-                item.style.display === 'none' && !item.classList.contains('filtered-hidden')
-            );
+            const hiddenItems = document.querySelectorAll('.poster-item.hidden');
             const itemsToLoad = Math.min(12, hiddenItems.length);
 
             for (let i = 0; i < itemsToLoad; i++) {
                 if (hiddenItems[i]) {
+                    hiddenItems[i].classList.remove('hidden');
                     hiddenItems[i].style.display = 'block';
                     hiddenItems[i].classList.add('fade-in');
                 }
