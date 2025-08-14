@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
+use App\Models\BookingItem;
+use App\Models\TicketHold;
+
 
 class Show extends Model
 {
@@ -187,4 +190,60 @@ class Show extends Model
             ->whereNotIn('id', $reservedSeatIds)
             ->get();
     }
+
+    public function getAvailableTicketTypes()
+{
+    return $this->ticketTypes()
+        ->where('is_active', true)
+        ->orderBy('display_order')
+        ->get();
+}
+
+public function getAvailableCapacityForTicketType($ticketTypeId)
+{
+    $ticketType = $this->ticketTypes()->find($ticketTypeId);
+    if (!$ticketType) {
+        return 0;
+    }
+
+    // If no capacity limit set, return large number
+    if (!$ticketType->capacity) {
+        return 999;
+    }
+
+    // Count sold tickets
+    $sold = BookingItem::whereHas('booking', function ($query) {
+        $query->where('show_id', $this->id)
+              ->where('status', 'confirmed');
+    })->where('ticket_type_id', $ticketTypeId)
+      ->sum('quantity');
+
+    // Count held tickets (temporary reservations)
+    $held = TicketHold::where('show_id', $this->id)
+        ->where('ticket_type_id', $ticketTypeId)
+        ->where('expires_at', '>', now())
+        ->sum('quantity');
+
+    return max(0, $ticketType->capacity - $sold - $held);
+}
+
+public function getTotalSoldTickets()
+{
+    return BookingItem::whereHas('booking', function ($query) {
+        $query->where('show_id', $this->id)
+              ->where('status', 'confirmed');
+    })->sum('quantity');
+}
+
+// Check if show has available tickets
+public function hasAvailableTickets()
+{
+    foreach ($this->getAvailableTicketTypes() as $ticketType) {
+        if ($this->getAvailableCapacityForTicketType($ticketType->id) > 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
 }

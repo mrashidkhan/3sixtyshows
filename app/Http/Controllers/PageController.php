@@ -168,7 +168,6 @@ public function showDetails($slug)
     // Find the show by slug with related models
     $show = Show::with(['venue', 'category'])
         ->where('slug', $slug)
-        ->where('is_active', true)
         ->firstOrFail();
 
     // Increment view count if you have this field

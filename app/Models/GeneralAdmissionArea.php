@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class GeneralAdmissionArea extends Model
 {
     use HasFactory;
-    
+
     protected $fillable = [
         'venue_id', 'name', 'description', 'capacity',
         'default_price', 'color_code', 'display_order', 'is_active'

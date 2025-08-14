@@ -10,10 +10,11 @@ class Ticket extends Model
     use HasFactory;
 
     protected $fillable = [
-        'show_id', 'customer_id', 'booking_id', 'ticket_type_id', 'seat_id',
-        'ticket_number', 'price', 'status', 'seat_number', 'seat_identifier',
-        'purchased_date', 'qr_code', 'ticket_mode', 'ticket_metadata'
-    ];
+    'show_id', 'user_id', 'booking_id', 'ticket_type_id', 'seat_id',  // REMOVED customer_id
+    'ticket_number', 'price', 'status', 'seat_number', 'seat_identifier',
+    'purchased_date', 'qr_code', 'ticket_mode', 'ticket_metadata'
+];
+
 
     protected $casts = [
         'purchased_date' => 'datetime',
@@ -38,16 +39,19 @@ class Ticket extends Model
     }
 
     // Other relationships remain the same
+
+    // ADD user relationship
+public function user()
+{
+    return $this->belongsTo(User::class);
+}
+
     public function show()
     {
         return $this->belongsTo(Show::class);
     }
 
-    public function customer()
-    {
-        return $this->belongsTo(Customer::class);
-    }
-
+    
     public function booking()
     {
         return $this->belongsTo(Booking::class);

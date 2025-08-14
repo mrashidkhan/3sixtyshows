@@ -41,41 +41,42 @@ class BookingItem extends Model
     }
 
     // Generate tickets for this booking item
-    public function generateTickets()
-    {
-        $tickets = [];
+    public function generateTickets($userId = null)
+{
+    $tickets = [];
 
-        for ($i = 0; $i < $this->quantity; $i++) {
-            $ticketData = [
-                'show_id' => $this->booking->show_id,
-                'customer_id' => $this->booking->customer_id,
-                'booking_id' => $this->booking_id,
-                'ticket_type_id' => $this->ticket_type_id,
-                'price' => $this->unit_price,
-                'status' => 'active',
-                'purchased_date' => now(),
+    for ($i = 0; $i < $this->quantity; $i++) {
+        $ticketData = [
+            'show_id' => $this->booking->show_id,
+            'user_id' => $userId, // USE user_id instead of customer_id
+            'booking_id' => $this->booking_id,
+            'ticket_type_id' => $this->ticket_type_id,
+            'price' => $this->unit_price,
+            'status' => 'active',
+            'purchased_date' => now(),
+        ];
+
+        if ($this->seat_id) {
+            // Assigned seating
+            $ticketData['seat_id'] = $this->seat_id;
+            $ticketData['seat_identifier'] = $this->seat_identifier;
+            $ticketData['ticket_mode'] = 'assigned_seat';
+        } else {
+            // General admission
+            $ticketData['ticket_mode'] = 'general_admission';
+            $ticketData['ticket_metadata'] = [
+                'area_name' => $this->generalAdmissionArea->name ?? 'General Admission',
+                'area_id' => $this->general_admission_area_id
             ];
-
-            if ($this->seat_id) {
-                // Assigned seating
-                $ticketData['seat_id'] = $this->seat_id;
-                $ticketData['seat_identifier'] = $this->seat_identifier;
-                $ticketData['ticket_mode'] = 'assigned_seat';
-            } else {
-                // General admission
-                $ticketData['ticket_mode'] = 'general_admission';
-                $ticketData['ticket_metadata'] = [
-                    'area_name' => $this->generalAdmissionArea->name ?? 'General Admission',
-                    'area_id' => $this->general_admission_area_id
-                ];
-            }
-
-            $ticket = Ticket::create($ticketData);
-            $tickets[] = $ticket;
         }
 
-        return collect($tickets);
+        $ticket = Ticket::create($ticketData);
+        $tickets[] = $ticket;
     }
+
+    return collect($tickets);
+}
+
 
     // Check if this is for assigned seating
     public function isAssignedSeating()

@@ -45,4 +45,20 @@ class User extends Authenticatable
     {
         return $query->where('is_active', true);
     }
+
+    // ADD THESE NEW RELATIONSHIPS FOR BOOKING
+    public function bookings()
+    {
+        return $this->hasMany(Booking::class, 'user_id');
+    }
+
+    public function tickets()
+    {
+        return $this->hasMany(Ticket::class, 'user_id');
+    }
+
+    public function payments()
+    {
+        return $this->hasMany(Payment::class, 'user_id');
+    }
 }

@@ -29,6 +29,7 @@ use App\Http\Controllers\Admin\CustomerController;
 
 
 
+
 // Public Routes
 Route::get('/seatselection', [PageController::class, 'selection'])->name('seatselection');
 Route::get('/', [PageController::class, 'index'])->name('index');
@@ -155,7 +156,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth']], function () {
 // Only include if you have these controllers available
 
 
-use App\Http\Controllers\BookingController;
+
 use App\Http\Controllers\OptimizedBookingController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\SeatMapController;
@@ -264,10 +265,10 @@ Route::get('/shows/{show:slug}/book', [BookingPageController::class, 'showSeatSe
     ->name('booking.seat-selection');
 
 // API routes with slug
-Route::prefix('api')->group(function () {
-    Route::get('/shows/{show:slug}/seating', [BookingController::class, 'getAvailableSeating']);
-    Route::post('/shows/{show:slug}/hold-tickets', [BookingController::class, 'holdTickets']);
-});
+// Route::prefix('api')->group(function () {
+//     Route::get('/shows/{show:slug}/seating', [BookingController::class, 'getAvailableSeating']);
+//     Route::post('/shows/{show:slug}/hold-tickets', [BookingController::class, 'holdTickets']);
+// });
 
 
 use App\Http\Controllers\GalleryController;
@@ -275,3 +276,105 @@ use App\Http\Controllers\GalleryController;
 // Gallery routes
 Route::get('/galleries', [GalleryController::class, 'index'])->name('galleries.index');
 Route::get('/gallery/{galleryId}/photos', [GalleryController::class, 'getGalleryPhotos'])->name('gallery.photos');
+
+
+// Add these booking routes (make sure they're not inside any other route groups)
+// Route::prefix('booking')->group(function () {
+//     Route::get('/{slug}/tickets', [BookingController::class, 'showTicketSelection'])->name('booking.tickets');
+//     Route::post('/{slug}/select-tickets', [BookingController::class, 'selectTickets'])->name('booking.select-tickets');
+// });
+
+// Test route to verify show exists
+Route::get('/test-show/{slug}', function($slug) {
+    $show = App\Models\Show::where('slug', $slug)->with('ticketTypes')->first();
+
+    if (!$show) {
+        return "Show not found with slug: $slug";
+    }
+
+    return response()->json([
+        'show_found' => true,
+        'title' => $show->title,
+        'slug' => $show->slug,
+        'ticket_types' => $show->ticketTypes->map(function($type) {
+            return [
+                'id' => $type->id,
+                'name' => $type->name,
+                'price' => $type->price,
+                'capacity' => $type->capacity,
+                'is_active' => $type->is_active
+            ];
+        })
+    ]);
+});
+
+
+
+use App\Http\Controllers\GeneralAdmissionController;
+
+// General admission booking routes
+Route::prefix('ga-booking')->group(function () {
+    Route::get('/{slug}/tickets', [GeneralAdmissionController::class, 'showTicketSelection'])->name('ga-booking.tickets');
+    Route::post('/{slug}/select-tickets', [GeneralAdmissionController::class, 'selectTickets'])->name('ga-booking.select-tickets');
+});
+
+// Test route
+Route::get('/test-show/{slug}', function($slug) {
+    $show = App\Models\Show::where('slug', $slug)->with('ticketTypes')->first();
+
+    if (!$show) {
+        return "Show not found with slug: $slug";
+    }
+
+    return response()->json([
+        'show_found' => true,
+        'title' => $show->title,
+        'slug' => $show->slug,
+        'ticket_types' => $show->ticketTypes->map(function($type) {
+            return [
+                'id' => $type->id,
+                'name' => $type->name,
+                'price' => $type->price,
+                'capacity' => $type->capacity,
+                'is_active' => $type->is_active
+            ];
+        })
+    ]);
+});
+
+
+Route::prefix('ga-booking')->group(function () {
+    Route::get('/{slug}/tickets', [GeneralAdmissionController::class, 'showTicketSelection'])->name('ga-booking.tickets');
+    Route::post('/{slug}/select-tickets', [GeneralAdmissionController::class, 'selectTickets'])->name('ga-booking.select-tickets');
+
+    // Add these new routes:
+    Route::get('/{slug}/customer-details', [GeneralAdmissionController::class, 'showCustomerDetails'])->name('ga-booking.customer-details');
+    Route::post('/{slug}/customer-details', [GeneralAdmissionController::class, 'processCustomerDetails'])->name('ga-booking.process-customer-details');
+
+        // ADD THESE MISSING ROUTES:
+    Route::get('/{slug}/payment', [GeneralAdmissionController::class, 'showPayment'])
+        ->name('ga-booking.payment');
+    Route::post('/{slug}/payment', [GeneralAdmissionController::class, 'processPayment'])
+        ->name('ga-booking.process-payment');
+
+    // SUCCESS/FAILURE ROUTES
+    Route::get('/{slug}/booking-success/{bookingNumber}', [GeneralAdmissionController::class, 'bookingSuccess'])
+        ->name('ga-booking.success');
+    Route::get('/{slug}/booking-failed', [GeneralAdmissionController::class, 'bookingFailed'])
+        ->name('ga-booking.failed');
+
+
+     // NEW PAYMENT ROUTES
+    Route::get('/{slug}/payment', [GeneralAdmissionController::class, 'showPayment'])
+        ->name('ga-booking.payment');
+    Route::post('/{slug}/payment', [GeneralAdmissionController::class, 'processPayment'])
+        ->name('ga-booking.process-payment');
+
+    // NEW SUCCESS/FAILURE ROUTES
+    Route::get('/{slug}/booking-success/{bookingNumber}', [GeneralAdmissionController::class, 'bookingSuccess'])
+        ->name('ga-booking.success');
+    Route::get('/{slug}/booking-failed', [GeneralAdmissionController::class, 'bookingFailed'])
+        ->name('ga-booking.failed');
+
+});
+
