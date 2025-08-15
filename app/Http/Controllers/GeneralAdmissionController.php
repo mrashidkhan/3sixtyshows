@@ -170,37 +170,51 @@ class GeneralAdmissionController extends Controller
         ]);
     }
 
-    public function processCustomerDetails(Request $request, $slug)
-    {
-        $show = Show::where('slug', $slug)->firstOrFail();
-        $bookingData = session('booking_data');
+    // In GeneralAdmissionController.php processCustomerDetails method:
 
-        if (!$bookingData) {
-            return redirect()->route('ga-booking.tickets', $slug)
-                ->with('error', 'Booking session expired. Please select tickets again.');
-        }
+public function processCustomerDetails(Request $request, $slug)
+{
+    $show = Show::where('slug', $slug)->firstOrFail();
+    $bookingData = session('booking_data');
 
-        // Validate customer information
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'phone' => 'required|string|max:20',
-            'terms' => 'required|accepted',
-            'newsletter' => 'nullable|boolean',
-        ]);
+    if (!$bookingData) {
+        return redirect()->route('ga-booking.tickets', $slug)
+            ->with('error', 'Booking session expired. Please select tickets again.');
+    }
 
-        // Store customer data in session
-        session([
-            'customer_data' => [
-                'name' => $request->name,
-                'email' => $request->email,
-                'phone' => $request->phone,
-                'newsletter' => $request->has('newsletter'),
-            ],
-        ]);
+    // Validate customer information
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|max:255',
+        'phone' => 'required|string|max:20',
+        'terms' => 'required|accepted',
+        'newsletter' => 'nullable|boolean',
+    ]);
 
+    // Store customer data in session
+    session([
+        'customer_data' => [
+            'name' => $request->name,
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'newsletter' => $request->has('newsletter')
+        ]
+    ]);
+
+    // Check if user is logged in
+    if (auth()->check()) {
+        // User already logged in, redirect to payment
         return redirect()->route('ga-booking.payment', $slug);
     }
+
+    // Store intended URL for after login
+    session(['intended_booking_url' => route('ga-booking.payment', $slug)]);
+    session(['booking_message' => 'Please login or register to complete your secure booking for ' . $show->title]);
+
+
+    return redirect()->route('user_login')
+        ->with('info', 'Please login or register to complete your booking securely.');
+}
 
     public function showPayment($slug)
     {

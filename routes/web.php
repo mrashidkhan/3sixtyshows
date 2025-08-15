@@ -209,15 +209,9 @@ Route::post('/webhooks/payment/paypal', [PaymentController::class, 'paypalWebhoo
 // Add to your existing admin middleware group
 Route::group(['middleware' => 'auth'], function () {
 
-    // Ticket Types Management
-    Route::get('/admin/shows/{show}/ticket-types', [TicketTypeController::class, 'index'])->name('admin.ticket-types.index');
-    Route::get('/admin/shows/{show}/ticket-types/create', [TicketTypeController::class, 'create'])->name('admin.ticket-types.create');
-    Route::post('/admin/shows/{show}/ticket-types', [TicketTypeController::class, 'store'])->name('admin.ticket-types.store');
-    Route::get('/admin/ticket-types/{ticketType}/edit', [TicketTypeController::class, 'edit'])->name('admin.ticket-types.edit');
-    Route::put('/admin/ticket-types/{ticketType}', [TicketTypeController::class, 'update'])->name('admin.ticket-types.update');
-    Route::delete('/admin/ticket-types/{ticketType}', [TicketTypeController::class, 'destroy'])->name('admin.ticket-types.delete');
 
-    // Booking Management
+
+// Booking Management
     Route::get('/admin/bookings', [AdminBookingController::class, 'index'])->name('admin.bookings.index');
     Route::get('/admin/bookings/{booking}', [AdminBookingController::class, 'show'])->name('admin.bookings.show');
     Route::patch('/admin/bookings/{booking}/status', [AdminBookingController::class, 'updateStatus'])->name('admin.bookings.update-status');
@@ -352,12 +346,14 @@ Route::prefix('ga-booking')->group(function () {
     Route::post('/{slug}/customer-details', [GeneralAdmissionController::class, 'processCustomerDetails'])->name('ga-booking.process-customer-details');
 
         // ADD THESE MISSING ROUTES:
+    Route::middleware('auth')->group(function() {
     Route::get('/{slug}/payment', [GeneralAdmissionController::class, 'showPayment'])
         ->name('ga-booking.payment');
     Route::post('/{slug}/payment', [GeneralAdmissionController::class, 'processPayment'])
         ->name('ga-booking.process-payment');
 
     // SUCCESS/FAILURE ROUTES
+
     Route::get('/{slug}/booking-success/{bookingNumber}', [GeneralAdmissionController::class, 'bookingSuccess'])
         ->name('ga-booking.success');
     Route::get('/{slug}/booking-failed', [GeneralAdmissionController::class, 'bookingFailed'])
@@ -375,6 +371,54 @@ Route::prefix('ga-booking')->group(function () {
         ->name('ga-booking.success');
     Route::get('/{slug}/booking-failed', [GeneralAdmissionController::class, 'bookingFailed'])
         ->name('ga-booking.failed');
-
+     });
 });
 
+// Add these routes INSIDE your existing Route::group(['middleware' => 'auth'], function () { block in web.php
+// Find your existing auth middleware group and add these routes:
+
+Route::group(['middleware' => 'auth'], function () {
+
+    // ==================== EXISTING ROUTES ====================
+    // Your existing admin dashboard, show category, venue, etc. routes...
+
+    // ==================== TICKET TYPES MANAGEMENT ====================
+
+    // Main ticket types routes
+    Route::get('/admin/ticket-types', [TicketTypeController::class, 'all'])
+        ->name('admin.ticket-types.all');
+
+    Route::get('/admin/ticket-types/create', [TicketTypeController::class, 'create'])
+        ->name('admin.ticket-types.create');
+
+    Route::post('/admin/ticket-types', [TicketTypeController::class, 'store'])
+        ->name('admin.ticket-types.store');
+
+    // AJAX route for show search
+    Route::get('/admin/ticket-types/search-shows', [TicketTypeController::class, 'searchShows'])
+        ->name('admin.ticket-types.search-shows');
+
+    // Edit and update routes
+    Route::get('/admin/ticket-types/{ticketType}/edit', [TicketTypeController::class, 'edit'])
+        ->name('admin.ticket-types.edit');
+
+    Route::put('/admin/ticket-types/{ticketType}', [TicketTypeController::class, 'update'])
+        ->name('admin.ticket-types.update');
+
+    Route::delete('/admin/ticket-types/{ticketType}', [TicketTypeController::class, 'destroy'])
+        ->name('admin.ticket-types.delete');
+
+    // Show-specific routes (for backward compatibility)
+    Route::get('/admin/shows/{show}/ticket-types', [TicketTypeController::class, 'index'])
+        ->name('admin.ticket-types.index');
+
+    Route::get('/admin/shows/{show}/ticket-types/create', [TicketTypeController::class, 'createForShow'])
+        ->name('admin.ticket-types.create-for-show');
+
+    Route::post('/admin/shows/{show}/ticket-types', [TicketTypeController::class, 'storeForShow'])
+        ->name('admin.ticket-types.store-for-show');
+
+    // ==================== OTHER EXISTING ROUTES ====================
+    // Your other existing routes...
+
+});

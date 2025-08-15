@@ -85,16 +85,16 @@
 
                             <div class="price-breakdown" id="price-breakdown" style="display: none;">
                                 <hr>
-                                <div class="d-flex justify-content-between mb-2">
+                                <div style="color:black;" class="d-flex justify-content-between mb-2">
                                     <span>Subtotal:</span>
                                     <span id="subtotal" style="font-weight: 600;">$0.00</span>
                                 </div>
-                                <div class="d-flex justify-content-between mb-2">
+                                <div style="color:black;" class="d-flex justify-content-between mb-2">
                                     <span>Service Fee (3%):</span>
                                     <span id="service-fee" style="font-weight: 600;">$0.00</span>
                                 </div>
-                                <div class="d-flex justify-content-between mb-3">
-                                    <span>Processing Fee:</span>
+                                <div style="color:black;" class="d-flex justify-content-between mb-3">
+                                    <span style="color:black;">Processing Fee:</span>
                                     <span id="processing-fee" style="font-weight: 600;">$0.00</span>
                                 </div>
                                 <hr style="border-top: 2px solid #007bff;">

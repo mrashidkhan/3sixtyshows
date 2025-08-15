@@ -15,6 +15,31 @@
             </div>
         @endif
 
+        <!-- Add this after the success message section -->
+@if(session('booking_message'))
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="alert alert-info alert-dismissible fade show custom-alert" role="alert">
+                <i class="fas fa-ticket-alt me-2"></i>
+                {{ session('booking_message') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+@endif
+
+@if(session('info'))
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="alert alert-info alert-dismissible fade show custom-alert" role="alert">
+                <i class="fas fa-info-circle me-2"></i>
+                {{ session('info') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+@endif
+
         <!-- General Error Messages -->
         @if ($errors->has('error'))
             <div class="row justify-content-center">

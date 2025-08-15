@@ -76,10 +76,30 @@ class Show extends Model
         return $this->hasMany(VideoGallery::class);
     }
 
-    public function ticketTypes()
-    {
-        return $this->hasMany(TicketType::class);
-    }
+
+/**
+ * Get active ticket types for this show
+ */
+// public function activeTicketTypes()
+// {
+//     return $this->hasMany(TicketType::class)->active()->ordered();
+// }
+
+/**
+ * Check if show has any ticket types
+ */
+public function hasTicketTypes()
+{
+    return $this->ticketTypes()->count() > 0;
+}
+
+/**
+ * Check if show has any active ticket types
+ */
+public function hasActiveTicketTypes()
+{
+    return $this->activeTicketTypes()->count() > 0;
+}
 
 
     // Get sold tickets count
@@ -244,6 +264,54 @@ public function hasAvailableTickets()
         }
     }
     return false;
+}
+
+// Add these methods to your Show.php model
+
+/**
+ * A show has many ticket types
+ */
+public function ticketTypes()
+{
+    return $this->hasMany(TicketType::class)->orderBy('display_order', 'asc')->orderBy('name', 'asc');
+}
+
+/**
+ * Get active ticket types for this show
+ */
+public function activeTicketTypes()
+{
+    return $this->hasMany(TicketType::class)
+                ->where('is_active', true)
+                ->orderBy('display_order', 'asc')
+                ->orderBy('name', 'asc');
+}
+
+
+/**
+ * Get total capacity for all ticket types
+ */
+public function getTotalCapacityAttribute()
+{
+    return $this->ticketTypes()->sum('capacity') ?: null;
+}
+
+/**
+ * Get total sold tickets across all ticket types
+ */
+public function getTotalSoldTicketsAttribute()
+{
+    return $this->ticketTypes()->withCount('tickets')->get()->sum('tickets_count');
+}
+
+/**
+ * Check if any ticket type is sold out
+ */
+public function hasAnySoldOutTicketTypes()
+{
+    return $this->ticketTypes()->get()->contains(function($ticketType) {
+        return $ticketType->capacity && $ticketType->tickets()->count() >= $ticketType->capacity;
+    });
 }
 
 }

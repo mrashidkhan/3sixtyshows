@@ -21,23 +21,11 @@
                             <div class="item">
                                 <div class="event-grid">
                                     <div class="movie-thumb c-thumb">
-                                        @php
-                                            // Determine the appropriate link based on ticket types and redirect settings
-                                            $hasTicketTypes = $event->ticketTypes && $event->ticketTypes->count() > 0;
-
-                                            if ($hasTicketTypes) {
-                                                $eventLink = route('ga-booking.tickets', $event->slug);
-                                                $linkTarget = '_self';
-                                            } elseif ($event->redirect && $event->redirect_url) {
-                                                $eventLink = $event->redirect_url;
-                                                $linkTarget = '_blank';
-                                            } else {
-                                                $eventLink = route('show.details', $event->slug);
-                                                $linkTarget = '_self';
-                                            }
-                                        @endphp
-
-                                        <a href="{{ $eventLink }}" target="{{ $linkTarget }}">
+                                        @if ($event->redirect && $event->redirect_url)
+                                            <a target="_blank" href="{{ $event->redirect_url }}">
+                                            @else
+                                                <a href="{{ route('show.details', $event->slug) }}">
+                                        @endif
                                         @if ($event->featured_image)
                                             <img src="{{ asset('storage/' . $event->featured_image) }}" height="420"
                                                 alt="{{ $event->title }}">
@@ -64,7 +52,11 @@
                                     </div>
                                     <div class="movie-content bg-one">
                                         <h5 class="title m-0" style="padding-bottom:0px; border:0px;">
-                                            <a href="{{ $eventLink }}" target="{{ $linkTarget }}">
+                                            @if ($event->redirect && $event->redirect_url)
+                                                <a target="_blank" href="{{ $event->redirect_url }}">
+                                                @else
+                                                    <a href="{{ route('show.details', $event->slug) }}">
+                                            @endif
                                             {{ Str::substr($event->title, 0, 20) }}@if (Str::length($event->title) > 20)
                                                 ...
                                             @endif
@@ -77,11 +69,10 @@
                                             </span>
                                         </div>
                                         <div class="movie-rating-percent" style="justify-content:center">
-                                            @php
-                                                $hasTicketTypes = $event->ticketTypes && $event->ticketTypes->count() > 0;
-                                            @endphp
-
-                                            @if ($event->status === 'sold_out' || $event->sold_out)
+                                            @if ($event->redirect && $event->redirect_url)
+                                                <a target="_blank" href="{{ $event->redirect_url }}"
+                                                    class="custom-button">book now</a>
+                                            @elseif($event->status === 'sold_out' || $event->sold_out)
                                                 <span class="custom-button"
                                                     style="background: #dc3545; cursor: not-allowed;">sold out</span>
                                             @elseif($event->start_date->isPast())
@@ -89,28 +80,14 @@
                                                     style="background: #6c757d; cursor: not-allowed;">event
                                                     passed</span>
                                             @else
-                                                @if ($hasTicketTypes)
-                                                    <a href="{{ route('ga-booking.tickets', $event->slug) }}"
-                                                        class="custom-button">
-                                                        @if ($event->price == 0 || $event->price === null)
-                                                            select tickets
-                                                        @else
-                                                            book now
-                                                        @endif
-                                                    </a>
-                                                @elseif($event->redirect && $event->redirect_url)
-                                                    <a target="_blank" href="{{ $event->redirect_url }}"
-                                                        class="custom-button">book now</a>
-                                                @else
-                                                    <a href="{{ route('show.details', $event->slug) }}"
-                                                        class="custom-button">
-                                                        @if ($event->price == 0 || $event->price === null)
-                                                            free event
-                                                        @else
-                                                            view details
-                                                        @endif
-                                                    </a>
-                                                @endif
+                                                <a href="{{ route('show.details', $event->slug) }}"
+                                                    class="custom-button">
+                                                    @if ($event->price == 0 || $event->price === null)
+                                                        free event
+                                                    @else
+                                                        book now
+                                                    @endif
+                                                </a>
                                             @endif
                                         </div>
                                     </div>

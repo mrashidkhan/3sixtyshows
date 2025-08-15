@@ -73,12 +73,25 @@
                                 <li><a href="{{ route('show.create') }}">Add Show</a></li>
                             </ul>
                         </li>
+
+<li>
+    <a>
+        <i class="fa fa-ticket"></i> Ticket Management
+        <span class="fa fa-chevron-down"></span>
+    </a>
+    <ul class="nav child_menu" style="display: none;">
+        <li><a href="{{ route('admin.ticket-types.all') }}">All Ticket Types</a></li>
+        <li><a href="{{ route('admin.ticket-types.create') }}">Create Ticket Type</a></li>
+        <li><a href="{{ route('show.index') }}">Manage by Show</a></li>
+    </ul>
+</li>
                     </ul>
                 </div>
 
                 <div class="menu_section">
                     <h3>Booking System</h3>
                     <ul class="nav side-menu">
+
                         <li>
                             <a>
                                 <i class="fa fa-ticket"></i> Bookings

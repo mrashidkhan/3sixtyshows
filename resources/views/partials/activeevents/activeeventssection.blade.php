@@ -9,11 +9,26 @@
                             <div class="col-sm-6 col-lg-4">
                                 <div class="event-grid" style="height: 510px;">
                                     <div class="movie-thumb c-thumb" style="height: 357px;">
-                                        @if ($show->redirect && $show->redirect_url)
-                                            <a target="_blank" href="{{ $show->redirect_url }}?frm=ae" rel="noopener">
-                                        @else
-                                            <a href="{{ route('show.details', $show->slug) }}">
-                                        @endif
+                                        @php
+                                            // Determine the appropriate link based on ticket types and redirect settings
+                                            $hasTicketTypes = $show->ticketTypes && $show->ticketTypes->count() > 0;
+
+                                            if ($hasTicketTypes) {
+                                                $eventLink = route('ga-booking.tickets', $show->slug);
+                                                $linkTarget = '_self';
+                                                $linkParams = '';
+                                            } elseif ($show->redirect && $show->redirect_url) {
+                                                $eventLink = $show->redirect_url;
+                                                $linkTarget = '_blank';
+                                                $linkParams = '?frm=ae';
+                                            } else {
+                                                $eventLink = route('show.details', $show->slug);
+                                                $linkTarget = '_self';
+                                                $linkParams = '';
+                                            }
+                                        @endphp
+
+                                        <a href="{{ $eventLink . $linkParams }}" target="{{ $linkTarget }}" @if($linkTarget === '_blank') rel="noopener" @endif>
                                             @if ($show->featured_image && file_exists(storage_path('app/public/' . $show->featured_image)))
                                                 <img src="{{ asset('storage/' . $show->featured_image) }}"
                                                      height="420"
@@ -43,11 +58,7 @@
 
                                     <div class="movie-content bg-one">
                                         <h5 class="title m-0">
-                                            @if ($show->redirect && $show->redirect_url)
-                                                <a target="_blank" href="{{ $show->redirect_url }}?frm=ae" rel="noopener">
-                                            @else
-                                                <a href="{{ route('show.details', $show->slug) }}">
-                                            @endif
+                                            <a href="{{ $eventLink . $linkParams }}" target="{{ $linkTarget }}" @if($linkTarget === '_blank') rel="noopener" @endif>
                                                 @php
                                                     $showTitle = $show->title ?? 'Untitled Show';
                                                     $displayTitle = mb_strlen($showTitle) > 35 ? mb_substr($showTitle, 0, 35) . '...' : $showTitle;
@@ -74,6 +85,44 @@
                                                 {{ $show->start_date->format('g:i A') }}
                                             </div>
                                         @endif
+
+                                        {{-- Show appropriate action button based on ticket availability --}}
+                                        <div class="show-actions" style="margin-top: 10px;">
+                                            @if ($show->status === 'sold_out' || $show->sold_out)
+                                                <span class="btn btn-secondary btn-sm" style="cursor: not-allowed;">
+                                                    Sold Out
+                                                </span>
+                                            @elseif($show->start_date->isPast())
+                                                <span class="btn btn-secondary btn-sm" style="cursor: not-allowed;">
+                                                    Event Passed
+                                                </span>
+                                            @else
+                                                @if ($hasTicketTypes)
+                                                    <a href="{{ route('ga-booking.tickets', $show->slug) }}"
+                                                       class="btn btn-primary btn-sm">
+                                                        @if ($show->price == 0 || $show->price === null)
+                                                            Select Tickets
+                                                        @else
+                                                            Book Now
+                                                        @endif
+                                                    </a>
+                                                @elseif($show->redirect && $show->redirect_url)
+                                                    <a target="_blank" href="{{ $show->redirect_url }}?frm=ae"
+                                                       rel="noopener" class="btn btn-primary btn-sm">
+                                                        Book Now
+                                                    </a>
+                                                @else
+                                                    <a href="{{ route('show.details', $show->slug) }}"
+                                                       class="btn btn-outline-primary btn-sm">
+                                                        @if ($show->price == 0 || $show->price === null)
+                                                            Free Event
+                                                        @else
+                                                            View Details
+                                                        @endif
+                                                    </a>
+                                                @endif
+                                            @endif
+                                        </div>
 
                                         {{-- Optional: Add price if available --}}
                                         @if($show->price && $show->price > 0)
