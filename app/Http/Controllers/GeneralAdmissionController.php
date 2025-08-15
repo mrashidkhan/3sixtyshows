@@ -340,7 +340,30 @@ public function processCustomerDetails(Request $request, $slug)
             // 5. Process payment
             $paymentResult = $this->processPaymentMethod($request, $grandTotal, $booking);
 
-            if ($paymentResult['success']) {
+            // Handle PayPal redirect
+            if (isset($paymentResult['success']) && $paymentResult['success'] === 'paypal_redirect') {
+                // Store booking ID in session for webhook verification
+                session(['paypal_booking_id' => $booking->id]);
+
+                // Clean up session data as we're redirecting
+                TicketHold::where('session_id', $bookingData['session_id'])->delete();
+
+                \DB::commit();
+
+                // Redirect to PayPal for payment
+                // Use approval URL from payment result
+                $approvalUrl = $paymentResult['approval_url'] ?? null;
+
+                if ($approvalUrl) {
+                    return redirect($approvalUrl);
+                } else {
+                    \DB::rollback();
+                    return redirect()->route('ga-booking.failed', $slug)
+                        ->with('error', 'Could not redirect to PayPal. Please try again.');
+                }
+            }
+
+            if ($paymentResult['success'] === true) {
                 // Payment successful
                 $booking->update([
                     'status' => \App\Models\Booking::STATUS_CONFIRMED,
@@ -411,11 +434,49 @@ public function processCustomerDetails(Request $request, $slug)
                 }
 
             case 'paypal':
-                // PayPal integration will be implemented later
-                return [
-                    'success' => false,
-                    'message' => 'PayPal payment is not available yet.'
-                ];
+                // Create PayPal order
+                try {
+                    $paypal = new \App\Services\PayPalService();
+
+                    // Create order with booking reference and custom return URLs
+                    $returnUrl = route('ga-booking.paypal-return', ['slug' => $booking->show->slug]);
+                    $cancelUrl = route('ga-booking.paypal-return', ['slug' => $booking->show->slug, 'cancel' => 'true']);
+
+                    $order = $paypal->createOrder(
+                        $amount,
+                        'Ticket Purchase for ' . $booking->show->title,
+                        $booking->booking_number,
+                        $returnUrl,
+                        $cancelUrl
+                    );
+
+                    // Store PayPal order ID in booking for later reference
+                    $booking->update([
+                        'payment_reference' => $order['id']
+                    ]);
+
+                    // Find approval URL
+                    $approvalUrl = null;
+                    foreach ($order['links'] as $link) {
+                        if ($link['rel'] === 'approve') {
+                            $approvalUrl = $link['href'];
+                            break;
+                        }
+                    }
+
+                    // Return special indicator for PayPal payment
+                    return [
+                        'success' => 'paypal_redirect',
+                        'paypal_order_id' => $order['id'],
+                        'approval_url' => $approvalUrl
+                    ];
+                } catch (\Exception $e) {
+                    \Log::error('PayPal payment error: ' . $e->getMessage());
+                    return [
+                        'success' => false,
+                        'message' => 'PayPal payment failed: ' . $e->getMessage()
+                    ];
+                }
 
             default:
                 return [
@@ -445,5 +506,168 @@ public function processCustomerDetails(Request $request, $slug)
         return view('pages.booking-failed', [
             'show' => $show,
         ]);
+    }
+
+    /**
+     * Handle PayPal return (success or cancel)
+     */
+    public function paypalReturn(Request $request, $slug)
+    {
+        $bookingId = session('paypal_booking_id');
+
+        if (!$bookingId) {
+            return redirect()->route('ga-booking.tickets', $slug)
+                ->with('error', 'Booking session expired. Please start again.');
+        }
+
+        $booking = \App\Models\Booking::findOrFail($bookingId);
+
+        // Check if user cancelled
+        if ($request->has('cancel')) {
+            $booking->update([
+                'status' => \App\Models\Booking::STATUS_CANCELLED,
+                'payment_status' => \App\Models\Booking::PAYMENT_FAILED
+            ]);
+
+            return redirect()->route('ga-booking.failed', $slug)
+                ->with('error', 'Payment was cancelled. Please try again.');
+        }
+
+        // Process successful payment
+        try {
+            $paypal = new \App\Services\PayPalService();
+            $order = $paypal->getOrderDetails($booking->payment_reference);
+
+            // Check if order is approved
+            if ($order['status'] === 'APPROVED') {
+                // Capture payment
+                $capture = $paypal->capturePayment($booking->payment_reference);
+
+                if ($capture['status'] === 'COMPLETED') {
+                    // Update booking
+                    $booking->update([
+                        'status' => \App\Models\Booking::STATUS_CONFIRMED,
+                        'payment_status' => \App\Models\Booking::PAYMENT_COMPLETED,
+                        'confirmed_at' => now()
+                    ]);
+
+                    // Generate tickets
+                    foreach ($booking->bookingItems as $item) {
+                        $item->generateTickets($booking->user_id);
+                    }
+
+                    // Clean up session
+                    session()->forget('paypal_booking_id');
+
+                    return redirect()->route('ga-booking.success', [
+                        'slug' => $slug,
+                        'bookingNumber' => $booking->booking_number
+                    ]);
+                }
+            }
+
+            // If we get here, payment wasn't completed
+            $booking->update([
+                'status' => \App\Models\Booking::STATUS_CANCELLED,
+                'payment_status' => \App\Models\Booking::PAYMENT_FAILED
+            ]);
+
+            return redirect()->route('ga-booking.failed', $slug)
+                ->with('error', 'Payment was not completed. Please try again.');
+
+        } catch (\Exception $e) {
+            \Log::error('PayPal return error: ' . $e->getMessage());
+
+            $booking->update([
+                'status' => \App\Models\Booking::STATUS_CANCELLED,
+                'payment_status' => \App\Models\Booking::PAYMENT_FAILED
+            ]);
+
+            return redirect()->route('ga-booking.failed', $slug)
+                ->with('error', 'Payment processing failed. Please try again.');
+        }
+    }
+
+    /**
+     * Handle PayPal webhook notifications
+     */
+    public function paypalWebhook(Request $request)
+    {
+        // Verify webhook signature (simplified for now)
+        $paypal = new \App\Services\PayPalService();
+        $verified = $paypal->verifyWebhookSignature($request->getContent(), $request->headers->all());
+
+        if (!$verified) {
+            \Log::warning('PayPal webhook signature verification failed');
+            return response('Webhook verification failed', 400);
+        }
+
+        // Process webhook data
+        $payload = json_decode($request->getContent(), true);
+        $eventType = $payload['event_type'] ?? null;
+        $resource = $payload['resource'] ?? null;
+
+        if (!$eventType || !$resource) {
+            \Log::warning('Invalid PayPal webhook payload');
+            return response('Invalid payload', 400);
+        }
+
+        // Handle different event types
+        switch ($eventType) {
+            case 'CHECKOUT.ORDER.APPROVED':
+                // Order approved, capture payment
+                $orderId = $resource['id'] ?? null;
+                if ($orderId) {
+                    try {
+                        // Find booking by payment reference
+                        $booking = \App\Models\Booking::where('payment_reference', $orderId)->first();
+                        if ($booking) {
+                            $capture = $paypal->capturePayment($orderId);
+                            if ($capture['status'] === 'COMPLETED') {
+                                $booking->update([
+                                    'status' => \App\Models\Booking::STATUS_CONFIRMED,
+                                    'payment_status' => \App\Models\Booking::PAYMENT_COMPLETED,
+                                    'confirmed_at' => now()
+                                ]);
+
+                                // Generate tickets
+                                foreach ($booking->bookingItems as $item) {
+                                    $item->generateTickets($booking->user_id);
+                                }
+                            }
+                        }
+                    } catch (\Exception $e) {
+                        \Log::error('PayPal webhook capture error: ' . $e->getMessage());
+                    }
+                }
+                break;
+
+            case 'PAYMENT.CAPTURE.COMPLETED':
+                // Payment completed
+                $captureId = $resource['id'] ?? null;
+                if ($captureId) {
+                    // You might want to update your records here
+                    \Log::info('PayPal payment captured: ' . $captureId);
+                }
+                break;
+
+            case 'PAYMENT.CAPTURE.DENIED':
+                // Payment denied
+                $captureId = $resource['id'] ?? null;
+                if ($captureId) {
+                    // Update booking status to failed
+                    $booking = \App\Models\Booking::where('payment_reference', $captureId)->first();
+                    if ($booking) {
+                        $booking->update([
+                            'status' => \App\Models\Booking::STATUS_CANCELLED,
+                            'payment_status' => \App\Models\Booking::PAYMENT_FAILED
+                        ]);
+                    }
+                    \Log::info('PayPal payment denied: ' . $captureId);
+                }
+                break;
+        }
+
+        return response('Webhook processed', 200);
     }
 }

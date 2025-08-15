@@ -104,19 +104,22 @@
                                     </div>
                                 </div>
 
-                                <!-- PayPal (Optional - for future) -->
+                                <!-- PayPal -->
                                 <div class="payment-method-card" data-method="paypal"
-                                     style="border: 2px solid #e9ecef; border-radius: 10px; padding: 20px; margin-bottom: 15px; cursor: pointer; opacity: 0.6;">
+                                     style="border: 2px solid #e9ecef; border-radius: 10px; padding: 20px; margin-bottom: 15px; cursor: pointer;">
                                     <div class="d-flex align-items-center">
-                                        <input type="radio" name="payment_method" value="paypal" disabled
+                                        <input type="radio" name="payment_method" value="paypal"
                                                style="margin-right: 15px; transform: scale(1.3);">
                                         <div class="flex-grow-1">
-                                            <h6 style="margin-bottom: 5px; color: #6c757d;">
+                                            <h6 style="margin-bottom: 5px; color: #1a1a2e;">
                                                 <i class="fab fa-paypal me-2"></i> PayPal
                                             </h6>
                                             <p class="text-muted mb-0" style="font-size: 13px;">
-                                                Coming Soon - Pay with your PayPal account
+                                                Pay with your PayPal account
                                             </p>
+                                        </div>
+                                        <div class="payment-icons">
+                                            <i class="fab fa-paypal" style="font-size: 24px; color: #0070ba;"></i>
                                         </div>
                                     </div>
                                 </div>
@@ -364,3 +367,34 @@
         </form>
     </div>
 </section>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Payment method selection
+    const paymentCards = document.querySelectorAll('.payment-method-card');
+    const cardForm = document.getElementById('card-form');
+
+    paymentCards.forEach(card => {
+        card.addEventListener('click', function() {
+            const radio = this.querySelector('input[type="radio"]');
+            if (radio) {
+                // Update visual state
+                paymentCards.forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+
+                // Select the radio button
+                radio.checked = true;
+
+                // Show/hide card form based on selection
+                if (radio.value === 'card') {
+                    cardForm.style.display = 'block';
+                } else {
+                    cardForm.style.display = 'none';
+                }
+            }
+        });
+    });
+});
+</script>
+@endpush

@@ -202,7 +202,7 @@ Route::middleware(['auth'])->prefix('payment')->name('payment.')->group(function
 
 // Payment Webhooks (no auth needed)
 Route::post('/webhooks/payment/stripe', [PaymentController::class, 'stripeWebhook'])->name('webhooks.stripe');
-Route::post('/webhooks/payment/paypal', [PaymentController::class, 'paypalWebhook'])->name('webhooks.paypal');
+Route::post('/webhooks/payment/paypal', [GeneralAdmissionController::class, 'paypalWebhook'])->name('webhooks.paypal');
 
 // ==================== ADMIN BOOKING ROUTES ====================
 
@@ -371,6 +371,10 @@ Route::prefix('ga-booking')->group(function () {
         ->name('ga-booking.success');
     Route::get('/{slug}/booking-failed', [GeneralAdmissionController::class, 'bookingFailed'])
         ->name('ga-booking.failed');
+
+    // PayPal return route
+    Route::get('/{slug}/paypal-return', [GeneralAdmissionController::class, 'paypalReturn'])
+        ->name('ga-booking.paypal-return');
      });
 });
 
@@ -422,3 +426,76 @@ Route::group(['middleware' => 'auth'], function () {
     // Your other existing routes...
 
 });
+
+
+// Route::get('/test-paypal', function() {
+//     try {
+//         // Check environment variables directly
+//         $envChecks = [
+//             'PAYPAL_MODE' => env('PAYPAL_MODE'),
+//             'PAYPAL_SANDBOX_CLIENT_ID' => env('PAYPAL_SANDBOX_CLIENT_ID') ? 'SET' : 'NOT SET',
+//             'PAYPAL_SANDBOX_CLIENT_SECRET' => env('PAYPAL_SANDBOX_CLIENT_SECRET') ? 'SET' : 'NOT SET',
+//         ];
+
+//         // Check config values
+//         $config = config('paypal');
+//         $mode = $config['mode'];
+
+//         $configChecks = [
+//             'mode' => $mode,
+//             'client_id' => $config[$mode]['client_id'] ?? 'NOT SET',
+//             'client_secret' => $config[$mode]['client_secret'] ? 'SET' : 'NOT SET',
+//             'api_url' => $config[$mode]['api_url'] ?? 'NOT SET',
+//         ];
+
+//         // Try to create PayPal service
+//         $paypal = new \App\Services\PayPalService();
+
+//         // Try to get access token
+//         $token = $paypal->getAccessToken();
+
+//         return response()->json([
+//             'success' => true,
+//             'env_checks' => $envChecks,
+//             'config_checks' => $configChecks,
+//             'token_received' => !empty($token),
+//             'token_length' => strlen($token),
+//         ]);
+
+//     } catch (\Exception $e) {
+//         return response()->json([
+//             'success' => false,
+//             'error' => $e->getMessage(),
+//             'env_checks' => $envChecks ?? [],
+//             'config_checks' => $configChecks ?? [],
+//         ]);
+//     }
+// });
+
+
+Route::get('/test-paypal-order', function() {
+    try {
+        $paypal = new \App\Services\PayPalService();
+
+        // Test getting access token
+        $token = $paypal->getAccessToken();
+
+        // Test creating an order
+        $order = $paypal->createOrder(10.00, 'Test Ticket Purchase');
+
+        return response()->json([
+            'success' => true,
+            'token_received' => !empty($token),
+            'order_created' => $order['status'] === 'CREATED',
+            'order_id' => $order['id'],
+            'approval_url' => collect($order['links'])->firstWhere('rel', 'approve')['href'] ?? null,
+            'order_details' => $order
+        ]);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage()
+        ]);
+    }
+})->middleware('auth');

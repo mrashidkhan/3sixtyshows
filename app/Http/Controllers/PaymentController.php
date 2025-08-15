@@ -81,4 +81,13 @@ class PaymentController extends Controller
         return redirect()->route('bookings.checkout', $booking->id)
                        ->with('error', 'Payment was cancelled. Please try again.');
     }
+
+    /**
+     * Handle PayPal webhook notifications
+     * This method is handled by GeneralAdmissionController
+     */
+    public function paypalWebhook(Request $request)
+    {
+        return response('Webhook handled by GeneralAdmissionController', 200);
+    }
 }
