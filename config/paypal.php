@@ -10,6 +10,22 @@ return [
     |
     */
 
+    // Add these to your existing config/paypal.php file:
+
+// Webhook settings
+'webhook_id' => env('PAYPAL_WEBHOOK_ID'),
+'skip_webhook_verification' => env('PAYPAL_SKIP_WEBHOOK_VERIFICATION', false),
+
+// Webhook events to listen for
+'webhook_events' => [
+    ['name' => 'PAYMENT.CAPTURE.COMPLETED'],
+    ['name' => 'PAYMENT.CAPTURE.DENIED'],
+    ['name' => 'CHECKOUT.ORDER.APPROVED'],
+    ['name' => 'CHECKOUT.ORDER.COMPLETED'],
+    ['name' => 'PAYMENT.CAPTURE.REFUNDED'],
+    ['name' => 'BILLING.SUBSCRIPTION.CANCELLED'],
+],
+
     'mode' => env('PAYPAL_MODE', 'sandbox'), // sandbox or live
 
     'sandbox' => [
@@ -50,3 +66,4 @@ return [
     'ssl_verify' => env('PAYPAL_SSL_VERIFY', true),
     'ssl_cert_path' => env('PAYPAL_SSL_CERT_PATH', null),
 ];
+

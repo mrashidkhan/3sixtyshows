@@ -214,6 +214,14 @@ public function getAccessToken()
             $returnUrl = $returnUrl ?? config('paypal.urls.success');
             $cancelUrl = $cancelUrl ?? config('paypal.urls.cancel');
 
+            // Replace placeholders in URLs if they still contain them
+            if (strpos($returnUrl, '{slug}') !== false || strpos($cancelUrl, '{slug}') !== false) {
+                // Use a generic slug for testing purposes
+                $placeholderSlug = 'test';
+                $returnUrl = str_replace('{slug}', $placeholderSlug, $returnUrl);
+                $cancelUrl = str_replace('{slug}', $placeholderSlug, $cancelUrl);
+            }
+
             $orderData = [
                 'intent' => 'CAPTURE',
                 'purchase_units' => [
@@ -255,8 +263,24 @@ public function getAccessToken()
             return $responseData;
 
         } catch (RequestException $e) {
-            Log::error('PayPal create order error: ' . $e->getMessage());
-            throw new \Exception('Failed to create PayPal order');
+            $statusCode = $e->hasResponse() ? $e->getResponse()->getStatusCode() : 'unknown';
+            $responseBody = $e->hasResponse() ? $e->getResponse()->getBody()->getContents() : 'no response';
+
+            Log::error('PayPal create order RequestException', [
+                'message' => $e->getMessage(),
+                'status_code' => $statusCode,
+                'response' => $responseBody,
+                'url' => $this->baseUrl . '/v2/checkout/orders'
+            ]);
+
+            throw new \Exception("Failed to create PayPal order: {$e->getMessage()}. Response: {$responseBody}");
+        } catch (\Exception $e) {
+            Log::error('PayPal create order general error', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            throw new \Exception("Failed to create PayPal order: {$e->getMessage()}");
         }
     }
 

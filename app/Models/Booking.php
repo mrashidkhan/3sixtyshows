@@ -8,10 +8,11 @@ use App\Models\TicketHold;
 class Booking extends Model
 {
     protected $fillable = [
-    'user_id', 'show_id', 'booking_number', 'total_amount', 'status',  
+    'user_id', 'show_id', 'booking_number', 'total_amount', 'status',
     'payment_status', 'payment_method', 'payment_reference',
     'booking_date', 'expires_at', 'confirmed_at', 'number_of_tickets',
-    'transaction_id', 'ticket_breakdown', 'service_fee', 'processing_fee', 'grand_total'
+    'transaction_id', 'ticket_breakdown', 'service_fee', 'processing_fee', 'grand_total','card_last_four',
+    'card_type',
 ];
 
     protected $casts = [

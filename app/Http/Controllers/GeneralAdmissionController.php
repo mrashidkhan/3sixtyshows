@@ -4,10 +4,64 @@ namespace App\Http\Controllers;
 
 use App\Models\Show;
 use App\Models\TicketHold;
+use App\Models\Booking;
+use App\Models\Ticket;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB; // Add this line
+use Illuminate\Support\Str; // Add this line if Str is also missing
+use App\Models\BookingItem;
+use App\Services\PayPalService;
+use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
 
 class GeneralAdmissionController extends Controller
 {
+    // Add to GeneralAdmissionController
+public function paypalSuccess(Request $request, $slug)
+{
+    $token = $request->query('token');
+    $payerId = $request->query('PayerID');
+
+    if (!$token || !$payerId) {
+        return redirect()->route('ga-booking.failed', $slug)
+            ->with('error', 'PayPal payment verification failed.');
+    }
+
+    try {
+        // Find booking by payment reference
+        $booking = Booking::where('payment_reference', $token)->firstOrFail();
+
+        $paypal = new \App\Services\PayPalService();
+        $captureResult = $paypal->capturePayment($token);
+
+        if ($captureResult['status'] === 'COMPLETED') {
+            $booking->update([
+                'status' => 'confirmed',
+                'payment_status' => 'paid',
+                'paypal_payer_id' => $payerId,
+                'paid_at' => now()
+            ]);
+
+            return redirect()->route('ga-booking.success', [
+                'slug' => $slug,
+                'bookingNumber' => $booking->booking_number
+            ])->with('success', 'Payment completed successfully!');
+        }
+
+    } catch (\Exception $e) {
+        Log::error('PayPal success error: ' . $e->getMessage());
+    }
+
+    return redirect()->route('ga-booking.failed', $slug)
+        ->with('error', 'Payment verification failed.');
+}
+
+public function paypalCancel(Request $request, $slug)
+{
+    return redirect()->route('ga-booking.failed', $slug)
+        ->with('warning', 'Payment was cancelled.');
+}
+
     // Show ticket selection page
     public function showTicketSelection($slug)
     {
@@ -256,158 +310,244 @@ public function processCustomerDetails(Request $request, $slug)
     }
 
     public function processPayment(Request $request, $slug)
-    {
-        $show = Show::where('slug', $slug)->firstOrFail();
-        $bookingData = session('booking_data');
-        $customerData = session('customer_data');
+{
+    $show = Show::where('slug', $slug)->firstOrFail();
 
-        // Validate session data
-        if (!$bookingData || !$customerData) {
-            return redirect()->route('ga-booking.tickets', $slug)
-                ->with('error', 'Booking session expired. Please start again.');
+    // Get booking data from session
+    $bookingData = session('booking_data');
+    $customerData = session('customer_data');
+    if (!$bookingData || !$customerData) {
+        return redirect()->route('ga-booking.tickets', $slug)
+            ->with('error', 'Booking session expired. Please start again.');
+    }
+
+
+//    $request->validate([
+//     'payment_method' => 'required|in:card,paypal',
+//     'card_number' => [
+//         'required_if:payment_method,card',
+//         'string',
+//         'regex:/^[0-9\s]{13,19}$/', // Allow digits and spaces, 13-19 characters
+//         function ($attribute, $value, $fail) {
+//             // Remove spaces and validate
+//             $cleanNumber = preg_replace('/\s+/', '', $value);
+
+//             // Check if it's exactly 16 digits after cleaning
+//             if (!preg_match('/^\d{16}$/', $cleanNumber)) {
+//                 $fail('The card number must be exactly 16 digits.');
+//                 return;
+//             }
+
+//             // Validate using Luhn algorithm
+//             if (!$this->validateLuhn($cleanNumber)) {
+//                 $fail('The card number is not valid.');
+//             }
+//         }
+//     ],
+//     'card_expiry' => 'required_if:payment_method,card|string|size:4|regex:/^(0[1-9]|1[0-2])([0-9]{2})$/',
+//     'card_cvv' => 'required_if:payment_method,card|numeric|digits_between:3,4',
+//     'card_holder_name' => 'required_if:payment_method,card|string|max:255|regex:/^[a-zA-Z\s]+$/',
+//     'billing_address' => 'required_if:payment_method,card|string|max:255',
+//     'billing_city' => 'required_if:payment_method,card|string|max:100',
+//     'billing_state' => 'required_if:payment_method,card|string|max:100',
+//     'billing_zip' => 'required_if:payment_method,card|string|max:20',
+// ]);
+
+// $request->validate([
+//     'payment_method' => 'required|in:card,paypal',
+//     'card_number' => [
+//         'required_if:payment_method,card',
+//         'string',
+//         'regex:/^[0-9\s]{13,19}$/',
+//         function ($attribute, $value, $fail) {
+//             $cleanNumber = preg_replace('/\s+/', '', $value);
+
+//             // Validate length
+//             if (!preg_match('/^\d{13,19}$/', $cleanNumber)) {
+//                 $fail('The card number must be between 13-19 digits.');
+//                 return;
+//             }
+
+//             // Detect card type
+//             $cardType = $this->detectCardType($cleanNumber);
+//             if (!$cardType) {
+//                 $fail('The card number format is not recognized.');
+//                 return;
+//             }
+
+//             // Validate Luhn
+//             if (!$this->validateLuhn($cleanNumber)) {
+//                 $fail('The card number is not valid.');
+//             }
+//         }
+//     ],
+// 'card_holder_name' => 'required_if:payment_method,card|string|max:255|regex:/^[a-zA-Z\s]+$/',
+// 'card_cvv' => 'required_if:payment_method,card|numeric|digits_between:3,4',
+// 'card_holder_name' => 'required_if:payment_method,card|string|max:255|regex:/^[a-zA-Z\s]+$/',
+// 'billing_address' => 'required_if:payment_method,card|string|max:255',
+// 'billing_city' => 'required_if:payment_method,card|string|max:100',
+// 'billing_state' => 'required_if:payment_method,card|string|max:100',
+// 'billing_zip' => 'required_if:payment_method,card|string|max:20',
+// ]);
+
+$request->validate([
+    'payment_method' => 'required|in:card,paypal',
+    'card_number' => [
+        'required_if:payment_method,card',
+        'string',
+        'regex:/^[0-9\s]{13,19}$/',
+        function ($attribute, $value, $fail) {
+            $cleanNumber = preg_replace('/\s+/', '', $value);
+
+            if (!preg_match('/^\d{13,19}$/', $cleanNumber)) {
+                $fail('The card number must be between 13-19 digits.');
+                return;
+            }
+
+            $cardType = $this->detectCardType($cleanNumber);
+            if (!$cardType) {
+                $fail('The card number format is not recognized.');
+                return;
+            }
+
+            if (!$this->validateLuhn($cleanNumber)) {
+                $fail('The card number is not valid.');
+            }
         }
+    ],
+    'card_expiry' => 'required_if:payment_method,card|string|size:4',
+    'card_cvv' => 'required_if:payment_method,card|numeric|digits_between:3,4',
+    'card_holder_name' => 'required_if:payment_method,card|string|max:255',
+    'billing_address' => 'required_if:payment_method,card|string|max:255',
+    'billing_city' => 'required_if:payment_method,card|string|max:100',
+    'billing_state' => 'required_if:payment_method,card|string|max:100',
+    'billing_zip' => 'required_if:payment_method,card|string|max:20',
+]);
+    try {
+        DB::beginTransaction();
 
-        // Check expiry
-        if (now() > \Carbon\Carbon::parse($bookingData['expires_at'])) {
-            TicketHold::where('session_id', $bookingData['session_id'])->delete();
-            session()->forget(['booking_data', 'customer_data']);
+        // Clean card data if needed
+        $cardData = $this->cleanCardData($request);
 
-            return redirect()->route('ga-booking.tickets', $slug)
-                ->with('error', 'Booking session expired. Please select tickets again.');
-        }
-
-        // Validate payment information
-        $request->validate([
-            'payment_method' => 'required|in:card,paypal',
-            // Add card validation for card payments
-            'card_number' => 'required_if:payment_method,card|string|min:13|max:19',
-            'card_holder_name' => 'required_if:payment_method,card|string|min:2',
-            'card_expiry' => 'required_if:payment_method,card|string|size:5',
-            'card_cvv' => 'required_if:payment_method,card|string|min:3|max:4',
+        // Create the booking
+        $booking = Booking::create([
+            'user_id' => auth()->id(),
+            'show_id' => $show->id,
+            'booking_number' => 'BK-' . strtoupper(Str::random(8)),
+            'customer_name' => $customerData['name'],
+            'customer_email' => $customerData['email'],
+            'customer_phone' => $customerData['phone'],
+            // 'total_tickets' => $bookingData['total_tickets'],
+            'booking_date' => now(),
+            'total_amount' => $bookingData['subtotal'],
+            'number_of_tickets' => $bookingData['total_tickets'],
+            'service_fee' => max($bookingData['subtotal'] * 0.03, 2.0),
+            'processing_fee' => $bookingData['total_tickets'] * 1.5,
+            'grand_total' => $bookingData['subtotal'] + max($bookingData['subtotal'] * 0.03, 2.0) + ($bookingData['total_tickets'] * 1.5),
+            'status' => 'pending',
+            'payment_method' => $request->payment_method,
+            'payment_status' => 'pending'
         ]);
 
-        try {
-            \DB::beginTransaction();
-
-            // 1. Create or find USER
-            $user = \App\Models\User::firstOrCreate(
-                ['email' => $customerData['email']],
-                [
-                    'name' => $customerData['name'],
-                    'phone' => $customerData['phone'],
-                    'newsletter_subscribed' => $customerData['newsletter'],
-                    'email_verified_at' => now(),
-                    'password' => bcrypt('temp_' . \Illuminate\Support\Str::random(8)),
-                    'role' => 'customer',
-                    'is_active' => true
-                ]
-            );
-
-            // 2. Calculate final amounts
-            $subtotal = $bookingData['subtotal'];
-            $serviceFee = max($subtotal * 0.03, 2.00);
-            $processingFee = $bookingData['total_tickets'] * 1.50;
-            $grandTotal = $subtotal + $serviceFee + $processingFee;
-
-            // 3. Create booking with USER_ID
-            $booking = \App\Models\Booking::create([
-                'user_id' => $user->id,
-                'show_id' => $show->id,
-                'total_amount' => $subtotal,
-                'service_fee' => $serviceFee,
-                'processing_fee' => $processingFee,
-                'grand_total' => $grandTotal,
-                'number_of_tickets' => $bookingData['total_tickets'],
-                'ticket_breakdown' => $bookingData['ticket_breakdown'],
-                'status' => \App\Models\Booking::STATUS_PENDING,
-                'payment_status' => \App\Models\Booking::PAYMENT_PENDING,
-                'payment_method' => $request->payment_method,
-                'booking_date' => now(),
-                'expires_at' => now()->addMinutes(30)
-            ]);
-
-            // 4. Create booking items
-            foreach ($bookingData['ticket_breakdown'] as $ticketData) {
-                \App\Models\BookingItem::create([
-                    'booking_id' => $booking->id,
-                    'ticket_type_id' => $ticketData['ticket_type_id'],
-                    'quantity' => $ticketData['quantity'],
-                    'unit_price' => $ticketData['unit_price'],
-                    'total_price' => $ticketData['total_price']
-                ]);
-            }
-
-            // 5. Process payment
-            $paymentResult = $this->processPaymentMethod($request, $grandTotal, $booking);
-
-            // Handle PayPal redirect
-            if (isset($paymentResult['success']) && $paymentResult['success'] === 'paypal_redirect') {
-                // Store booking ID in session for webhook verification
-                session(['paypal_booking_id' => $booking->id]);
-
-                // Clean up session data as we're redirecting
-                TicketHold::where('session_id', $bookingData['session_id'])->delete();
-
-                \DB::commit();
-
-                // Redirect to PayPal for payment
-                // Use approval URL from payment result
-                $approvalUrl = $paymentResult['approval_url'] ?? null;
-
-                if ($approvalUrl) {
-                    return redirect($approvalUrl);
-                } else {
-                    \DB::rollback();
-                    return redirect()->route('ga-booking.failed', $slug)
-                        ->with('error', 'Could not redirect to PayPal. Please try again.');
-                }
-            }
-
-            if ($paymentResult['success'] === true) {
-                // Payment successful
-                $booking->update([
-                    'status' => \App\Models\Booking::STATUS_CONFIRMED,
-                    'payment_status' => \App\Models\Booking::PAYMENT_COMPLETED,
-                    'payment_reference' => $paymentResult['transaction_id'],
-                    'confirmed_at' => now()
-                ]);
-
-                // Generate tickets
-                foreach ($booking->bookingItems as $item) {
-                    $item->generateTickets($user->id);
-                }
-
-                // Clean up
-                TicketHold::where('session_id', $bookingData['session_id'])->delete();
-                session()->forget(['booking_data', 'customer_data']);
-
-                \DB::commit();
-
-                return redirect()->route('ga-booking.success', [
-                    'slug' => $slug,
-                    'bookingNumber' => $booking->booking_number
-                ]);
-            } else {
-                // Payment failed
-                $booking->update([
-                    'status' => \App\Models\Booking::STATUS_CANCELLED,
-                    'payment_status' => \App\Models\Booking::PAYMENT_FAILED
-                ]);
-
-                \DB::rollback();
-
-                return redirect()->route('ga-booking.failed', $slug)
-                    ->with('error', $paymentResult['message']);
-            }
-
-        } catch (\Exception $e) {
-            \DB::rollback();
-
-            return back()->withErrors([
-                'error' => 'Payment processing failed: ' . $e->getMessage()
+        // Create booking items
+        foreach ($bookingData['ticket_breakdown'] as $ticketData) {
+            \App\Models\BookingItem::create([
+                'booking_id' => $booking->id,
+                'ticket_type_id' => $ticketData['ticket_type_id'],
+                'quantity' => $ticketData['quantity'],
+                'unit_price' => $ticketData['unit_price'],
+                'total_price' => $ticketData['total_price']
             ]);
         }
+
+        DB::commit();
+
+        // Clear session data
+        session()->forget(['booking_data', 'customer_data']);
+
+        // Process payment based on method
+        if ($request->payment_method === 'paypal') {
+            return $this->processPayPalPayment($booking);
+        } elseif ($request->payment_method === 'card') {
+            // For card payments, simulate success for testing
+            // In production, integrate with Stripe or another card processor
+            $booking->update([
+                'status' => 'confirmed',
+                'payment_status' => 'paid',
+                'paid_at' => now()
+            ]);
+
+            // Generate tickets
+            $booking->generateTickets();
+
+            return redirect()->route('ga-booking.success', [
+                'slug' => $slug,
+                'bookingNumber' => $booking->booking_number
+            ])->with('success', 'Payment completed successfully!');
+        }
+
+        return redirect()->route('ga-booking.success', [
+            'slug' => $slug,
+            'bookingNumber' => $booking->booking_number
+        ])->with('success', 'Booking created successfully!');
+
+    } catch (\Exception $e) {
+        // DB::rollback();
+        // Log::error('Booking creation error: ' . $e->getMessage());
+        // return back()->with('error', 'Booking failed. Please try again.');
+
+        DB::rollback();
+    Log::error('Booking creation error: ' . $e->getMessage());
+    Log::error('Error line: ' . $e->getLine());
+    Log::error('Error file: ' . $e->getFile());
+    Log::error('Stack trace: ' . $e->getTraceAsString());
+
+    // Temporarily show actual error (remove in production)
+    return back()->with('error', 'Booking failed: ' . $e->getMessage() . ' on line ' . $e->getLine());
     }
+}
+
+/**
+ * Process PayPal payment
+ */
+private function processPayPalPayment($booking)
+{
+    try {
+        $paypal = new \App\Services\PayPalService();
+
+        // Create PayPal order with proper return and cancel URLs
+        $returnUrl = route('ga-booking.paypal-success', ['slug' => $booking->show->slug]);
+        $cancelUrl = route('ga-booking.paypal-cancel', ['slug' => $booking->show->slug]);
+
+        $order = $paypal->createOrder(
+            $booking->total_amount,
+            "Ticket Purchase - {$booking->show->title}",
+            $booking->booking_number,
+            $returnUrl,
+            $cancelUrl
+        );
+
+        // Store PayPal order ID in payment_reference field
+        $booking->update([
+            'payment_reference' => $order['id']
+        ]);
+
+        // Get approval URL
+        $approvalUrl = collect($order['links'])
+            ->firstWhere('rel', 'approve')['href'] ?? null;
+
+        if (!$approvalUrl) {
+            throw new \Exception('PayPal approval URL not found');
+        }
+
+        // Redirect to PayPal
+        return redirect($approvalUrl);
+
+    } catch (\Exception $e) {
+        Log::error('PayPal payment error: ' . $e->getMessage());
+        return back()->with('error', 'PayPal payment failed. Please try again.');
+    }
+}
 
     // ADDED: Missing processPaymentMethod function
     private function processPaymentMethod($request, $amount, $booking)
@@ -670,4 +810,73 @@ public function processCustomerDetails(Request $request, $slug)
 
         return response('Webhook processed', 200);
     }
+
+    /**
+ * Validate credit card number using Luhn algorithm
+ */
+private function validateLuhn($number)
+{
+    $number = strrev($number);
+    $sum = 0;
+
+    for ($i = 0; $i < strlen($number); $i++) {
+        $digit = intval($number[$i]);
+
+        if ($i % 2 == 1) {
+            $digit *= 2;
+            if ($digit > 9) {
+                $digit = ($digit % 10) + 1;
+            }
+        }
+
+        $sum += $digit;
+    }
+
+    return ($sum % 10) == 0;
+}
+
+/**
+ * Detect and validate card type
+ */
+private function detectCardType($number)
+{
+    $cleanNumber = preg_replace('/\s+/', '', $number);
+
+    $cardTypes = [
+        'visa' => '/^4[0-9]{15}$/',
+        'mastercard' => '/^5[1-5][0-9]{14}$/',
+        'amex' => '/^3[47][0-9]{13}$/',
+        'discover' => '/^6(?:011|5[0-9]{2})[0-9]{12}$/',
+    ];
+
+    foreach ($cardTypes as $type => $pattern) {
+        if (preg_match($pattern, $cleanNumber)) {
+            return $type;
+        }
+    }
+
+    return null;
+}
+
+/**
+ * Clean and format card data for processing
+ */
+private function cleanCardData($request)
+{
+    if ($request->payment_method === 'card') {
+        // Clean card number (remove spaces)
+        $cleanCardNumber = preg_replace('/\s+/', '', $request->card_number);
+
+        return [
+            'card_number' => $cleanCardNumber,
+            'card_expiry' => $request->card_expiry,
+            'card_cvv' => $request->card_cvv,
+            'card_holder_name' => trim($request->card_holder_name),
+            'card_type' => $this->detectCardType($cleanCardNumber),
+        ];
+    }
+
+    return null;
+}
+
 }
