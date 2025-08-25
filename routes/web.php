@@ -340,9 +340,15 @@ Route::get('/test-show/{slug}', function($slug) {
 Route::prefix('ga-booking')->group(function () {
 
     // PayPal return routes
-    Route::get('/{slug}/paypal-success', [GeneralAdmissionController::class, 'paypalSuccess'])
+    // Route::get('/{slug}/paypal-success', [GeneralAdmissionController::class, 'paypalSuccess'])
+    //     ->name('ga-booking.paypal-success');
+    // Route::get('/{slug}/paypal-cancel', [GeneralAdmissionController::class, 'paypalCancel'])
+    //     ->name('ga-booking.paypal-cancel');
+    // PayPal return routes - these MUST match what you send to PayPal
+    Route::get('/{slug}/paypal/success', [GeneralAdmissionController::class, 'paypalSuccess'])
         ->name('ga-booking.paypal-success');
-    Route::get('/{slug}/paypal-cancel', [GeneralAdmissionController::class, 'paypalCancel'])
+
+    Route::get('/{slug}/paypal/cancel', [GeneralAdmissionController::class, 'paypalCancel'])
         ->name('ga-booking.paypal-cancel');
     Route::get('/{slug}/tickets', [GeneralAdmissionController::class, 'showTicketSelection'])->name('ga-booking.tickets');
     Route::post('/{slug}/select-tickets', [GeneralAdmissionController::class, 'selectTickets'])->name('ga-booking.select-tickets');
@@ -531,4 +537,4 @@ Route::get('/test-paypal', function() {
 })->middleware('auth');
 
 // Update your existing webhook route to use the new controller
-Route::post('/webhooks/payment/paypal', [WebhookController::class, 'paypalWebhook'])->name('webhooks.paypal');
+Route::post('/webhooks/payment/paypal', [GeneralAdmissionController::class, 'paypalWebhook'])->name('webhooks.paypal');

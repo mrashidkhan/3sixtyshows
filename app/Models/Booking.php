@@ -11,20 +11,25 @@ class Booking extends Model
     'user_id', 'show_id', 'booking_number', 'total_amount', 'status',
     'payment_status', 'payment_method', 'payment_reference',
     'booking_date', 'expires_at', 'confirmed_at', 'number_of_tickets',
-    'transaction_id', 'ticket_breakdown', 'service_fee', 'processing_fee', 'grand_total','card_last_four',
-    'card_type',
+    'transaction_id', 'ticket_breakdown', 'service_fee', 'processing_fee', 
+    'grand_total', 'card_last_four', 'card_type',
+    // ADD THESE MISSING FIELDS:
+    'customer_name', 'customer_email', 'customer_phone',
+    'paypal_payer_id', 'paid_at'
 ];
 
-    protected $casts = [
-        'total_amount' => 'decimal:2',
-        'service_fee' => 'decimal:2',
-        'processing_fee' => 'decimal:2',
-        'grand_total' => 'decimal:2',
-        'ticket_breakdown' => 'array',
-        'expires_at' => 'datetime',
-        'confirmed_at' => 'datetime',
-        'booking_date' => 'datetime',
-    ];
+// Also update the casts array:
+protected $casts = [
+    'total_amount' => 'decimal:2',
+    'service_fee' => 'decimal:2',
+    'processing_fee' => 'decimal:2',
+    'grand_total' => 'decimal:2',
+    'ticket_breakdown' => 'array',
+    'expires_at' => 'datetime',
+    'confirmed_at' => 'datetime',
+    'booking_date' => 'datetime',
+    'paid_at' => 'datetime',  // ADD THIS
+];
 
     // Booking statuses
     const STATUS_DRAFT = 'draft';

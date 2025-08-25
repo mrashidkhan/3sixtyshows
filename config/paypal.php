@@ -32,12 +32,14 @@ return [
         'client_id' => env('PAYPAL_SANDBOX_CLIENT_ID'),
         'client_secret' => env('PAYPAL_SANDBOX_CLIENT_SECRET'),
         'api_url' => env('PAYPAL_SANDBOX_API_URL', 'https://api-m.sandbox.paypal.com'),
+        'web_url' => 'https://www.sandbox.paypal.com',
     ],
 
     'live' => [
         'client_id' => env('PAYPAL_LIVE_CLIENT_ID'),
         'client_secret' => env('PAYPAL_LIVE_CLIENT_SECRET'),
         'api_url' => env('PAYPAL_LIVE_API_URL', 'https://api-m.paypal.com'),
+        'web_url' => 'https://www.paypal.com',
     ],
 
     // Application URLs
