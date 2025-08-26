@@ -359,10 +359,9 @@ Route::prefix('ga-booking')->group(function () {
 
         // ADD THESE MISSING ROUTES:
     Route::middleware('auth')->group(function() {
-    Route::get('/{slug}/payment', [GeneralAdmissionController::class, 'showPayment'])
-        ->name('ga-booking.payment');
-    Route::post('/{slug}/payment', [GeneralAdmissionController::class, 'processPayment'])
-        ->name('ga-booking.process-payment');
+    // Route::get('/{slug}/payment', [GeneralAdmissionController::class, 'showPayment'])
+    //     ->name('ga-booking.payment');
+    // Route::post('/{slug}/payment', [GeneralAdmissionController::class, 'processPayment'])->name('ga-booking.process-payment');
 
     // SUCCESS/FAILURE ROUTES
 
