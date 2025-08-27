@@ -208,7 +208,8 @@ public function processCustomerDetails(Request $request, $slug)
             'name' => $request->name,
             'email' => $request->email,
             'phone' => $request->phone,
-            'newsletter' => $request->has('newsletter')
+            'newsletter' => $request->has('newsletter'),
+            'terms_accepted' => true
         ]
     ]);
 
@@ -278,8 +279,10 @@ public function processCustomerDetails(Request $request, $slug)
             ->with('error', 'Booking session expired. Please start again.');
     }
 
-    // Validation based on payment method
-    $this->validatePaymentData($request);
+    // Simple validation - no credit card fields needed
+    $request->validate([
+        // 'terms' => 'required|accepted',
+    ]);
 
     try {
         DB::beginTransaction();
@@ -299,7 +302,7 @@ public function processCustomerDetails(Request $request, $slug)
             'processing_fee' => $bookingData['total_tickets'] * 1.5,
             'grand_total' => $bookingData['subtotal'] + max($bookingData['subtotal'] * 0.03, 2.0) + ($bookingData['total_tickets'] * 1.5),
             'status' => 'pending',
-            'payment_method' => $request->payment_method,
+            'payment_method' => 'paypal',
             'payment_status' => 'pending'
         ]);
 
@@ -316,21 +319,14 @@ public function processCustomerDetails(Request $request, $slug)
 
         DB::commit();
 
-        // Process payment based on method - both through PayPal gateway
-        if ($request->payment_method === 'card') {
-            return $this->processPayPalCreditCard($booking, $request);
-        } elseif ($request->payment_method === 'paypal') {
-            return $this->processPayPalAccount($booking);
-        }
-
-        throw new \Exception('Invalid payment method selected');
+        // Directly redirect to PayPal (no credit card form)
+        return $this->createPayPalOrder($booking);
 
     } catch (\Exception $e) {
         DB::rollback();
         Log::error('Booking creation error', [
             'error' => $e->getMessage(),
             'line' => $e->getLine(),
-            'payment_method' => $request->payment_method
         ]);
 
         return back()->with('error', 'Booking failed: ' . $e->getMessage());
@@ -1142,9 +1138,55 @@ private function completeBookingPayment($booking, $captureDetails, $payerId = nu
 /**
  * Create Order for PayPal Account Payment (redirect flow)
  */
-public function createPayPalOrder($amount, $description, $invoiceId, $returnUrl, $cancelUrl)
+private function createPayPalOrder($booking)
 {
-    return $this->createOrder($amount, $description, $invoiceId, $returnUrl, $cancelUrl);
+    try {
+        $paypal = new PayPalService();
+
+        $returnUrl = route('ga-booking.paypal-success', ['slug' => $booking->show->slug]);
+        $cancelUrl = route('ga-booking.paypal-cancel', ['slug' => $booking->show->slug]);
+
+        // Create PayPal order WITHOUT payment_source
+        $order = $paypal->createOrder(
+            $booking->grand_total,
+            "Tickets for {$booking->show->title}",
+            $booking->booking_number,
+            $returnUrl,
+            $cancelUrl
+        );
+
+        if (!isset($order['id'])) {
+            throw new \Exception('PayPal order creation failed');
+        }
+
+        // Store order ID
+        $booking->update([
+            'payment_reference' => $order['id']
+        ]);
+
+        // Get approval URL and redirect
+        $approvalUrl = collect($order['links'])
+            ->firstWhere('rel', 'approve')['href'] ?? null;
+
+        if (!$approvalUrl) {
+            throw new \Exception('PayPal approval URL not found');
+        }
+
+        return redirect($approvalUrl);
+
+    } catch (\Exception $e) {
+        Log::error('PayPal order creation error', [
+            'booking_id' => $booking->id,
+            'error' => $e->getMessage()
+        ]);
+
+        $booking->update([
+            'status' => 'cancelled',
+            'payment_status' => 'failed'
+        ]);
+
+        return back()->with('error', 'PayPal payment setup failed');
+    }
 }
 
 /**
