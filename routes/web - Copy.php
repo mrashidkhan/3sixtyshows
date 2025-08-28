@@ -338,6 +338,18 @@ Route::get('/test-show/{slug}', function($slug) {
 
 
 Route::prefix('ga-booking')->group(function () {
+
+    // PayPal return routes
+    // Route::get('/{slug}/paypal-success', [GeneralAdmissionController::class, 'paypalSuccess'])
+    //     ->name('ga-booking.paypal-success');
+    // Route::get('/{slug}/paypal-cancel', [GeneralAdmissionController::class, 'paypalCancel'])
+    //     ->name('ga-booking.paypal-cancel');
+    // PayPal return routes - these MUST match what you send to PayPal
+    Route::get('/{slug}/paypal/success', [GeneralAdmissionController::class, 'paypalSuccess'])
+        ->name('ga-booking.paypal-success');
+
+    Route::get('/{slug}/paypal/cancel', [GeneralAdmissionController::class, 'paypalCancel'])
+        ->name('ga-booking.paypal-cancel');
     Route::get('/{slug}/tickets', [GeneralAdmissionController::class, 'showTicketSelection'])->name('ga-booking.tickets');
     Route::post('/{slug}/select-tickets', [GeneralAdmissionController::class, 'selectTickets'])->name('ga-booking.select-tickets');
 
@@ -347,10 +359,9 @@ Route::prefix('ga-booking')->group(function () {
 
         // ADD THESE MISSING ROUTES:
     Route::middleware('auth')->group(function() {
-    Route::get('/{slug}/payment', [GeneralAdmissionController::class, 'showPayment'])
-        ->name('ga-booking.payment');
-    Route::post('/{slug}/payment', [GeneralAdmissionController::class, 'processPayment'])
-        ->name('ga-booking.process-payment');
+    // Route::get('/{slug}/payment', [GeneralAdmissionController::class, 'showPayment'])
+    //     ->name('ga-booking.payment');
+    // Route::post('/{slug}/payment', [GeneralAdmissionController::class, 'processPayment'])->name('ga-booking.process-payment');
 
     // SUCCESS/FAILURE ROUTES
 
@@ -428,6 +439,51 @@ Route::group(['middleware' => 'auth'], function () {
 });
 
 
+// Route::get('/test-paypal', function() {
+//     try {
+//         // Check environment variables directly
+//         $envChecks = [
+//             'PAYPAL_MODE' => env('PAYPAL_MODE'),
+//             'PAYPAL_SANDBOX_CLIENT_ID' => env('PAYPAL_SANDBOX_CLIENT_ID') ? 'SET' : 'NOT SET',
+//             'PAYPAL_SANDBOX_CLIENT_SECRET' => env('PAYPAL_SANDBOX_CLIENT_SECRET') ? 'SET' : 'NOT SET',
+//         ];
+
+//         // Check config values
+//         $config = config('paypal');
+//         $mode = $config['mode'];
+
+//         $configChecks = [
+//             'mode' => $mode,
+//             'client_id' => $config[$mode]['client_id'] ?? 'NOT SET',
+//             'client_secret' => $config[$mode]['client_secret'] ? 'SET' : 'NOT SET',
+//             'api_url' => $config[$mode]['api_url'] ?? 'NOT SET',
+//         ];
+
+//         // Try to create PayPal service
+//         $paypal = new \App\Services\PayPalService();
+
+//         // Try to get access token
+//         $token = $paypal->getAccessToken();
+
+//         return response()->json([
+//             'success' => true,
+//             'env_checks' => $envChecks,
+//             'config_checks' => $configChecks,
+//             'token_received' => !empty($token),
+//             'token_length' => strlen($token),
+//         ]);
+
+//     } catch (\Exception $e) {
+//         return response()->json([
+//             'success' => false,
+//             'error' => $e->getMessage(),
+//             'env_checks' => $envChecks ?? [],
+//             'config_checks' => $configChecks ?? [],
+//         ]);
+//     }
+// });
+
+
 Route::get('/test-paypal', function() {
     try {
         // Check environment variables directly
@@ -454,12 +510,19 @@ Route::get('/test-paypal', function() {
         // Try to get access token
         $token = $paypal->getAccessToken();
 
+        // Test creating an order
+        $order = $paypal->createOrder(10.00, 'Test Ticket Purchase');
+
         return response()->json([
             'success' => true,
             'env_checks' => $envChecks,
             'config_checks' => $configChecks,
             'token_received' => !empty($token),
             'token_length' => strlen($token),
+            'order_created' => $order['status'] === 'CREATED',
+            'order_id' => $order['id'],
+            'approval_url' => collect($order['links'])->firstWhere('rel', 'approve')['href'] ?? null,
+            'order_details' => $order
         ]);
 
     } catch (\Exception $e) {
@@ -470,4 +533,7 @@ Route::get('/test-paypal', function() {
             'config_checks' => $configChecks ?? [],
         ]);
     }
-});
+})->middleware('auth');
+
+// Update your existing webhook route to use the new controller
+Route::post('/webhooks/payment/paypal', [GeneralAdmissionController::class, 'paypalWebhook'])->name('webhooks.paypal');

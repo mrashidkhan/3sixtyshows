@@ -56,18 +56,6 @@ class GeneralAdmissionController extends Controller
             return response()->json([
                 'error' => 'Sorry, this show is sold out.',
                 'show' => $show->title,
-                'debug_info' => [
-                    'total_ticket_types' => $show->ticketTypes->count(),
-                    'active_ticket_types' => $show->ticketTypes->where('is_active', true)->count(),
-                    'ticket_types_details' => $show->ticketTypes->map(function ($type) use ($show) {
-                        return [
-                            'name' => $type->name,
-                            'is_active' => $type->is_active,
-                            'capacity' => $type->capacity,
-                            'available' => $show->getAvailableCapacityForTicketType($type->id),
-                        ];
-                    }),
-                ],
             ]);
         }
 
@@ -155,6 +143,7 @@ class GeneralAdmissionController extends Controller
         }
     }
 
+
     public function showCustomerDetails($slug)
     {
         $show = Show::where('slug', $slug)->firstOrFail();
@@ -181,157 +170,72 @@ class GeneralAdmissionController extends Controller
         ]);
     }
 
+
     // In GeneralAdmissionController.php processCustomerDetails method:
 
 public function processCustomerDetails(Request $request, $slug)
-{
-    $show = Show::where('slug', $slug)->firstOrFail();
-    $bookingData = session('booking_data');
-
-    if (!$bookingData) {
-        return redirect()->route('ga-booking.tickets', $slug)
-            ->with('error', 'Booking session expired. Please select tickets again.');
-    }
-
-    // Validate customer information
-    $request->validate([
-        'name' => 'required|string|max:255',
-        'email' => 'required|email|max:255',
-        'phone' => 'required|string|max:20',
-        'terms' => 'required|accepted',
-        'newsletter' => 'nullable|boolean',
-    ]);
-
-    // Store customer data in session
-    session([
-        'customer_data' => [
-            'name' => $request->name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'newsletter' => $request->has('newsletter'),
-            'terms_accepted' => true
-        ]
-    ]);
-
-    // Check if user is logged in
-    if (auth()->check()) {
-        // User already logged in, redirect to payment
-        // return redirect()->route('ga-booking.payment', $slug);
-        return redirect()->route('ga-booking.process-payment', $slug);
-    }
-
-    // Store intended URL for after login
-    session(['intended_booking_url' => route('ga-booking.payment', $slug)]);
-    session(['booking_message' => 'Please login or register to complete your secure booking for ' . $show->title]);
-
-
-    return redirect()->route('user_login')
-        ->with('info', 'Please login or register to complete your booking securely.');
-}
-
-    public function showPayment($slug)
     {
         $show = Show::where('slug', $slug)->firstOrFail();
         $bookingData = session('booking_data');
-        $customerData = session('customer_data');
 
-        // Check if required session data exists
-        if (!$bookingData || !$customerData) {
-            return redirect()->route('ga-booking.tickets', $slug)
-                ->with('error', 'Booking session expired. Please start again.');
-        }
-
-        // Check if booking hasn't expired
-        if (now() > \Carbon\Carbon::parse($bookingData['expires_at'])) {
-            TicketHold::where('session_id', $bookingData['session_id'])->delete();
-            session()->forget(['booking_data', 'customer_data']);
-
+        if (!$bookingData) {
             return redirect()->route('ga-booking.tickets', $slug)
                 ->with('error', 'Booking session expired. Please select tickets again.');
         }
 
-        // Calculate fees
-        $subtotal = $bookingData['subtotal'];
-        $serviceFee = max($subtotal * 0.03, 2.0);
-        $processingFee = $bookingData['total_tickets'] * 1.5;
-        $grandTotal = $subtotal + $serviceFee + $processingFee;
-
-        // FIXED: Change view name to booking-payment
-        return view('pages.booking-payment', [
-            'show' => $show,
-            'bookingData' => $bookingData,
-            'customerData' => $customerData,
-            'subtotal' => $subtotal,
-            'serviceFee' => $serviceFee,
-            'processingFee' => $processingFee,
-            'grandTotal' => $grandTotal,
-        ]);
-    }
-
-    public function processPayment(Request $request, $slug)
-{
-    $show = Show::where('slug', $slug)->firstOrFail();
-    $bookingData = session('booking_data');
-    $customerData = session('customer_data');
-
-    if (!$bookingData || !$customerData) {
-        return redirect()->route('ga-booking.tickets', $slug)
-            ->with('error', 'Booking session expired. Please start again.');
-    }
-
-    // Simple validation - no credit card fields needed
-    $request->validate([
-        // 'terms' => 'required|accepted',
-    ]);
-
-    try {
-        DB::beginTransaction();
-
-        // Create booking record
-        $booking = Booking::create([
-            'user_id' => auth()->id(),
-            'show_id' => $show->id,
-            'booking_number' => 'BK-' . strtoupper(Str::random(8)),
-            'customer_name' => $customerData['name'],
-            'customer_email' => $customerData['email'],
-            'customer_phone' => $customerData['phone'],
-            'booking_date' => now(),
-            'total_amount' => $bookingData['subtotal'],
-            'number_of_tickets' => $bookingData['total_tickets'],
-            'service_fee' => max($bookingData['subtotal'] * 0.03, 2.0),
-            'processing_fee' => $bookingData['total_tickets'] * 1.5,
-            'grand_total' => $bookingData['subtotal'] + max($bookingData['subtotal'] * 0.03, 2.0) + ($bookingData['total_tickets'] * 1.5),
-            'status' => 'pending',
-            'payment_method' => 'paypal',
-            'payment_status' => 'pending'
+        // Validate customer information
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'phone' => 'required|string|max:20',
+            'terms' => 'required|accepted',
+            'newsletter' => 'nullable|boolean',
         ]);
 
-        // Create booking items
-        foreach ($bookingData['ticket_breakdown'] as $ticketData) {
-            BookingItem::create([
-                'booking_id' => $booking->id,
-                'ticket_type_id' => $ticketData['ticket_type_id'],
-                'quantity' => $ticketData['quantity'],
-                'unit_price' => $ticketData['unit_price'],
-                'total_price' => $ticketData['total_price']
-            ]);
+        // Store customer data in session
+        session([
+            'customer_data' => [
+                'name' => $request->name,
+                'email' => $request->email,
+                'phone' => $request->phone,
+                'newsletter' => $request->has('newsletter'),
+                'terms_accepted' => true
+            ]
+        ]);
+
+        // Check if user is logged in
+        if (auth()->check()) {
+            // ✅ DIRECT PAYPAL: Skip payment form, go directly to PayPal
+            return $this->createBookingAndRedirectToPayPal($slug);
         }
 
-        DB::commit();
+        // Store intended URL for after login (matches your existing BaseController logic)
+        session(['intended_booking_url' => route('ga-booking.process-payment', $slug)]);
+        session(['booking_message' => 'Please login or register to complete your secure booking for ' . $show->title]);
 
-        // Directly redirect to PayPal (no credit card form)
-        return $this->createPayPalOrder($booking);
-
-    } catch (\Exception $e) {
-        DB::rollback();
-        Log::error('Booking creation error', [
-            'error' => $e->getMessage(),
-            'line' => $e->getLine(),
-        ]);
-
-        return back()->with('error', 'Booking failed: ' . $e->getMessage());
+        return redirect()->route('user_login')
+            ->with('info', 'Please login or register to complete your booking securely.');
     }
-}
+
+    /**
+     * ✅ SIMPLIFIED: Only handle login redirects now (payment form removed)
+     */
+    public function showPayment($slug)
+    {
+        // If someone directly accesses this route, redirect to customer details
+        return redirect()->route('ga-booking.customer-details', $slug)
+            ->with('info', 'Please complete customer information first.');
+    }
+
+    /**
+     * ✅ SIMPLIFIED: This method is now only called from user login redirect
+     */
+    public function processPayment(Request $request, $slug)
+    {
+        // This is called when user logs in and gets redirected back from BaseController
+        // Your BaseController already handles the intended_booking_url redirect
+        return $this->createBookingAndRedirectToPayPal($slug);
+    }
 /**
  * Process PayPal payment
  */
@@ -399,144 +303,139 @@ private function processPayPalPayment($booking)
         }
     }
 
-public function paypalSuccess(Request $request, $slug)
-{
-    $token = $request->query('token');
-    $payerId = $request->query('PayerID');
+// public function paypalSuccess(Request $request, $slug)
+// {
+//     $token = $request->query('token');
+//     $payerId = $request->query('PayerID');
 
-    Log::info('PayPal success callback received', [
-        'slug' => $slug,
-        'token' => $token,
-        'payer_id' => $payerId,
-        'request_params' => $request->all()
-    ]);
+//     Log::info('PayPal success callback received', [
+//         'slug' => $slug,
+//         'token' => $token,
+//         'payer_id' => $payerId,
+//         'request_params' => $request->all()
+//     ]);
 
-    // PayPal account payments will have both token and payerId
-    // Credit card payments processed directly may not have payerId
-    if (!$token) {
-        Log::error('Missing PayPal token in success callback');
-        return redirect()->route('ga-booking.failed', $slug)
-            ->with('error', 'PayPal payment verification failed - missing transaction ID.');
-    }
+//     // PayPal account payments will have both token and payerId
+//     // Credit card payments processed directly may not have payerId
+//     if (!$token) {
+//         Log::error('Missing PayPal token in success callback');
+//         return redirect()->route('ga-booking.failed', $slug)
+//             ->with('error', 'PayPal payment verification failed - missing transaction ID.');
+//     }
 
-    try {
-        // Find booking by PayPal order ID
-        $booking = Booking::where('payment_reference', $token)->first();
+//     try {
+//         // Find booking by PayPal order ID
+//         $booking = Booking::where('payment_reference', $token)->first();
 
-        if (!$booking) {
-            Log::error('Booking not found for PayPal token', [
-                'token' => $token,
-                'recent_bookings' => Booking::whereIn('payment_method', ['paypal', 'card'])
-                    ->where('created_at', '>=', now()->subHours(2))
-                    ->pluck('payment_reference', 'id')
-                    ->toArray()
-            ]);
+//         if (!$booking) {
+//             Log::error('Booking not found for PayPal token', [
+//                 'token' => $token,
+//                 'recent_bookings' => Booking::whereIn('payment_method', ['paypal', 'card'])
+//                     ->where('created_at', '>=', now()->subHours(2))
+//                     ->pluck('payment_reference', 'id')
+//                     ->toArray()
+//             ]);
 
-            throw new \Exception("Booking not found for PayPal transaction: {$token}");
-        }
+//             throw new \Exception("Booking not found for PayPal transaction: {$token}");
+//         }
 
-        Log::info('Processing PayPal payment completion', [
-            'booking_id' => $booking->id,
-            'booking_number' => $booking->booking_number,
-            'payment_method' => $booking->payment_method,
-            'current_status' => $booking->payment_status
-        ]);
+//         Log::info('Processing PayPal payment completion', [
+//             'booking_id' => $booking->id,
+//             'booking_number' => $booking->booking_number,
+//             'payment_method' => $booking->payment_method,
+//             'current_status' => $booking->payment_status
+//         ]);
 
-        $paypal = new PayPalService();
+//         $paypal = new PayPalService();
 
-        // Get current order status first
-        $orderDetails = $paypal->getOrderDetails($token);
+//         // Get current order status first
+//         $orderDetails = $paypal->getOrderDetails($token);
 
-        Log::info('PayPal order status check', [
-            'booking_id' => $booking->id,
-            'order_status' => $orderDetails['status'] ?? 'unknown',
-            'order_details' => $orderDetails
-        ]);
+//         Log::info('PayPal order status check', [
+//             'booking_id' => $booking->id,
+//             'order_status' => $orderDetails['status'] ?? 'unknown',
+//             'order_details' => $orderDetails
+//         ]);
 
-        // Handle different order states
-        if ($orderDetails['status'] === 'COMPLETED') {
-            // Payment already captured (common with credit cards)
-            $captureDetails = $orderDetails['purchase_units'][0]['payments']['captures'][0] ?? null;
+//         // Handle different order states
+//         if ($orderDetails['status'] === 'COMPLETED') {
+//             // Payment already captured (common with credit cards)
+//             $captureDetails = $orderDetails['purchase_units'][0]['payments']['captures'][0] ?? null;
 
-            if ($captureDetails && $captureDetails['status'] === 'COMPLETED') {
-                return $this->completeBookingPayment($booking, $captureDetails, $payerId);
-            }
-        } elseif ($orderDetails['status'] === 'APPROVED') {
-            // Payment approved but needs capture (common with PayPal account)
-            $captureResult = $paypal->capturePayment($token);
+//             if ($captureDetails && $captureDetails['status'] === 'COMPLETED') {
+//                 return $this->completeBookingPayment($booking, $captureDetails, $payerId);
+//             }
+//         } elseif ($orderDetails['status'] === 'APPROVED') {
+//             // Payment approved but needs capture (common with PayPal account)
+//             $captureResult = $paypal->capturePayment($token);
 
-            if ($captureResult['status'] === 'COMPLETED') {
-                $captureDetails = $captureResult['purchase_units'][0]['payments']['captures'][0] ?? null;
-                return $this->completeBookingPayment($booking, $captureDetails, $payerId);
-            } else {
-                throw new \Exception('Payment capture failed with status: ' . $captureResult['status']);
-            }
-        }
+//             if ($captureResult['status'] === 'COMPLETED') {
+//                 $captureDetails = $captureResult['purchase_units'][0]['payments']['captures'][0] ?? null;
+//                 return $this->completeBookingPayment($booking, $captureDetails, $payerId);
+//             } else {
+//                 throw new \Exception('Payment capture failed with status: ' . $captureResult['status']);
+//             }
+//         }
 
-        // If we get here, payment wasn't successful
-        Log::error('PayPal payment not in successful state', [
-            'booking_id' => $booking->id,
-            'order_status' => $orderDetails['status'] ?? 'unknown'
-        ]);
+//         // If we get here, payment wasn't successful
+//         Log::error('PayPal payment not in successful state', [
+//             'booking_id' => $booking->id,
+//             'order_status' => $orderDetails['status'] ?? 'unknown'
+//         ]);
 
-        throw new \Exception('Payment was not completed successfully');
+//         throw new \Exception('Payment was not completed successfully');
 
-    } catch (\Exception $e) {
-        Log::error('PayPal success processing error', [
-            'token' => $token,
-            'payer_id' => $payerId,
-            'error' => $e->getMessage(),
-            'trace' => $e->getTraceAsString()
-        ]);
+//     } catch (\Exception $e) {
+//         Log::error('PayPal success processing error', [
+//             'token' => $token,
+//             'payer_id' => $payerId,
+//             'error' => $e->getMessage(),
+//             'trace' => $e->getTraceAsString()
+//         ]);
 
-        // Mark booking as failed if it exists
-        if (isset($booking)) {
-            $booking->update([
-                'status' => 'cancelled',
-                'payment_status' => 'failed',
-                'paypal_transaction_data' => [
-                    'error' => $e->getMessage(),
-                    'failed_at' => now()->toISOString()
-                ]
-            ]);
-        }
+//         // Mark booking as failed if it exists
+//         if (isset($booking)) {
+//             $booking->update([
+//                 'status' => 'cancelled',
+//                 'payment_status' => 'failed',
+//                 'paypal_transaction_data' => [
+//                     'error' => $e->getMessage(),
+//                     'failed_at' => now()->toISOString()
+//                 ]
+//             ]);
+//         }
 
-        return redirect()->route('ga-booking.failed', $slug)
-            ->with('error', 'Payment processing failed: ' . $e->getMessage());
-    }
-}
+//         return redirect()->route('ga-booking.failed', $slug)
+//             ->with('error', 'Payment processing failed: ' . $e->getMessage());
+//     }
+// }
 
 
     /**
  * Enhanced PayPal cancel handler
  */
 public function paypalCancel(Request $request, $slug)
-{
-    $token = $request->query('token');
+    {
+        $token = $request->query('token');
 
-    Log::info('PayPal payment cancelled', [
-        'slug' => $slug,
-        'token' => $token
-    ]);
+        Log::info('PayPal payment cancelled', [
+            'slug' => $slug,
+            'token' => $token
+        ]);
 
-    // Try to find and cancel the booking if possible
-    if ($token) {
-        $booking = Booking::where('payment_reference', $token)->first();
-        if ($booking) {
-            $booking->update([
-                'status' => 'cancelled',
-                'payment_status' => 'cancelled'
-            ]);
-
-            Log::info('Booking cancelled due to PayPal cancellation', [
-                'booking_id' => $booking->id
-            ]);
+        if ($token) {
+            $booking = Booking::where('payment_reference', $token)->first();
+            if ($booking) {
+                $booking->update([
+                    'status' => 'cancelled',
+                    'payment_status' => 'cancelled'
+                ]);
+            }
         }
-    }
 
-    return redirect()->route('ga-booking.failed', $slug)
-        ->with('warning', 'Payment was cancelled. You can try again anytime.');
-}
+        return redirect()->route('ga-booking.failed', $slug)
+            ->with('warning', 'Payment was cancelled. You can try again anytime.');
+    }
 
 
 
@@ -620,7 +519,7 @@ public function paypalCancel(Request $request, $slug)
     public function bookingSuccess($slug, $bookingNumber)
     {
         $show = Show::where('slug', $slug)->firstOrFail();
-        $booking = \App\Models\Booking::where('booking_number', $bookingNumber)
+        $booking = Booking::where('booking_number', $bookingNumber)
             ->with(['user', 'bookingItems.ticketType', 'tickets'])
             ->firstOrFail();
 
@@ -1020,22 +919,86 @@ private function processPayPalAccount($booking)
 /**
  * Handle successful PayPal payment (both credit card and account)
  */
-private function handlePayPalSuccess($booking, $paypalResponse)
-{
-    try {
-        // Extract capture details
-        $purchaseUnit = $paypalResponse['purchase_units'][0] ?? null;
-        $captureDetails = $purchaseUnit['payments']['captures'][0] ?? null;
+// ✅ PayPal Success and Cancel handlers remain the same
+    public function paypalSuccess(Request $request, $slug)
+    {
+        $token = $request->query('token');
+        $payerId = $request->query('PayerID');
 
-        if (!$captureDetails || $captureDetails['status'] !== 'COMPLETED') {
-            throw new \Exception('Payment capture was not completed');
+        Log::info('PayPal success callback received', [
+            'slug' => $slug,
+            'token' => $token,
+            'payer_id' => $payerId,
+        ]);
+
+        if (!$token) {
+            Log::error('Missing PayPal token in success callback');
+            return redirect()->route('ga-booking.failed', $slug)
+                ->with('error', 'PayPal payment verification failed - missing transaction ID.');
+        }
+
+        try {
+            $booking = Booking::where('payment_reference', $token)->first();
+
+            if (!$booking) {
+                Log::error('Booking not found for PayPal token', ['token' => $token]);
+                throw new \Exception("Booking not found for PayPal transaction: {$token}");
+            }
+
+            $paypal = new PayPalService();
+            $orderDetails = $paypal->getOrderDetails($token);
+
+            Log::info('PayPal order status check', [
+                'booking_id' => $booking->id,
+                'order_status' => $orderDetails['status'] ?? 'unknown',
+            ]);
+
+            if ($orderDetails['status'] === 'COMPLETED') {
+                $captureDetails = $orderDetails['purchase_units'][0]['payments']['captures'][0] ?? null;
+                if ($captureDetails && $captureDetails['status'] === 'COMPLETED') {
+                    return $this->completeBookingPayment($booking, $captureDetails, $payerId);
+                }
+            } elseif ($orderDetails['status'] === 'APPROVED') {
+                $captureResult = $paypal->capturePayment($token);
+                if ($captureResult['status'] === 'COMPLETED') {
+                    $captureDetails = $captureResult['purchase_units'][0]['payments']['captures'][0] ?? null;
+                    return $this->completeBookingPayment($booking, $captureDetails, $payerId);
+                }
+            }
+
+            throw new \Exception('Payment was not completed successfully');
+
+        } catch (\Exception $e) {
+            Log::error('PayPal success processing error', [
+                'token' => $token,
+                'error' => $e->getMessage(),
+            ]);
+
+            if (isset($booking)) {
+                $booking->update([
+                    'status' => 'cancelled',
+                    'payment_status' => 'failed',
+                ]);
+            }
+
+            return redirect()->route('ga-booking.failed', $slug)
+                ->with('error', 'Payment processing failed: ' . $e->getMessage());
+        }
+    }
+
+/**
+     * Complete booking payment - remains the same
+     */
+    private function completeBookingPayment($booking, $captureDetails, $payerId = null)
+    {
+        if (!$captureDetails || !isset($captureDetails['id'])) {
+            throw new \Exception('Invalid capture details received from PayPal');
         }
 
         $captureId = $captureDetails['id'];
         $paypalFee = $captureDetails['seller_receivable_breakdown']['paypal_fee']['value'] ?? 0;
 
-        // Update booking as completed
-        $booking->update([
+        $updateData = [
             'status' => 'confirmed',
             'payment_status' => 'paid',
             'transaction_id' => $captureId,
@@ -1043,151 +1006,97 @@ private function handlePayPalSuccess($booking, $paypalResponse)
             'confirmed_at' => now(),
             'paypal_capture_id' => $captureId,
             'paypal_fee' => $paypalFee,
-            'paypal_transaction_data' => $captureDetails
-        ]);
+            'paypal_transaction_data' => $captureDetails,
+        ];
 
-        // Generate tickets
+        if ($payerId) {
+            $updateData['paypal_payer_id'] = $payerId;
+        }
+
+        $booking->update($updateData);
         $booking->generateTickets();
 
         // Clear session data
         session()->forget(['booking_data', 'customer_data']);
 
-        Log::info('PayPal payment completed', [
+        Log::info('PayPal payment completed successfully', [
             'booking_id' => $booking->id,
-            'payment_method' => $booking->payment_method,
-            'capture_id' => $captureId
+            'capture_id' => $captureId,
         ]);
 
         return redirect()->route('ga-booking.success', [
             'slug' => $booking->show->slug,
             'bookingNumber' => $booking->booking_number
-        ])->with('success', 'Payment completed successfully!');
-
-    } catch (\Exception $e) {
-        Log::error('PayPal success handling error', [
-            'booking_id' => $booking->id,
-            'error' => $e->getMessage()
-        ]);
-
-        $booking->update([
-            'status' => 'cancelled',
-            'payment_status' => 'failed'
-        ]);
-
-        throw $e;
+        ])->with('success', 'Payment completed successfully! Your tickets have been confirmed.');
     }
-}
-
-/**
- * Complete booking payment for both credit card and PayPal account methods
- */
-private function completeBookingPayment($booking, $captureDetails, $payerId = null)
-{
-    if (!$captureDetails || !isset($captureDetails['id'])) {
-        throw new \Exception('Invalid capture details received from PayPal');
-    }
-
-    $captureId = $captureDetails['id'];
-    $paypalFee = $captureDetails['seller_receivable_breakdown']['paypal_fee']['value'] ?? 0;
-    $netAmount = $captureDetails['seller_receivable_breakdown']['net_amount']['value'] ?? $booking->grand_total;
-
-    // Update booking with complete transaction data
-    $updateData = [
-        'status' => 'confirmed',
-        'payment_status' => 'paid',
-        'transaction_id' => $captureId,
-        'paid_at' => now(),
-        'confirmed_at' => now(),
-        'paypal_capture_id' => $captureId,
-        'paypal_fee' => $paypalFee,
-        'paypal_transaction_data' => $captureDetails,
-        'paypal_processed_at' => now()
-    ];
-
-    // Add payer ID if available (PayPal account payments)
-    if ($payerId) {
-        $updateData['paypal_payer_id'] = $payerId;
-    }
-
-    $booking->update($updateData);
-
-    // Generate tickets
-    $booking->generateTickets();
-
-    // Clear session data
-    session()->forget(['booking_data', 'customer_data']);
-
-    Log::info('PayPal payment completed successfully', [
-        'booking_id' => $booking->id,
-        'booking_number' => $booking->booking_number,
-        'payment_method' => $booking->payment_method,
-        'capture_id' => $captureId,
-        'paypal_fee' => $paypalFee,
-        'net_amount' => $netAmount,
-        'has_payer_id' => !empty($payerId)
-    ]);
-
-    return redirect()->route('ga-booking.success', [
-        'slug' => $booking->show->slug,
-        'bookingNumber' => $booking->booking_number
-    ])->with('success', 'Payment completed successfully! Your tickets have been confirmed.');
-}
 
 // Add these methods to your PayPalService class
 
 /**
- * Create Order for PayPal Account Payment (redirect flow)
- */
-private function createPayPalOrder($booking)
-{
-    try {
-        $paypal = new PayPalService();
+     * ✅ UPDATED: Create PayPal order and redirect
+     */
+    private function createPayPalOrder($booking)
+    {
+        try {
+            $paypal = new PayPalService();
 
-        $returnUrl = route('ga-booking.paypal-success', ['slug' => $booking->show->slug]);
-        $cancelUrl = route('ga-booking.paypal-cancel', ['slug' => $booking->show->slug]);
+            $returnUrl = route('ga-booking.paypal-success', ['slug' => $booking->show->slug]);
+            $cancelUrl = route('ga-booking.paypal-cancel', ['slug' => $booking->show->slug]);
 
-        // Create PayPal order WITHOUT payment_source
-        $order = $paypal->createOrder(
-            $booking->grand_total,
-            "Tickets for {$booking->show->title}",
-            $booking->booking_number,
-            $returnUrl,
-            $cancelUrl
-        );
+            Log::info('Creating PayPal order for booking', [
+                'booking_id' => $booking->id,
+                'booking_number' => $booking->booking_number,
+                'amount' => $booking->grand_total,
+                'return_url' => $returnUrl,
+                'cancel_url' => $cancelUrl
+            ]);
 
-        if (!isset($order['id'])) {
-            throw new \Exception('PayPal order creation failed');
+            $order = $paypal->createOrder(
+                $booking->grand_total,
+                "Ticket Purchase - {$booking->show->title}",
+                $booking->booking_number,
+                $returnUrl,
+                $cancelUrl
+            );
+
+            if (!isset($order['id'])) {
+                throw new \Exception('PayPal order creation failed - no order ID returned');
+            }
+
+            $booking->update([
+                'payment_reference' => $order['id']
+            ]);
+
+            $approvalUrl = collect($order['links'])
+                ->firstWhere('rel', 'approve')['href'] ?? null;
+
+            if (!$approvalUrl) {
+                throw new \Exception('PayPal approval URL not found in order response');
+            }
+
+            Log::info('PayPal order created successfully', [
+                'booking_id' => $booking->id,
+                'paypal_order_id' => $order['id'],
+                'approval_url' => $approvalUrl
+            ]);
+
+            return redirect($approvalUrl);
+
+        } catch (\Exception $e) {
+            Log::error('PayPal payment error', [
+                'booking_id' => $booking->id,
+                'error' => $e->getMessage(),
+            ]);
+
+            $booking->update([
+                'status' => 'cancelled',
+                'payment_status' => 'failed'
+            ]);
+
+            return redirect()->route('ga-booking.failed', $booking->show->slug)
+                ->with('error', 'PayPal payment setup failed: ' . $e->getMessage());
         }
-
-        // Store order ID
-        $booking->update([
-            'payment_reference' => $order['id']
-        ]);
-
-        // Get approval URL and redirect
-        $approvalUrl = collect($order['links'])
-            ->firstWhere('rel', 'approve')['href'] ?? null;
-
-        if (!$approvalUrl) {
-            throw new \Exception('PayPal approval URL not found');
-        }
-
-        return redirect($approvalUrl);
-
-    } catch (\Exception $e) {
-        Log::error('PayPal order creation error', [
-            'booking_id' => $booking->id,
-            'error' => $e->getMessage()
-        ]);
-
-        $booking->update([
-            'status' => 'cancelled',
-            'payment_status' => 'failed'
-        ]);
-
-        return back()->with('error', 'PayPal payment setup failed');
     }
-}
 
 /**
  * Create Order for Credit Card Payment (direct processing)
@@ -1302,5 +1211,86 @@ public function formatCardData($cardNumber, $cardExpiry, $cardCvv, $cardHolderNa
         'card_holder_name' => trim($cardHolderName)
     ];
 }
+
+/**
+     * ✅ NEW METHOD: Create booking and redirect directly to PayPal
+     */
+    private function createBookingAndRedirectToPayPal($slug)
+    {
+        $show = Show::where('slug', $slug)->firstOrFail();
+        $bookingData = session('booking_data');
+        $customerData = session('customer_data');
+
+        if (!$bookingData || !$customerData) {
+            return redirect()->route('ga-booking.tickets', $slug)
+                ->with('error', 'Booking session expired. Please start again.');
+        }
+
+        // Check if booking hasn't expired
+        if (now() > Carbon::parse($bookingData['expires_at'])) {
+            TicketHold::where('session_id', $bookingData['session_id'])->delete();
+            session()->forget(['booking_data', 'customer_data']);
+
+            return redirect()->route('ga-booking.tickets', $slug)
+                ->with('error', 'Booking session expired. Please select tickets again.');
+        }
+
+        try {
+            DB::beginTransaction();
+
+            // Calculate fees
+            $subtotal = $bookingData['subtotal'];
+            $serviceFee = max($subtotal * 0.03, 2.0);
+            $processingFee = $bookingData['total_tickets'] * 1.5;
+            $grandTotal = $subtotal + $serviceFee + $processingFee;
+
+            // Create booking record
+            $booking = Booking::create([
+                'user_id' => auth()->id(),
+                'show_id' => $show->id,
+                'booking_number' => 'BK-' . strtoupper(Str::random(8)),
+                'customer_name' => $customerData['name'],
+                'customer_email' => $customerData['email'],
+                'customer_phone' => $customerData['phone'],
+                'booking_date' => now(),
+                'total_amount' => $subtotal,
+                'number_of_tickets' => $bookingData['total_tickets'],
+                'service_fee' => $serviceFee,
+                'processing_fee' => $processingFee,
+                'grand_total' => $grandTotal,
+                'status' => 'pending',
+                'payment_method' => 'paypal',
+                'payment_status' => 'pending'
+            ]);
+
+            // Create booking items
+            foreach ($bookingData['ticket_breakdown'] as $ticketData) {
+                BookingItem::create([
+                    'booking_id' => $booking->id,
+                    'ticket_type_id' => $ticketData['ticket_type_id'],
+                    'quantity' => $ticketData['quantity'],
+                    'unit_price' => $ticketData['unit_price'],
+                    'total_price' => $ticketData['total_price']
+                ]);
+            }
+
+            DB::commit();
+
+            // ✅ DIRECT PAYPAL: Create PayPal order and redirect
+            return $this->createPayPalOrder($booking);
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error('Booking creation error', [
+                'error' => $e->getMessage(),
+                'line' => $e->getLine(),
+                'slug' => $slug
+            ]);
+
+            return redirect()->route('ga-booking.tickets', $slug)
+                ->with('error', 'Booking failed: ' . $e->getMessage());
+        }
+    }
+
 
 }

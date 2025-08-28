@@ -9,31 +9,33 @@
                     <div class="event-about-content">
                         <div class="section-header-3 left-style">
                             <h3 class="title">Customer Information</h3>
-                            <p>Please provide your details to complete the booking. You'll be redirected to PayPal for secure payment.</p>
+                            <p>Please provide your details to complete the booking. Your tickets will be sent to your
+                                email.</p>
                         </div>
 
-                        <!-- Step Indicator - Updated for Direct PayPal Flow -->
+                        <!-- Step Indicator -->
                         <div class="step-indicator mb-4">
-                            <div class="steps-wrapper">
-                                <div class="step completed">
-                                    <div class="step-number">
-                                        <i class="fas fa-check"></i>
-                                    </div>
-                                    <div class="step-text">Select Tickets</div>
-                                </div>
-                                <div class="step active">
-                                    <div class="step-number">2</div>
-                                    <div class="step-text">Customer Details</div>
-                                </div>
-                                <div class="step pending">
-                                    <div class="step-number">3</div>
-                                    <div class="step-text">PayPal Payment</div>
-                                </div>
-                            </div>
-                        </div>
+    <div class="steps-wrapper">
+        <div class="step completed">
+            <div class="step-number">
+                <i class="fas fa-check"></i>
+            </div>
+            <div class="step-text">Select Tickets</div>
+        </div>
+        <div class="step active">
+            <div class="step-number">2</div>
+            <div class="step-text">Customer Details</div>
+        </div>
+        <div class="step pending">
+            <div class="step-number">3</div>
+            <div class="step-text">Payment</div>
+        </div>
+    </div>
+</div>
 
                         @if ($errors->any())
-                            <div class="alert alert-danger" style="border-radius: 10px; border: none; padding: 15px 20px;">
+                            <div class="alert alert-danger"
+                                style="border-radius: 10px; border: none; padding: 15px 20px;">
                                 <h6><i class="fas fa-exclamation-triangle"></i> Please fix the following errors:</h6>
                                 <ul class="mb-0">
                                     @foreach ($errors->all() as $error)
@@ -42,37 +44,6 @@
                                 </ul>
                             </div>
                         @endif
-
-                        <!-- Payment Method Information -->
-                        <div class="payment-info-card mb-4" style="background: #e7f3ff; border: 2px solid #007bff; border-radius: 10px; padding: 20px;">
-                            <h6 style="color: #0066cc; margin-bottom: 15px;">
-                                <i class="fab fa-paypal me-2"></i> Secure Payment with PayPal
-                            </h6>
-                            <p style="color: #0066cc; margin-bottom: 10px; font-size: 14px;">
-                                After completing your details, you'll be securely redirected to PayPal to complete payment. 
-                                You can pay with:
-                            </p>
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="text-center">
-                                        <i class="fas fa-credit-card" style="font-size: 20px; color: #0066cc;"></i>
-                                        <small class="d-block mt-1" style="color: #0066cc;">Credit/Debit Cards</small>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="text-center">
-                                        <i class="fab fa-paypal" style="font-size: 20px; color: #0066cc;"></i>
-                                        <small class="d-block mt-1" style="color: #0066cc;">PayPal Account</small>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="text-center">
-                                        <i class="fas fa-university" style="font-size: 20px; color: #0066cc;"></i>
-                                        <small class="d-block mt-1" style="color: #0066cc;">Bank Transfer</small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
 
                         <div class="customer-form">
                             <div class="row">
@@ -105,7 +76,8 @@
                           width: 100%;
                           transition: all 0.3s;">
                                     <small class="form-text text-muted mt-2" style="display: block;">
-                                        <i class="fas fa-info-circle me-1"></i> Your tickets will be sent to this email address
+                                        <i class="fas fa-info-circle me-1"></i> Your tickets will be sent to this email
+                                        address
                                     </small>
                                 </div>
 
@@ -125,33 +97,34 @@
                                 </div>
 
                                 <div class="col-12 mb-3">
-                                    <div class="form-check d-flex align-items-start" style="padding-left: 0;">
-                                        <input class="form-check-input me-3 mt-1" type="checkbox" id="terms"
-                                               name="terms" value="1" required style="transform: scale(1.3); flex-shrink: 0;">
-                                        <label class="form-check-label" for="terms"
-                                               style="font-size: 14px; line-height: 1.4;">
-                                            I agree to the <a href="#" target="_blank"
-                                                style="color: #007bff; text-decoration: none;">Terms & Conditions</a>
-                                            and <a href="#" target="_blank"
-                                                style="color: #007bff; text-decoration: none;">Privacy Policy</a> *
-                                        </label>
-                                    </div>
-                                </div>
+    <div class="form-check d-flex align-items-start" style="padding-left: 0;">
+        <input class="form-check-input me-3 mt-1" type="checkbox" id="terms"
+               name="terms" value="1" required style="transform: scale(1.3); flex-shrink: 0;">
+        <label class="form-check-label" for="terms"
+               style="font-size: 14px; line-height: 1.4;">
+            I agree to the <a href="#" target="_blank"
+                style="color: #007bff; text-decoration: none;">Terms & Conditions</a>
+            and <a href="#" target="_blank"
+                style="color: #007bff; text-decoration: none;">Privacy Policy</a> *
+        </label>
+    </div>
+</div>
 
                                 <div class="col-12 mb-4">
-                                    <div class="form-check d-flex align-items-start" style="padding-left: 0;">
-                                        <input class="form-check-input me-3 mt-1" type="checkbox" id="newsletter"
-                                               name="newsletter" value="1" style="transform: scale(1.3); flex-shrink: 0;">
-                                        <label class="form-check-label" for="newsletter"
-                                               style="font-size: 14px; line-height: 1.4;">
-                                            Subscribe to our newsletter for upcoming events and exclusive offers
-                                        </label>
-                                    </div>
-                                </div>
+    <div class="form-check d-flex align-items-start" style="padding-left: 0;">
+        <input class="form-check-input me-3 mt-1" type="checkbox" id="newsletter"
+               name="newsletter" value="1" style="transform: scale(1.3); flex-shrink: 0;">
+        <label class="form-check-label" for="newsletter"
+               style="font-size: 14px; line-height: 1.4;">
+            Subscribe to our newsletter for upcoming events and exclusive offers
+        </label>
+    </div>
+</div>
                             </div>
                         </div>
                     </div>
                 </div>
+
 
                 <!-- Booking Summary Column -->
                 <div class="col-lg-5">
@@ -182,7 +155,8 @@
                                             <div style="font-weight: 600; color: #1a1a2e;">
                                                 {{ $ticket['ticket_type_name'] }}</div>
                                             <div class="text-muted" style="font-size: 12px;">Qty:
-                                                {{ $ticket['quantity'] }} × ${{ number_format($ticket['unit_price'], 2) }}</div>
+                                                {{ $ticket['quantity'] }} ×
+                                                ${{ number_format($ticket['unit_price'], 2) }}</div>
                                         </div>
                                         <div class="text-end">
                                             <strong
@@ -215,9 +189,8 @@
                                 </div>
                             </div>
 
-                            <!-- Updated PayPal Button -->
                             <button type="submit" class="btn w-100 mt-3"
-                                style="background: linear-gradient(45deg, #0070ba, #003087);
+                                style="background: linear-gradient(45deg, #28a745, #20c997);
                                            border: none;
                                            padding: 15px 30px;
                                            border-radius: 25px;
@@ -226,7 +199,7 @@
                                            text-transform: uppercase;
                                            letter-spacing: 1px;
                                            transition: all 0.3s;">
-                                <i class="fab fa-paypal me-2"></i> Continue to PayPal
+                                <i class="fas fa-credit-card"></i> Continue to Payment
                             </button>
 
                             <div class="text-center mt-3">
@@ -236,30 +209,11 @@
                                 </a>
                             </div>
 
-                            <!-- Updated Security Note -->
                             <div class="security-note mt-3 text-center">
                                 <small class="text-muted">
                                     <i class="fas fa-shield-alt"></i>
-                                    Secure payment powered by PayPal - Your payment info is protected
+                                    Your information is secure and encrypted
                                 </small>
-                            </div>
-
-                            <!-- PayPal Trust Indicators -->
-                            <div class="paypal-indicators mt-3 p-3" style="background: #fff; border-radius: 8px; border: 1px solid #e9ecef;">
-                                <div class="row text-center">
-                                    <div class="col-4">
-                                        <i class="fas fa-shield-alt" style="color: #0070ba; font-size: 20px;"></i>
-                                        <small class="d-block mt-1" style="color: #666;">Buyer Protection</small>
-                                    </div>
-                                    <div class="col-4">
-                                        <i class="fas fa-lock" style="color: #0070ba; font-size: 20px;"></i>
-                                        <small class="d-block mt-1" style="color: #666;">SSL Encrypted</small>
-                                    </div>
-                                    <div class="col-4">
-                                        <i class="fas fa-globe" style="color: #0070ba; font-size: 20px;"></i>
-                                        <small class="d-block mt-1" style="color: #666;">Global Trust</small>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -277,7 +231,7 @@
 
     .btn:hover {
         transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(0, 112, 186, 0.4);
+        box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
     }
 
     .alert {
@@ -309,22 +263,6 @@
         }
     }
 
-    /* Payment Info Card Animation */
-    .payment-info-card {
-        animation: fadeInUp 0.6s ease-out;
-    }
-
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
     /* DARK THEME FORM FIX */
     .customer-form {
         display: block !important;
@@ -343,11 +281,13 @@
         font-size: 16px !important;
         background-color: white !important;
         color: #333 !important;
+        /* Dark text on white background */
         box-sizing: border-box !important;
     }
 
     .customer-form .form-control::placeholder {
         color: #888 !important;
+        /* Placeholder color */
         opacity: 1 !important;
     }
 
@@ -356,18 +296,20 @@
         visibility: visible !important;
         font-weight: 600 !important;
         color: white !important;
+        /* White text for dark background */
         margin-bottom: 8px !important;
         font-size: 16px !important;
         text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5) !important;
+        /* Text shadow for readability */
     }
 
     .customer-form .form-check {
         display: flex !important;
         align-items: flex-start !important;
-        padding: 20px 0 !important;
-        margin-bottom: 20px !important;
+        padding: 15px 0 !important;
+        margin-bottom: 15px !important;
         visibility: visible !important;
-        min-height: 60px !important;
+        min-height: 50px !important;
     }
 
     .customer-form .form-check-input {
@@ -375,7 +317,7 @@
         visibility: visible !important;
         width: 18px !important;
         height: 18px !important;
-        margin-right: 20px !important;
+        margin-right: 15px !important;
         margin-top: 2px !important;
         flex-shrink: 0 !important;
         background-color: white !important;
@@ -386,11 +328,12 @@
         display: block !important;
         visibility: visible !important;
         font-size: 14px !important;
-        line-height: 1.6 !important;
+        line-height: 1.5 !important;
         color: white !important;
+        /* White text for checkboxes */
         flex: 1 !important;
         text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5) !important;
-        padding-left: 5px !important;
+        /* Text shadow */
     }
 
     .customer-form .col-12 {
@@ -404,6 +347,7 @@
         display: block !important;
         visibility: visible !important;
         color: #ccc !important;
+        /* Light gray for dark background */
         font-size: 13px !important;
         margin-top: 5px !important;
     }
@@ -411,155 +355,247 @@
     /* Links in checkboxes */
     .customer-form .form-check-label a {
         color: #87CEEB !important;
+        /* Light blue for links */
         text-decoration: underline !important;
     }
 
     .customer-form .form-check-label a:hover {
         color: #ADD8E6 !important;
+        /* Lighter blue on hover */
     }
 
-    /* Step Indicator */
     .step-indicator {
-        margin: 20px 0 40px 0;
-    }
+    margin: 20px 0 40px 0;
+}
 
-    .step-indicator .steps-wrapper {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        max-width: 450px;
-        margin: 0 auto;
-        position: relative;
-    }
+.step-indicator .steps-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 450px;
+    margin: 0 auto;
+    position: relative;
+}
 
-    .step-indicator .step {
-        display: flex;
-        align-items: center;
-        flex-direction: column;
-        text-align: center;
-        position: relative;
-        z-index: 2;
-        flex: 0 0 auto;
+.step-indicator .step {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+    flex: 0 0 auto;
+}
+
+.step-indicator .step-number {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 14px;
+    margin-bottom: 8px;
+    transition: all 0.3s ease;
+}
+
+.step-indicator .step-text {
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+    margin-top: 5px;
+    color: #666;
+}
+
+/* Step states */
+.step-indicator .step.completed .step-number {
+    background: #28a745;
+    color: white;
+}
+
+.step-indicator .step.completed .step-text {
+    color: #28a745;
+    font-weight: 600;
+}
+
+.step-indicator .step.active .step-number {
+    background: #007bff;
+    color: white;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.3);
+}
+
+.step-indicator .step.active .step-text {
+    color: #007bff;
+    font-weight: 600;
+}
+
+.step-indicator .step.pending .step-number {
+    background: #6c757d;
+    color: white;
+}
+
+.step-indicator .step.pending .step-text {
+    color: #6c757d;
+}
+
+/* Connection lines between steps */
+.step-indicator .steps-wrapper::before {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 20%;
+    right: 20%;
+    height: 2px;
+    background: #6c757d;
+    z-index: 1;
+}
+
+/* Progress line (shows completed progress) */
+.step-indicator .steps-wrapper::after {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 20%;
+    width: 30%;
+    height: 2px;
+    background: #28a745;
+    z-index: 1;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .step-indicator .step-text {
+        display: none;
     }
 
     .step-indicator .step-number {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-        font-size: 14px;
-        margin-bottom: 8px;
-        transition: all 0.3s ease;
-    }
-
-    .step-indicator .step-text {
+        width: 35px;
+        height: 35px;
         font-size: 12px;
-        font-weight: 500;
-        white-space: nowrap;
-        margin-top: 5px;
-        color: #666;
     }
 
-    /* Step states */
-    .step-indicator .step.completed .step-number {
-        background: #28a745;
-        color: white;
+    .step-indicator .steps-wrapper {
+        max-width: 300px;
     }
 
-    .step-indicator .step.completed .step-text {
-        color: #28a745;
-        font-weight: 600;
-    }
-
-    .step-indicator .step.active .step-number {
-        background: #007bff;
-        color: white;
-        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.3);
-    }
-
-    .step-indicator .step.active .step-text {
-        color: #007bff;
-        font-weight: 600;
-    }
-
-    .step-indicator .step.pending .step-number {
-        background: #6c757d;
-        color: white;
-    }
-
-    .step-indicator .step.pending .step-text {
-        color: #6c757d;
-    }
-
-    /* Connection lines between steps */
-    .step-indicator .steps-wrapper::before {
-        content: '';
-        position: absolute;
-        top: 20px;
-        left: 20%;
-        right: 20%;
-        height: 2px;
-        background: #6c757d;
-        z-index: 1;
-    }
-
-    /* Progress line (shows completed progress) */
+    .step-indicator .steps-wrapper::before,
     .step-indicator .steps-wrapper::after {
-        content: '';
-        position: absolute;
-        top: 20px;
-        left: 20%;
-        width: 30%;
-        height: 2px;
-        background: #28a745;
-        z-index: 1;
+        top: 17px;
+    }
+}
+
+@media (max-width: 480px) {
+    .step-indicator .step-number {
+        width: 30px;
+        height: 30px;
+        font-size: 11px;
     }
 
-    /* Enhanced contrast for better readability */
-    .booking-summary {
-        background: #ffffff !important;
-        border: 1px solid #e9ecef !important;
+    .step-indicator .steps-wrapper {
+        max-width: 250px;
     }
 
-    .booking-summary * {
-        color: #1a1a2e !important;
+    .step-indicator .steps-wrapper::before,
+    .step-indicator .steps-wrapper::after {
+        top: 15px;
+    }
+}
+
+/* Checkbox Spacing Fix */
+.customer-form .form-check-input {
+    display: block !important;
+    visibility: visible !important;
+    width: 18px !important;
+    height: 18px !important;
+    margin-right: 20px !important;  /* Increased from 15px to 20px */
+    margin-top: 2px !important;
+    flex-shrink: 0 !important;
+    background-color: white !important;
+    border: 2px solid #ddd !important;
+}
+
+.customer-form .form-check-label {
+    display: block !important;
+    visibility: visible !important;
+    font-size: 14px !important;
+    line-height: 1.6 !important;  /* Increased line height */
+    color: white !important;
+    flex: 1 !important;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5) !important;
+    padding-left: 5px !important;  /* Extra padding from checkbox */
+}
+
+.customer-form .form-check {
+    display: flex !important;
+    align-items: flex-start !important;
+    padding: 20px 0 !important;  /* Increased from 15px to 20px */
+    margin-bottom: 20px !important;  /* Increased from 15px to 20px */
+    visibility: visible !important;
+    min-height: 60px !important;  /* Increased from 50px to 60px */
+}
+
+/* Better responsive spacing */
+@media (max-width: 768px) {
+    .step-indicator .step {
+        margin: 0 10px !important;
+        font-size: 12px !important;
     }
 
-    .booking-summary .text-end strong,
-    .booking-summary span[style*="color: #28a745"] {
-        color: #28a745 !important;
+    .step-indicator .step span {
+        display: none !important;  /* Hide text on mobile, show only circles */
     }
+}
 
-    .ticket-item .text-end strong {
-        color: #28a745 !important;
-        font-weight: 700 !important;
-        font-size: 15px !important;
-    }
+/* Booking Summary Text Enhancement */
+.price-breakdown .d-flex span:first-child {
+    color: #1a1a2e !important;  /* Black color for labels */
+    font-weight: 600 !important;  /* Bold text */
+    font-size: 15px !important;  /* Slightly larger text */
+}
 
-    /* Responsive design */
-    @media (max-width: 768px) {
-        .step-indicator .step-text {
-            display: none;
-        }
+.price-breakdown .d-flex span:last-child {
+    color: #28a745 !important;  /* Green color for amounts */
+    font-weight: 700 !important;  /* Extra bold for amounts */
+    font-size: 15px !important;  /* Slightly larger text */
+}
 
-        .step-indicator .step-number {
-            width: 35px;
-            height: 35px;
-            font-size: 12px;
-        }
+/* Total amount special styling */
+.price-breakdown .h5 span:first-child {
+    color: #1a1a2e !important;  /* Black for "Total:" */
+    font-weight: 700 !important;
+    font-size: 18px !important;
+}
 
-        .step-indicator .steps-wrapper {
-            max-width: 300px;
-        }
+.price-breakdown .h5 span:last-child {
+    color: #28a745 !important;  /* Green for total amount */
+    font-weight: 800 !important;  /* Extra bold */
+    font-size: 20px !important;  /* Larger for emphasis */
+}
 
-        .step-indicator .steps-wrapper::before,
-        .step-indicator .steps-wrapper::after {
-            top: 17px;
-        }
-    }
+/* Enhanced contrast for better readability */
+.booking-summary {
+    background: #ffffff !important;  /* Pure white background */
+    border: 1px solid #e9ecef !important;  /* Subtle border */
+}
+
+/* Make sure all text in booking summary is dark */
+.booking-summary * {
+    color: #1a1a2e !important;
+}
+
+/* Override for specific green amounts */
+.booking-summary .text-end strong,
+.booking-summary span[style*="color: #28a745"] {
+    color: #28a745 !important;
+}
+
+/* Ticket item amounts */
+.ticket-item .text-end strong {
+    color: #28a745 !important;
+    font-weight: 700 !important;
+    font-size: 15px !important;
+}
 </style>
 
 <script>
@@ -571,19 +607,17 @@
         const minutes = Math.floor(timeLeft / 60);
         const seconds = timeLeft % 60;
 
-        if (timerElement) {
-            timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 
-            if (timeLeft <= 60) {
-                timerElement.style.background = '#dc3545';
-                timerElement.style.animation = 'pulse 1s infinite';
-            }
+        if (timeLeft <= 60) {
+            timerElement.style.background = '#dc3545';
+            timerElement.style.animation = 'pulse 1s infinite';
+        }
 
-            if (timeLeft <= 0) {
-                alert('Your booking session has expired. You will be redirected to start over.');
-                window.location.href = '{{ route('ga-booking.tickets', $show->slug) }}';
-                return;
-            }
+        if (timeLeft <= 0) {
+            alert('Your booking session has expired. You will be redirected to start over.');
+            window.location.href = '{{ route('ga-booking.tickets', $show->slug) }}';
+            return;
         }
 
         timeLeft--;
@@ -620,10 +654,5 @@
             alert('Please enter a valid phone number.');
             return false;
         }
-
-        // Show loading state on button
-        const btn = e.target.querySelector('button[type="submit"]');
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Redirecting to PayPal...';
     });
 </script>

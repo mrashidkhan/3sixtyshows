@@ -65,7 +65,7 @@
                                         {{ $show->venue->name }}
                                     </p>
                                     <p style="color: #1a1a2e;" class="mb-2">
-                                        <strong><i class="fas fa-user me-2"></i> Name:</strong>
+                                        <strong><i class="fas fa-user me-2"></i> User:</strong>
                                         {{ $booking->user->name }}
                                         {{-- {{ $booking->user->email }} --}}
                                     </p>
